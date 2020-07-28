@@ -28,13 +28,13 @@
         <version>2.0.1</version>
     </parent>
 
-    <groupId>io.bootique.rabbitmq.client</groupId>
-    <artifactId>bootique-rabbitmq-client-parent</artifactId>
+    <groupId>io.bootique.rabbitmq</groupId>
+    <artifactId>bootique-rabbitmq-parent</artifactId>
     <version>2.0-SNAPSHOT</version>
 
-    <name>bootique-rabbitmq-client-parent</name>
+    <name>bootique-rabbitmq-parent</name>
     <description>
-        Parent POM of Bootique RabbitMQ module.
+        Parent POM of Bootique RabbitMQ modules.
     </description>
 
     <modules>
@@ -48,8 +48,8 @@
     </properties>
 
     <scm>
-        <developerConnection>scm:git:ssh://git@github.com/bootique/bootique-rabbitmq-client</developerConnection>
-        <url>https://github.com/bootique/bootique-cayenne</url>
+        <developerConnection>scm:git:ssh://git@github.com/bootique/bootique-rabbitmq</developerConnection>
+        <url>https://github.com/bootique/bootique-rabbitmq</url>
         <tag>HEAD</tag>
     </scm>
 
@@ -57,7 +57,7 @@
         <repository>
             <id>bintray-bootique-releases</id>
             <name>bintray-bootique-releases</name>
-            <url>https://api.bintray.com/maven/bootique/releases/bootique-rabbitmq-client/;publish=1</url>
+            <url>https://api.bintray.com/maven/bootique/releases/bootique-rabbitmq/;publish=1</url>
         </repository>
     </distributionManagement>
 

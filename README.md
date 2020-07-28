@@ -17,9 +17,9 @@
   under the License.
   -->
 
-[![Build Status](https://travis-ci.org/bootique/bootique-rabbitmq-client.svg)](https://travis-ci.org/bootique/bootique-rabbitmq-client)
-[![Maven Central](https://img.shields.io/maven-central/v/io.bootique.rabbitmq.client/bootique-rabbitmq-client.svg?colorB=brightgreen)](https://search.maven.org/artifact/io.bootique.rabbitmq.client/bootique-rabbitmq-client/)
+[![Build Status](https://travis-ci.org/bootique/bootique-rabbitmq.svg)](https://travis-ci.org/bootique/bootique-rabbitmq)
+[![Maven Central](https://img.shields.io/maven-central/v/io.bootique.rabbitmq/bootique-rabbitmq.svg?colorB=brightgreen)](https://search.maven.org/artifact/io.bootique.rabbitmq/bootique-rabbitmq/)
 
 
-# Bootique RabbitMQ client
-Provides RabbitMQ integration with [Bootique](http://bootique.io)
+# Bootique RabbitMQ
+Provides RabbitMQ AMQP client integration with [Bootique](http://bootique.io)

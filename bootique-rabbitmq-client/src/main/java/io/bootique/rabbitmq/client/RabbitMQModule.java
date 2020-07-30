@@ -19,38 +19,36 @@
 
 package io.bootique.rabbitmq.client;
 
-import javax.inject.Singleton;
-
 import io.bootique.ConfigModule;
 import io.bootique.config.ConfigurationFactory;
-import io.bootique.di.Binder;
 import io.bootique.di.Provides;
 import io.bootique.log.BootLogger;
 import io.bootique.rabbitmq.client.channel.ChannelFactory;
 import io.bootique.rabbitmq.client.connection.ConnectionFactory;
 import io.bootique.shutdown.ShutdownManager;
 
+import javax.inject.Singleton;
+
 public class RabbitMQModule extends ConfigModule {
 
-    @Override
-    public void configure(Binder binder) {
-    }
-
-    @Provides
+    /**
+     * @deprecated ConnectionFactory should not be used directly under normal circumstances. If needed, it can be
+     * retrieved from the injectable {@link ChannelFactory}.
+     */
+    @Deprecated
     @Singleton
-    RabbitMQFactory provideRabbitMQFactory(ConfigurationFactory configFactory) {
-        return config(RabbitMQFactory.class, configFactory);
+    @Provides
+    ConnectionFactory provideConnectionFactory(ChannelFactory channelFactory) {
+        return channelFactory.getConnectionFactory();
     }
 
+    @Singleton
     @Provides
-    ConnectionFactory provideConnectionFactory(RabbitMQFactory rabbitMQFactory,
-                                               BootLogger bootLogger,
-                                               ShutdownManager shutdownManager) {
-        return rabbitMQFactory.createConnectionFactory(bootLogger, shutdownManager);
-    }
+    ChannelFactory provideChannelFactory(
+            ConfigurationFactory configFactory,
+            BootLogger bootLogger,
+            ShutdownManager shutdownManager) {
 
-    @Provides
-    ChannelFactory provideChannelFactory(RabbitMQFactory rabbitMQFactory) {
-        return rabbitMQFactory.createChannelFactory();
+        return config(RabbitMQFactory.class, configFactory).createChannelFactory(bootLogger, shutdownManager);
     }
 }

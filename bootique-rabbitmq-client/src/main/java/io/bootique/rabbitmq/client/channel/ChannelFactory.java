@@ -21,17 +21,32 @@ package io.bootique.rabbitmq.client.channel;
 
 import com.rabbitmq.client.Channel;
 import com.rabbitmq.client.Connection;
+import io.bootique.rabbitmq.client.connection.ConnectionFactory;
 
 import java.io.IOException;
 import java.util.Map;
 
 public class ChannelFactory {
+
+    private ConnectionFactory connectionFactory;
     private Map<String, ExchangeConfig> exchanges;
     private Map<String, QueueConfig> queues;
 
-    public ChannelFactory(Map<String, ExchangeConfig> exchanges, Map<String, QueueConfig> queues) {
+    public ChannelFactory(
+            ConnectionFactory connectionFactory,
+            Map<String, ExchangeConfig> exchanges,
+            Map<String, QueueConfig> queues) {
+
+        this.connectionFactory = connectionFactory;
         this.exchanges = exchanges;
         this.queues = queues;
+    }
+
+    /**
+     * @since 2.0
+     */
+    public ConnectionFactory getConnectionFactory() {
+        return connectionFactory;
     }
 
     /**
@@ -57,7 +72,7 @@ public class ChannelFactory {
             }
 
             channel.queueBind(queueName, exchangeName, routingKey);
-            return  channel;
+            return channel;
         } catch (IOException e) {
             throw new RuntimeException(e);
         }

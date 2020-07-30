@@ -31,6 +31,7 @@ import java.util.Objects;
 import java.util.concurrent.atomic.AtomicReference;
 
 public class ConnectionFactory {
+
     private static final Logger LOGGER = LoggerFactory.getLogger(ConnectionFactory.class);
 
     private Map<String, ConnectionConfig> configMap;

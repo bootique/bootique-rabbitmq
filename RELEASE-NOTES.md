@@ -1,8 +1,7 @@
-
-
 ## 2.0
 
 * #1 Migrate "bootique-rabbitmq-client" to "bootique-rabbitmq"
+* #2 More straightforward channel access
 * #3 Upgrade to the latest amqp-client
 
 _The task numbering below this is coming from the old project at https://github.com/bootique/bootique-rabbitmq-client and was restarted

@@ -38,7 +38,15 @@ public class RabbitMQFactory {
     private Map<String, ExchangeConfig> exchanges;
     private Map<String, QueueConfig> queues;
 
-    public ConnectionFactory createConnectionFactory(BootLogger bootLogger, ShutdownManager shutdownManager) {
+    /**
+     * @since 2.0
+     */
+    public ChannelFactory createChannelFactory(BootLogger bootLogger, ShutdownManager shutdownManager) {
+        ConnectionFactory connectionFactory = createConnectionFactory(bootLogger, shutdownManager);
+        return new ChannelFactory(connectionFactory, exchanges, queues);
+    }
+
+    protected ConnectionFactory createConnectionFactory(BootLogger bootLogger, ShutdownManager shutdownManager) {
         ConnectionFactory factory = new ConnectionFactory(connections);
         shutdownManager.addShutdownHook(() -> {
             bootLogger.trace(() -> "shutting down RabbitMQ ConnectionFactory...");
@@ -48,9 +56,6 @@ public class RabbitMQFactory {
         return factory;
     }
 
-    public ChannelFactory createChannelFactory() {
-        return new ChannelFactory(exchanges, queues);
-    }
 
     @BQConfigProperty
     public void setConnections(Map<String, ConnectionConfig> connections) {

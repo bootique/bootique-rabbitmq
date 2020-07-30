@@ -99,6 +99,9 @@ public class ChannelFactory {
     protected Channel doOpenChannel(Connection connection, String exchangeName, String queueName, String routingKey) {
         try {
             Channel channel = connection.createChannel();
+
+            // TODO: this assumes an exchange is present. While probably rare, there are cases when producer and consumer
+            //  communicate directly over a queue, ignoring exchanges
             exchangeDeclare(channel, exchangeName);
 
             if (queueName == null) {

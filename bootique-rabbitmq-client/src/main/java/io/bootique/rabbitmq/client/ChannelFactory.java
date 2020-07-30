@@ -54,17 +54,50 @@ public class ChannelFactory {
     }
 
     /**
-     * TODO: Comment what this method should do (and actually do)
+     * Provides a channel for communication with RabbitMQ.
+     *
+     * @since 2.0
      */
-    public Channel openChannel(Connection connection, String exchangeName, String routingKey) {
-        return openChannel(connection, exchangeName, null, routingKey);
+    public Channel openChannel(String connectionName, String exchangeName) {
+        return doOpenChannel(connectionFactory.forName(connectionName), exchangeName, null, "");
     }
 
     /**
-     * TODO: Comment what this method should do (and actually do)
-     * Create channel and bind queue to exchange.
+     * Provides a channel for communication with RabbitMQ.
+     *
+     * @since 2.0
      */
+    public Channel openChannel(String connectionName, String exchangeName, String routingKey) {
+        return doOpenChannel(connectionFactory.forName(connectionName), exchangeName, null, routingKey);
+    }
+
+
+    /**
+     * Provides a channel for communication with RabbitMQ.
+     *
+     * @since 2.0
+     */
+    public Channel openChannel(String connectionName, String exchangeName, String queueName, String routingKey) {
+        return doOpenChannel(connectionFactory.forName(connectionName), exchangeName, queueName, routingKey);
+    }
+
+    /**
+     * @deprecated since 2.0 in favor of {@link #openChannel(String, String, String)}
+     */
+    @Deprecated
+    public Channel openChannel(Connection connection, String exchangeName, String routingKey) {
+        return doOpenChannel(connection, exchangeName, null, routingKey);
+    }
+
+    /**
+     * @deprecated since 2.0 in favor of {@link #openChannel(String, String, String, String)}
+     */
+    @Deprecated
     public Channel openChannel(Connection connection, String exchangeName, String queueName, String routingKey) {
+        return doOpenChannel(connection, exchangeName, queueName, routingKey);
+    }
+
+    protected Channel doOpenChannel(Connection connection, String exchangeName, String queueName, String routingKey) {
         try {
             Channel channel = connection.createChannel();
             exchangeDeclare(channel, exchangeName);

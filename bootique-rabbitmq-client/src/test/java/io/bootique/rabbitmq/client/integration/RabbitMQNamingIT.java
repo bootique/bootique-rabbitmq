@@ -20,7 +20,6 @@
 package io.bootique.rabbitmq.client.integration;
 
 import com.rabbitmq.client.Channel;
-import com.rabbitmq.client.Connection;
 import com.rabbitmq.client.GetResponse;
 import io.bootique.BQCoreModule;
 import io.bootique.BQRuntime;
@@ -32,12 +31,11 @@ import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.testcontainers.containers.GenericContainer;
-import org.testcontainers.containers.wait.LogMessageWaitStrategy;
-
-import java.io.IOException;
-import java.util.concurrent.TimeoutException;
+import org.testcontainers.containers.wait.strategy.LogMessageWaitStrategy;
 
 import javax.inject.Inject;
+import java.io.IOException;
+import java.util.concurrent.TimeoutException;
 
 import static org.junit.Assert.assertEquals;
 
@@ -100,9 +98,7 @@ class RabbitMqUI {
             (reply-code=404, reply-text=NOT_FOUND - no exchange 'bqQueue' in vhost '/', class-id=40, method-id=30)
      */
     public void init() throws IOException, TimeoutException {
-        try (Connection connection = connectionFactory.forName(CONNECTION_NAME);
-             Channel channel = channelFactory.openChannel(connection, EXCHANGE_NAME, QUEUE_NAME, "")
-        ) {
+        try (Channel channel = channelFactory.openChannel(CONNECTION_NAME, EXCHANGE_NAME, QUEUE_NAME, "")) {
             // RabbitMQ Exchange with "bqQueue" must exist or IOException is thrown
             byte[] message = "Hello World!".getBytes("UTF-8");
             channel.basicPublish("", QUEUE_NAME, null, message);

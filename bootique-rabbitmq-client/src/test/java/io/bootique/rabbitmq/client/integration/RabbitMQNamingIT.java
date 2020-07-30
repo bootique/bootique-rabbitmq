@@ -43,7 +43,6 @@ import static org.junit.Assert.assertEquals;
  * Runs RabbitMQ and tests against real RMQ instance.
  *
  * @author Ibragimov Ruslan
- * @since 0.24
  */
 public class RabbitMQNamingIT {
 

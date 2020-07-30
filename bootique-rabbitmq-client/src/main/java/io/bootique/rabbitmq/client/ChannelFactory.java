@@ -71,7 +71,6 @@ public class ChannelFactory {
         return doOpenChannel(connectionFactory.forName(connectionName), exchangeName, null, routingKey);
     }
 
-
     /**
      * Provides a channel for communication with RabbitMQ.
      *
@@ -103,6 +102,8 @@ public class ChannelFactory {
             exchangeDeclare(channel, exchangeName);
 
             if (queueName == null) {
+                // TODO: this code is suspect. What if I am a producer and sending to exchange?
+                //  I don't need a queue in that case.
                 queueName = channel.queueDeclare().getQueue();
             } else {
                 queueDeclare(channel, queueName);

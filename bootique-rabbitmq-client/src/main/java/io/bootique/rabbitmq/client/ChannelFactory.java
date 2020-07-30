@@ -102,8 +102,10 @@ public class ChannelFactory {
             exchangeDeclare(channel, exchangeName);
 
             if (queueName == null) {
-                // TODO: this code is suspect. What if I am a producer and sending to exchange?
-                //  I don't need a queue in that case.
+                // TODO: this code is suspect. There are two distinct cases for when "queueName" is null:
+                //  1. I am a producer and sending to an exchange. I don't need a queue
+                //  2. I am a consumer for an exchange, and I need a fresh dynamically-named queue bound to an exchange
+                //  Here we are addressing case #2, and creating unneeded queue for #1
                 queueName = channel.queueDeclare().getQueue();
             } else {
                 queueDeclare(channel, queueName);

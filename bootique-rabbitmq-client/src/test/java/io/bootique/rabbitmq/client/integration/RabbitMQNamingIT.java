@@ -50,7 +50,7 @@ public class RabbitMQNamingIT {
     private static final Logger LOGGER = LoggerFactory.getLogger(RabbitMQNamingIT.class);
 
     @ClassRule
-    public static GenericContainer rabbit = new GenericContainer("rabbitmq:3.6-alpine")
+    public static GenericContainer rabbit = new GenericContainer("rabbitmq:3.8-alpine")
             .withExposedPorts(5672)
             .waitingFor(new LogMessageWaitStrategy().withRegEx(".*Server startup complete.*\\s"));
 

@@ -23,8 +23,6 @@ import io.bootique.ConfigModule;
 import io.bootique.config.ConfigurationFactory;
 import io.bootique.di.Provides;
 import io.bootique.log.BootLogger;
-import io.bootique.rabbitmq.client.channel.ChannelFactory;
-import io.bootique.rabbitmq.client.connection.ConnectionFactory;
 import io.bootique.shutdown.ShutdownManager;
 
 import javax.inject.Singleton;
@@ -49,6 +47,6 @@ public class RabbitMQModule extends ConfigModule {
             BootLogger bootLogger,
             ShutdownManager shutdownManager) {
 
-        return config(RabbitMQFactory.class, configFactory).createChannelFactory(bootLogger, shutdownManager);
+        return config(ChannelFactoryFactory.class, configFactory).createChannelFactory(bootLogger, shutdownManager);
     }
 }

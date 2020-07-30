@@ -39,7 +39,7 @@ public class RabbitMQModuleProvider implements BQModuleProvider {
     public Map<String, Type> configs() {
         // TODO: config prefix is hardcoded. Refactor away from ConfigModule, and make provider
         // generate config prefix, reusing it in metadata...
-        return Collections.singletonMap("rabbitmq", RabbitMQFactory.class);
+        return Collections.singletonMap("rabbitmq", ChannelFactoryFactory.class);
     }
 
     @Override

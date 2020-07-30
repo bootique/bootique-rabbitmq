@@ -22,25 +22,23 @@ package io.bootique.rabbitmq.client;
 import io.bootique.annotation.BQConfig;
 import io.bootique.annotation.BQConfigProperty;
 import io.bootique.log.BootLogger;
-import io.bootique.rabbitmq.client.channel.ChannelFactory;
-import io.bootique.rabbitmq.client.channel.ExchangeConfig;
-import io.bootique.rabbitmq.client.channel.QueueConfig;
-import io.bootique.rabbitmq.client.connection.ConnectionConfig;
-import io.bootique.rabbitmq.client.connection.ConnectionFactory;
+import io.bootique.rabbitmq.client.config.ExchangeConfig;
+import io.bootique.rabbitmq.client.config.QueueConfig;
+import io.bootique.rabbitmq.client.config.ConnectionConfig;
 import io.bootique.shutdown.ShutdownManager;
 
 import java.util.Map;
 
+/**
+ * @since 2.0
+ */
 @BQConfig
-public class RabbitMQFactory {
+public class ChannelFactoryFactory {
 
     private Map<String, ConnectionConfig> connections;
     private Map<String, ExchangeConfig> exchanges;
     private Map<String, QueueConfig> queues;
 
-    /**
-     * @since 2.0
-     */
     public ChannelFactory createChannelFactory(BootLogger bootLogger, ShutdownManager shutdownManager) {
         ConnectionFactory connectionFactory = createConnectionFactory(bootLogger, shutdownManager);
         return new ChannelFactory(connectionFactory, exchanges, queues);

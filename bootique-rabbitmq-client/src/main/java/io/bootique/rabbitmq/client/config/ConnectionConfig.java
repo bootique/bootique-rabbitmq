@@ -17,7 +17,7 @@
  * under the License.
  */
 
-package io.bootique.rabbitmq.client.connection;
+package io.bootique.rabbitmq.client.config;
 
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import com.rabbitmq.client.Connection;

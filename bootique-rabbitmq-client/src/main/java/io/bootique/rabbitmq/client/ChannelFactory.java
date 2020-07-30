@@ -17,15 +17,19 @@
  * under the License.
  */
 
-package io.bootique.rabbitmq.client.channel;
+package io.bootique.rabbitmq.client;
 
 import com.rabbitmq.client.Channel;
 import com.rabbitmq.client.Connection;
-import io.bootique.rabbitmq.client.connection.ConnectionFactory;
+import io.bootique.rabbitmq.client.config.ExchangeConfig;
+import io.bootique.rabbitmq.client.config.QueueConfig;
 
 import java.io.IOException;
 import java.util.Map;
 
+/**
+ * An injectable singleton that is the main access point to the RabbitMQ client.
+ */
 public class ChannelFactory {
 
     private ConnectionFactory connectionFactory;

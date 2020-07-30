@@ -17,9 +17,10 @@
  * under the License.
  */
 
-package io.bootique.rabbitmq.client.connection;
+package io.bootique.rabbitmq.client;
 
 import com.rabbitmq.client.Connection;
+import io.bootique.rabbitmq.client.config.ConnectionConfig;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -30,6 +31,11 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.concurrent.atomic.AtomicReference;
 
+/**
+ * A factory of RabbitMQ connections. Configured via YAML and accessed via {@link ChannelFactory#getConnectionFactory()}.
+ * Though you'd rarely need to access the connection directly. It is too low-level and RabbitMQ access in Bootique is
+ * done via {@link ChannelFactory}.
+ */
 public class ConnectionFactory {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(ConnectionFactory.class);

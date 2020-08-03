@@ -31,7 +31,7 @@ import java.io.IOException;
 import java.util.concurrent.TimeoutException;
 
 @BQConfig
-@JsonTypeInfo(use = JsonTypeInfo.Id.NAME, property = "type")
+@JsonTypeInfo(use = JsonTypeInfo.Id.NAME, property = "type", defaultImpl = AMQPConnectionConfig.class)
 public abstract class ConnectionConfig implements PolymorphicConfiguration {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(ConnectionConfig.class);

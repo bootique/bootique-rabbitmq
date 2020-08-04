@@ -33,7 +33,7 @@ import java.io.IOException;
 import java.util.concurrent.TimeoutException;
 
 @BQTest
-public class TcAndBQAppIT {
+public class RmqTesterIT {
 
     @BQTestTool
     static final RmqTester rmq = RmqTester.create("rabbitmq:3.8.5-alpine");

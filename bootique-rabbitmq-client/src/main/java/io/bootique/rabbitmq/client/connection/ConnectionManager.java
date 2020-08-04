@@ -27,10 +27,9 @@ import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.ConcurrentMap;
 import java.util.concurrent.TimeoutException;
 import java.util.concurrent.atomic.AtomicReference;
 
@@ -46,7 +45,7 @@ public class ConnectionManager {
     private static final Logger LOGGER = LoggerFactory.getLogger(ConnectionManager.class);
 
     private Map<String, ConnectionFactory> factories;
-    private ConcurrentMap<String, AtomicReference<Connection>> connections;
+    private Map<String, AtomicReference<Connection>> connections;
     private volatile boolean shutdown;
 
     public ConnectionManager(Map<String, ConnectionFactory> factories) {
@@ -55,7 +54,7 @@ public class ConnectionManager {
         // RabbitMQ connections are thread-safe and we can reuse them for parallel calls
         // https://www.rabbitmq.com/api-guide.html
         // so just create a fixed-size self-inflating cache of connections by name
-        this.connections = new ConcurrentHashMap<>();
+        this.connections = new HashMap<>();
         factories.keySet().forEach(name -> connections.put(name, new AtomicReference<>()));
     }
 

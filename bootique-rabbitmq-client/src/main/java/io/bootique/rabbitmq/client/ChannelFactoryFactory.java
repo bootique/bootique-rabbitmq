@@ -22,6 +22,7 @@ package io.bootique.rabbitmq.client;
 import com.rabbitmq.client.ConnectionFactory;
 import io.bootique.annotation.BQConfig;
 import io.bootique.annotation.BQConfigProperty;
+import io.bootique.di.Injector;
 import io.bootique.log.BootLogger;
 import io.bootique.rabbitmq.client.connection.ConnectionManager;
 import io.bootique.rabbitmq.client.exchange.ExchangeConfig;
@@ -43,19 +44,19 @@ public class ChannelFactoryFactory {
     private Map<String, ExchangeConfig> exchanges;
     private Map<String, QueueConfig> queues;
 
-    public ChannelFactory createChannelFactory(BootLogger bootLogger, ShutdownManager shutdownManager) {
-        Map<String, ConnectionFactory> factories = createConnectionFactories();
+    public ChannelFactory createChannelFactory(BootLogger bootLogger, ShutdownManager shutdownManager, Injector injector) {
+        Map<String, ConnectionFactory> factories = createConnectionFactories(injector);
         ConnectionManager connectionManager = createConnectionManager(factories, bootLogger, shutdownManager);
         return new ChannelFactory(connectionManager, exchanges, queues);
     }
 
-    protected Map<String, ConnectionFactory> createConnectionFactories() {
+    protected Map<String, ConnectionFactory> createConnectionFactories(Injector injector) {
         if (connections == null || connections.isEmpty()) {
             return Collections.emptyMap();
         }
 
         Map<String, ConnectionFactory> map = new HashMap<>();
-        connections.forEach((k, v) -> map.put(k, v.createConnectionFactory()));
+        connections.forEach((k, v) -> map.put(k, v.createConnectionFactory(k, injector)));
         return map;
     }
 

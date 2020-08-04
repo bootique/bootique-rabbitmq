@@ -24,6 +24,7 @@ import com.rabbitmq.client.ConnectionFactory;
 import io.bootique.annotation.BQConfig;
 import io.bootique.annotation.BQConfigProperty;
 import io.bootique.config.PolymorphicConfiguration;
+import io.bootique.di.Injector;
 
 @BQConfig
 @JsonTypeInfo(use = JsonTypeInfo.Id.NAME, property = "type", defaultImpl = AMQPConnectionFactoryFactory.class)
@@ -39,11 +40,11 @@ public abstract class ConnectionFactoryFactory implements PolymorphicConfigurati
     private Boolean topologyRecovery;
     private Long networkRecoveryInterval;
 
-    public ConnectionFactory createConnectionFactory() {
-        return configureFactory(new ConnectionFactory());
+    public ConnectionFactory createConnectionFactory(String connectionName, Injector injector) {
+        return configureFactory(new ConnectionFactory(), connectionName, injector);
     }
 
-    protected ConnectionFactory configureFactory(ConnectionFactory factory) {
+    protected ConnectionFactory configureFactory(ConnectionFactory factory, String connectionName, Injector injector) {
 
         // let's preserve RMQ defaults if parameters are not setup explicitly
         if (requestedChannelMax != null) {

@@ -39,6 +39,7 @@
 
     <modules>
         <module>bootique-rabbitmq-client</module>
+        <module>bootique-rabbitmq-junit5</module>
     </modules>
 
     <properties>

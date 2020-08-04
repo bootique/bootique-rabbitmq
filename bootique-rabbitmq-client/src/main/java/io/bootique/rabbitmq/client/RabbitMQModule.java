@@ -21,6 +21,7 @@ package io.bootique.rabbitmq.client;
 
 import io.bootique.ConfigModule;
 import io.bootique.config.ConfigurationFactory;
+import io.bootique.di.Injector;
 import io.bootique.di.Provides;
 import io.bootique.log.BootLogger;
 import io.bootique.shutdown.ShutdownManager;
@@ -34,8 +35,10 @@ public class RabbitMQModule extends ConfigModule {
     ChannelFactory provideChannelFactory(
             ConfigurationFactory configFactory,
             BootLogger bootLogger,
-            ShutdownManager shutdownManager) {
+            ShutdownManager shutdownManager,
+            Injector injector) {
 
-        return config(ChannelFactoryFactory.class, configFactory).createChannelFactory(bootLogger, shutdownManager);
+        return config(ChannelFactoryFactory.class, configFactory)
+                .createChannelFactory(bootLogger, shutdownManager, injector);
     }
 }

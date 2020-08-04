@@ -29,33 +29,59 @@ import io.bootique.config.PolymorphicConfiguration;
 @JsonTypeInfo(use = JsonTypeInfo.Id.NAME, property = "type", defaultImpl = AMQPConnectionFactoryFactory.class)
 public abstract class ConnectionFactoryFactory implements PolymorphicConfiguration {
 
-    private int requestedChannelMax;
-    private int requestedFrameMax;
-    private int requestedHeartbeat;
-    private int connectionTimeout;
-    private int handshakeTimeout;
-    private int shutdownTimeout;
-
-    private boolean automaticRecoveryEnabled;
-    private boolean topologyRecovery;
-
-    private long networkRecoveryInterval;
-
+    private Integer requestedChannelMax;
+    private Integer requestedFrameMax;
+    private Integer requestedHeartbeat;
+    private Integer connectionTimeout;
+    private Integer handshakeTimeout;
+    private Integer shutdownTimeout;
+    private Boolean automaticRecoveryEnabled;
+    private Boolean topologyRecovery;
+    private Long networkRecoveryInterval;
 
     public ConnectionFactory createConnectionFactory() {
         return configureFactory(new ConnectionFactory());
     }
 
     protected ConnectionFactory configureFactory(ConnectionFactory factory) {
-        factory.setRequestedChannelMax(requestedChannelMax);
-        factory.setRequestedFrameMax(requestedFrameMax);
-        factory.setRequestedHeartbeat(requestedHeartbeat);
-        factory.setConnectionTimeout(connectionTimeout);
-        factory.setHandshakeTimeout(handshakeTimeout);
-        factory.setShutdownTimeout(shutdownTimeout);
-        factory.setAutomaticRecoveryEnabled(automaticRecoveryEnabled);
-        factory.setTopologyRecoveryEnabled(topologyRecovery);
-        factory.setNetworkRecoveryInterval(networkRecoveryInterval);
+
+        // let's preserve RMQ defaults if parameters are not setup explicitly
+        if (requestedChannelMax != null) {
+            factory.setRequestedChannelMax(requestedChannelMax);
+        }
+
+        if (requestedFrameMax != null) {
+            factory.setRequestedFrameMax(requestedFrameMax);
+        }
+
+        if (requestedHeartbeat != null) {
+            factory.setRequestedHeartbeat(requestedHeartbeat);
+        }
+
+        if (connectionTimeout != null) {
+            factory.setConnectionTimeout(connectionTimeout);
+        }
+
+        if (handshakeTimeout != null) {
+            factory.setHandshakeTimeout(handshakeTimeout);
+        }
+
+        if (shutdownTimeout != null) {
+            factory.setShutdownTimeout(shutdownTimeout);
+        }
+
+        if(automaticRecoveryEnabled != null) {
+            factory.setAutomaticRecoveryEnabled(automaticRecoveryEnabled);
+        }
+
+        if(topologyRecovery != null) {
+            factory.setTopologyRecoveryEnabled(topologyRecovery);
+        }
+
+        if(networkRecoveryInterval != null) {
+            factory.setNetworkRecoveryInterval(networkRecoveryInterval);
+        }
+
         return factory;
     }
 

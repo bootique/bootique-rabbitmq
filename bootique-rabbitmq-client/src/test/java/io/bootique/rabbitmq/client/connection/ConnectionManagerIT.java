@@ -36,6 +36,20 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 public class ConnectionManagerIT extends RabbitMQBaseTest {
 
     @Test
+    public void testUri_Defaults() throws IOException, TimeoutException {
+        BQRuntime runtime = testFactory
+                .app()
+                .module(b -> BQCoreModule.extend(b)
+                        // WHEN no explicit connections parameter are set beyond the URI
+                        .setProperty("bq.rabbitmq.connections.c1.type", "uri")
+                        .setProperty("bq.rabbitmq.connections.c1.uri", rmq.getAmqpUrl()))
+                .autoLoadModules()
+                .createRuntime();
+
+        assertCanSendAndReceive(runtime.getInstance(ChannelFactory.class).getConnectionManager());
+    }
+
+    @Test
     public void testAmqpConfig() throws IOException, TimeoutException {
         BQRuntime runtime = testFactory
                 .app("-c", "classpath:connection-amqp.yml")

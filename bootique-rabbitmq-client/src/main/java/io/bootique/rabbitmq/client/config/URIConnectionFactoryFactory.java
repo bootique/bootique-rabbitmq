@@ -26,19 +26,18 @@ import io.bootique.annotation.BQConfigProperty;
 
 @BQConfig
 @JsonTypeName("uri")
-public class URIConnectionConfig extends ConnectionConfig {
+public class URIConnectionFactoryFactory extends ConnectionFactoryFactory {
 
     private String uri;
 
     @Override
-    protected ConnectionFactory createConnectionFactory() {
-        ConnectionFactory factory = new ConnectionFactory();
+    protected ConnectionFactory configureFactory(ConnectionFactory factory) {
         try {
             factory.setUri(uri);
         } catch (Exception e) {
             throw new RuntimeException("Failed to initialize RabbitMQ URI connection factory", e);
         }
-        return factory;
+        return super.configureFactory(factory);
     }
 
     @BQConfigProperty

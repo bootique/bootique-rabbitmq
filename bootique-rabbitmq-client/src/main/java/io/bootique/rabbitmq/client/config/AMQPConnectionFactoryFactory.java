@@ -26,7 +26,7 @@ import io.bootique.annotation.BQConfigProperty;
 
 @BQConfig
 @JsonTypeName("amqp")
-public class AMQPConnectionConfig extends ConnectionConfig {
+public class AMQPConnectionFactoryFactory extends ConnectionFactoryFactory {
 
     private String username;
     private String password;
@@ -35,21 +35,26 @@ public class AMQPConnectionConfig extends ConnectionConfig {
     private int port = -1;
 
     @Override
-    protected ConnectionFactory createConnectionFactory() {
-        ConnectionFactory factory = new ConnectionFactory();
-
-        if (username != null)
+    protected ConnectionFactory configureFactory(ConnectionFactory factory) {
+        if (username != null) {
             factory.setUsername(username);
-        if (password != null)
+        }
+
+        if (password != null) {
             factory.setPassword(password);
-        if (virtualHost != null)
+        }
+
+        if (virtualHost != null) {
             factory.setVirtualHost(virtualHost);
-        if (host != null)
+        }
+
+        if (host != null) {
             factory.setHost(host);
+        }
 
         factory.setPort(port);
 
-        return factory;
+        return super.configureFactory(factory);
     }
 
     @BQConfigProperty

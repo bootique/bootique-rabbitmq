@@ -29,17 +29,6 @@ import javax.inject.Singleton;
 
 public class RabbitMQModule extends ConfigModule {
 
-    /**
-     * @deprecated ConnectionFactory should not be used directly under normal circumstances. If needed, it can be
-     * retrieved from the injectable {@link ChannelFactory}.
-     */
-    @Deprecated
-    @Singleton
-    @Provides
-    ConnectionFactory provideConnectionFactory(ChannelFactory channelFactory) {
-        return channelFactory.getConnectionFactory();
-    }
-
     @Singleton
     @Provides
     ChannelFactory provideChannelFactory(

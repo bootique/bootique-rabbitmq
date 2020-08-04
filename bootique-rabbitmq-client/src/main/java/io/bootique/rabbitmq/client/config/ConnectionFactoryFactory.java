@@ -20,21 +20,18 @@
 package io.bootique.rabbitmq.client.config;
 
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
-import com.rabbitmq.client.Connection;
+import com.rabbitmq.client.ConnectionFactory;
 import io.bootique.annotation.BQConfig;
 import io.bootique.annotation.BQConfigProperty;
 import io.bootique.config.PolymorphicConfiguration;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.IOException;
-import java.util.concurrent.TimeoutException;
-
 @BQConfig
-@JsonTypeInfo(use = JsonTypeInfo.Id.NAME, property = "type", defaultImpl = AMQPConnectionConfig.class)
-public abstract class ConnectionConfig implements PolymorphicConfiguration {
+@JsonTypeInfo(use = JsonTypeInfo.Id.NAME, property = "type", defaultImpl = AMQPConnectionFactoryFactory.class)
+public abstract class ConnectionFactoryFactory implements PolymorphicConfiguration {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(ConnectionConfig.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(ConnectionFactoryFactory.class);
 
     private int requestedChannelMax;
     private int requestedFrameMax;
@@ -48,11 +45,12 @@ public abstract class ConnectionConfig implements PolymorphicConfiguration {
 
     private long networkRecoveryInterval;
 
-    protected abstract com.rabbitmq.client.ConnectionFactory createConnectionFactory();
 
-    public Connection createConnection(String connectionName) {
-        com.rabbitmq.client.ConnectionFactory factory = createConnectionFactory();
+    public ConnectionFactory createConnectionFactory() {
+        return configureFactory(new ConnectionFactory());
+    }
 
+    protected ConnectionFactory configureFactory(ConnectionFactory factory) {
         factory.setRequestedChannelMax(requestedChannelMax);
         factory.setRequestedFrameMax(requestedFrameMax);
         factory.setRequestedHeartbeat(requestedHeartbeat);
@@ -62,13 +60,7 @@ public abstract class ConnectionConfig implements PolymorphicConfiguration {
         factory.setAutomaticRecoveryEnabled(automaticRecoveryEnabled);
         factory.setTopologyRecoveryEnabled(topologyRecovery);
         factory.setNetworkRecoveryInterval(networkRecoveryInterval);
-
-        LOGGER.info("Creating RabbitMQ connection.");
-        try {
-            return factory.newConnection();
-        } catch (IOException | TimeoutException e) {
-            throw new RuntimeException(String.format("Can't create connection \"%s\".", connectionName) , e);
-        }
+        return factory;
     }
 
     @BQConfigProperty

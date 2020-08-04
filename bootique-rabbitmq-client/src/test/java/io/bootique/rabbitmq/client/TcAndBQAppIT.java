@@ -40,11 +40,11 @@ public class TcAndBQAppIT extends RabbitMQBaseTest {
 
     @Test
     public void testAppInitialized() throws IOException, TimeoutException {
-        assertCanOpenChannel(app.getInstance(ChannelFactory.class).getConnectionFactory());
+        assertCanOpenChannel(app.getInstance(ChannelFactory.class).getConnectionManager());
     }
 
-    private void assertCanOpenChannel(ConnectionFactory connectionFactory) throws IOException, TimeoutException {
-        try (Connection connection = connectionFactory.forName("c1")) {
+    private void assertCanOpenChannel(ConnectionManager connectionManager) throws IOException, TimeoutException {
+        try (Connection connection = connectionManager.forName("c1")) {
            connection.openChannel().get().close();
         }
     }

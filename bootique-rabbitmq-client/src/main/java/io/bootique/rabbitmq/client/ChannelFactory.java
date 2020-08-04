@@ -32,16 +32,16 @@ import java.util.Map;
  */
 public class ChannelFactory {
 
-    private ConnectionFactory connectionFactory;
+    private ConnectionManager connectionManager;
     private Map<String, ExchangeConfig> exchanges;
     private Map<String, QueueConfig> queues;
 
     public ChannelFactory(
-            ConnectionFactory connectionFactory,
+            ConnectionManager connectionManager,
             Map<String, ExchangeConfig> exchanges,
             Map<String, QueueConfig> queues) {
 
-        this.connectionFactory = connectionFactory;
+        this.connectionManager = connectionManager;
         this.exchanges = exchanges;
         this.queues = queues;
     }
@@ -49,8 +49,8 @@ public class ChannelFactory {
     /**
      * @since 2.0
      */
-    public ConnectionFactory getConnectionFactory() {
-        return connectionFactory;
+    public ConnectionManager getConnectionManager() {
+        return connectionManager;
     }
 
     /**
@@ -59,7 +59,7 @@ public class ChannelFactory {
      * @since 2.0
      */
     public Channel openChannel(String connectionName, String exchangeName) {
-        return doOpenChannel(connectionFactory.forName(connectionName), exchangeName, null, "");
+        return doOpenChannel(connectionManager.forName(connectionName), exchangeName, null, "");
     }
 
     /**
@@ -68,7 +68,7 @@ public class ChannelFactory {
      * @since 2.0
      */
     public Channel openChannel(String connectionName, String exchangeName, String routingKey) {
-        return doOpenChannel(connectionFactory.forName(connectionName), exchangeName, null, routingKey);
+        return doOpenChannel(connectionManager.forName(connectionName), exchangeName, null, routingKey);
     }
 
     /**
@@ -77,7 +77,7 @@ public class ChannelFactory {
      * @since 2.0
      */
     public Channel openChannel(String connectionName, String exchangeName, String queueName, String routingKey) {
-        return doOpenChannel(connectionFactory.forName(connectionName), exchangeName, queueName, routingKey);
+        return doOpenChannel(connectionManager.forName(connectionName), exchangeName, queueName, routingKey);
     }
 
     /**

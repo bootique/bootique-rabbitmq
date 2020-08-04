@@ -31,7 +31,7 @@ import java.util.concurrent.TimeoutException;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-public class ConnectionFactoryIT extends RabbitMQBaseTest {
+public class ConnectionManagerIT extends RabbitMQBaseTest {
 
     @Test
     public void testAmqpConfig() throws IOException, TimeoutException {
@@ -42,7 +42,7 @@ public class ConnectionFactoryIT extends RabbitMQBaseTest {
                 .autoLoadModules()
                 .createRuntime();
 
-        assertCanSendAndReceive(runtime.getInstance(ChannelFactory.class).getConnectionFactory());
+        assertCanSendAndReceive(runtime.getInstance(ChannelFactory.class).getConnectionManager());
     }
 
     @Test
@@ -53,11 +53,11 @@ public class ConnectionFactoryIT extends RabbitMQBaseTest {
                 .autoLoadModules()
                 .createRuntime();
 
-        assertCanSendAndReceive(runtime.getInstance(ChannelFactory.class).getConnectionFactory());
+        assertCanSendAndReceive(runtime.getInstance(ChannelFactory.class).getConnectionManager());
     }
 
-    private void assertCanSendAndReceive(ConnectionFactory connectionFactory) throws IOException, TimeoutException {
-        try (Connection connection = connectionFactory.forName("c1")) {
+    private void assertCanSendAndReceive(ConnectionManager connectionManager) throws IOException, TimeoutException {
+        try (Connection connection = connectionManager.forName("c1")) {
             try (Channel channel = connection.openChannel().get()) {
 
                 String queue = channel.queueDeclare().getQueue();

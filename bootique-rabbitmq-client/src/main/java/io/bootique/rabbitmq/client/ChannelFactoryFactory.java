@@ -19,14 +19,17 @@
 
 package io.bootique.rabbitmq.client;
 
+import com.rabbitmq.client.ConnectionFactory;
 import io.bootique.annotation.BQConfig;
 import io.bootique.annotation.BQConfigProperty;
 import io.bootique.log.BootLogger;
 import io.bootique.rabbitmq.client.config.ExchangeConfig;
 import io.bootique.rabbitmq.client.config.QueueConfig;
-import io.bootique.rabbitmq.client.config.ConnectionConfig;
+import io.bootique.rabbitmq.client.config.ConnectionFactoryFactory;
 import io.bootique.shutdown.ShutdownManager;
 
+import java.util.Collections;
+import java.util.HashMap;
 import java.util.Map;
 
 /**
@@ -35,28 +38,42 @@ import java.util.Map;
 @BQConfig
 public class ChannelFactoryFactory {
 
-    private Map<String, ConnectionConfig> connections;
+    private Map<String, ConnectionFactoryFactory> connections;
     private Map<String, ExchangeConfig> exchanges;
     private Map<String, QueueConfig> queues;
 
     public ChannelFactory createChannelFactory(BootLogger bootLogger, ShutdownManager shutdownManager) {
-        ConnectionFactory connectionFactory = createConnectionFactory(bootLogger, shutdownManager);
-        return new ChannelFactory(connectionFactory, exchanges, queues);
+        Map<String, ConnectionFactory> factories = createConnectionFactories();
+        ConnectionManager connectionManager = createConnectionManager(factories, bootLogger, shutdownManager);
+        return new ChannelFactory(connectionManager, exchanges, queues);
     }
 
-    protected ConnectionFactory createConnectionFactory(BootLogger bootLogger, ShutdownManager shutdownManager) {
-        ConnectionFactory factory = new ConnectionFactory(connections);
+    protected Map<String, ConnectionFactory> createConnectionFactories() {
+        if (connections == null || connections.isEmpty()) {
+            return Collections.emptyMap();
+        }
+
+        Map<String, ConnectionFactory> map = new HashMap<>();
+        connections.forEach((k, v) -> map.put(k, v.createConnectionFactory()));
+        return map;
+    }
+
+    protected ConnectionManager createConnectionManager(
+            Map<String, ConnectionFactory> connectionFactories,
+            BootLogger bootLogger,
+            ShutdownManager shutdownManager) {
+
+        ConnectionManager manager = new ConnectionManager(connectionFactories);
         shutdownManager.addShutdownHook(() -> {
-            bootLogger.trace(() -> "shutting down RabbitMQ ConnectionFactory...");
-            factory.shutdown();
+            bootLogger.trace(() -> "shutting down RabbitMQ ConnectionManager...");
+            manager.shutdown();
         });
 
-        return factory;
+        return manager;
     }
 
-
     @BQConfigProperty
-    public void setConnections(Map<String, ConnectionConfig> connections) {
+    public void setConnections(Map<String, ConnectionFactoryFactory> connections) {
         this.connections = connections;
     }
 

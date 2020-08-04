@@ -23,9 +23,10 @@ import com.rabbitmq.client.ConnectionFactory;
 import io.bootique.annotation.BQConfig;
 import io.bootique.annotation.BQConfigProperty;
 import io.bootique.log.BootLogger;
-import io.bootique.rabbitmq.client.config.ExchangeConfig;
-import io.bootique.rabbitmq.client.config.QueueConfig;
-import io.bootique.rabbitmq.client.config.ConnectionFactoryFactory;
+import io.bootique.rabbitmq.client.connection.ConnectionManager;
+import io.bootique.rabbitmq.client.exchange.ExchangeConfig;
+import io.bootique.rabbitmq.client.queue.QueueConfig;
+import io.bootique.rabbitmq.client.connection.ConnectionFactoryFactory;
 import io.bootique.shutdown.ShutdownManager;
 
 import java.util.Collections;

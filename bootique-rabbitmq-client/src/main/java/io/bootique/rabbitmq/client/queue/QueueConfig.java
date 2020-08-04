@@ -17,9 +17,8 @@
  * under the License.
  */
 
-package io.bootique.rabbitmq.client.config;
+package io.bootique.rabbitmq.client.queue;
 
-import com.rabbitmq.client.BuiltinExchangeType;
 import com.rabbitmq.client.Channel;
 import io.bootique.annotation.BQConfig;
 import io.bootique.annotation.BQConfigProperty;
@@ -28,20 +27,14 @@ import java.io.IOException;
 import java.util.Map;
 
 @BQConfig
-public class ExchangeConfig {
-    private BuiltinExchangeType type;
-    private boolean durable = false;
+public class QueueConfig {
+    private boolean durable = true;
+    private boolean exclusive = false;
     private boolean autoDelete = false;
-    private boolean internal = false;
     private Map<String, Object> arguments;
 
-    public void exchangeDeclare(Channel channel, String exchangeName) throws IOException {
-        channel.exchangeDeclare(exchangeName, type, durable, autoDelete, internal, arguments);
-    }
-
-    @BQConfigProperty
-    public void setType(BuiltinExchangeType type) {
-        this.type = type;
+    public void queueDeclare(Channel channel, String queueName) throws IOException {
+        channel.queueDeclare(queueName, durable, exclusive, autoDelete, arguments);
     }
 
     @BQConfigProperty
@@ -50,13 +43,13 @@ public class ExchangeConfig {
     }
 
     @BQConfigProperty
-    public void setAutoDelete(boolean autoDelete) {
-        this.autoDelete = autoDelete;
+    public void setExclusive(boolean exclusive) {
+        this.exclusive = exclusive;
     }
 
     @BQConfigProperty
-    public void setInternal(boolean internal) {
-        this.internal = internal;
+    public void setAutoDelete(boolean autoDelete) {
+        this.autoDelete = autoDelete;
     }
 
     @BQConfigProperty

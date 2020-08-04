@@ -21,8 +21,9 @@ package io.bootique.rabbitmq.client;
 
 import com.rabbitmq.client.Channel;
 import com.rabbitmq.client.Connection;
-import io.bootique.rabbitmq.client.config.ExchangeConfig;
-import io.bootique.rabbitmq.client.config.QueueConfig;
+import io.bootique.rabbitmq.client.connection.ConnectionManager;
+import io.bootique.rabbitmq.client.exchange.ExchangeConfig;
+import io.bootique.rabbitmq.client.queue.QueueConfig;
 
 import java.io.IOException;
 import java.util.Map;

@@ -17,7 +17,7 @@
  * under the License.
  */
 
-package io.bootique.rabbitmq.client.config;
+package io.bootique.rabbitmq.client.connection;
 
 import com.fasterxml.jackson.annotation.JsonTypeName;
 import com.rabbitmq.client.ConnectionFactory;
@@ -25,23 +25,60 @@ import io.bootique.annotation.BQConfig;
 import io.bootique.annotation.BQConfigProperty;
 
 @BQConfig
-@JsonTypeName("uri")
-public class URIConnectionFactoryFactory extends ConnectionFactoryFactory {
+@JsonTypeName("amqp")
+public class AMQPConnectionFactoryFactory extends ConnectionFactoryFactory {
 
-    private String uri;
+    private String username;
+    private String password;
+    private String virtualHost;
+    private String host;
+    private int port = -1;
 
     @Override
     protected ConnectionFactory configureFactory(ConnectionFactory factory) {
-        try {
-            factory.setUri(uri);
-        } catch (Exception e) {
-            throw new RuntimeException("Failed to initialize RabbitMQ URI connection factory", e);
+        if (username != null) {
+            factory.setUsername(username);
         }
+
+        if (password != null) {
+            factory.setPassword(password);
+        }
+
+        if (virtualHost != null) {
+            factory.setVirtualHost(virtualHost);
+        }
+
+        if (host != null) {
+            factory.setHost(host);
+        }
+
+        factory.setPort(port);
+
         return super.configureFactory(factory);
     }
 
     @BQConfigProperty
-    public void setUri(String uri) {
-        this.uri = uri;
+    public void setUsername(String username) {
+        this.username = username;
+    }
+
+    @BQConfigProperty
+    public void setPassword(String password) {
+        this.password = password;
+    }
+
+    @BQConfigProperty
+    public void setVirtualHost(String virtualHost) {
+        this.virtualHost = virtualHost;
+    }
+
+    @BQConfigProperty
+    public void setHost(String host) {
+        this.host = host;
+    }
+
+    @BQConfigProperty
+    public void setPort(int port) {
+        this.port = port;
     }
 }

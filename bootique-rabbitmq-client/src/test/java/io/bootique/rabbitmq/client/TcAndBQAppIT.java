@@ -24,6 +24,7 @@ import io.bootique.BQCoreModule;
 import io.bootique.BQRuntime;
 import io.bootique.Bootique;
 import io.bootique.junit5.BQApp;
+import io.bootique.rabbitmq.client.connection.ConnectionManager;
 import org.junit.jupiter.api.Test;
 
 import java.io.IOException;

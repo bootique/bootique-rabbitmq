@@ -17,10 +17,11 @@
  * under the License.
  */
 
-package io.bootique.rabbitmq.client;
+package io.bootique.rabbitmq.client.connection;
 
 import com.rabbitmq.client.Connection;
 import com.rabbitmq.client.ConnectionFactory;
+import io.bootique.rabbitmq.client.ChannelFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

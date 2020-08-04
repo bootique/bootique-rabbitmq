@@ -17,21 +17,17 @@
  * under the License.
  */
 
-package io.bootique.rabbitmq.client.config;
+package io.bootique.rabbitmq.client.connection;
 
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import com.rabbitmq.client.ConnectionFactory;
 import io.bootique.annotation.BQConfig;
 import io.bootique.annotation.BQConfigProperty;
 import io.bootique.config.PolymorphicConfiguration;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 @BQConfig
 @JsonTypeInfo(use = JsonTypeInfo.Id.NAME, property = "type", defaultImpl = AMQPConnectionFactoryFactory.class)
 public abstract class ConnectionFactoryFactory implements PolymorphicConfiguration {
-
-    private static final Logger LOGGER = LoggerFactory.getLogger(ConnectionFactoryFactory.class);
 
     private int requestedChannelMax;
     private int requestedFrameMax;

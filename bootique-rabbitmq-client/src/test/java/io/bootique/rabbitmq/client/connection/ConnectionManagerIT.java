@@ -17,13 +17,15 @@
  * under the License.
  */
 
-package io.bootique.rabbitmq.client;
+package io.bootique.rabbitmq.client.connection;
 
 import com.rabbitmq.client.Channel;
 import com.rabbitmq.client.Connection;
 import com.rabbitmq.client.GetResponse;
 import io.bootique.BQCoreModule;
 import io.bootique.BQRuntime;
+import io.bootique.rabbitmq.client.ChannelFactory;
+import io.bootique.rabbitmq.client.RabbitMQBaseTest;
 import org.junit.jupiter.api.Test;
 
 import java.io.IOException;

@@ -30,8 +30,7 @@ import org.junit.ClassRule;
 import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.testcontainers.containers.GenericContainer;
-import org.testcontainers.containers.wait.strategy.LogMessageWaitStrategy;
+import org.testcontainers.containers.RabbitMQContainer;
 
 import javax.inject.Inject;
 import java.io.IOException;
@@ -49,24 +48,18 @@ public class RabbitMQNamingIT {
     private static final Logger LOGGER = LoggerFactory.getLogger(RabbitMQNamingIT.class);
 
     @ClassRule
-    public static GenericContainer rabbit = new GenericContainer("rabbitmq:3.8-alpine")
-            .withExposedPorts(5672)
-            .waitingFor(new LogMessageWaitStrategy().withRegEx(".*Server startup complete.*\\s"));
+    public static RabbitMQContainer rabbit = new RabbitMQContainer("rabbitmq:3.8-alpine");
 
     @Test
     public void test() throws IOException, TimeoutException {
-        LOGGER.info("Rabbit url: {}", rabbit.getContainerIpAddress() + ":" + rabbit.getMappedPort(5672));
+        LOGGER.info("Rabbit url: {}", rabbit.getAmqpUrl());
 
         BQRuntime runtime = Bootique
                 .app()
                 .args("--config=classpath:naming.yml")
-                .module((binder) -> {
-                    BQCoreModule.extend(binder)
-                            .setProperty(
-                                    "bq.rabbitmq.connections.bqConnection.port",
-                                    String.valueOf(rabbit.getMappedPort(5672))
-                            );
-                    binder.bind(RabbitMqUI.class);
+                .module(b -> {
+                    BQCoreModule.extend(b).setProperty("bq.rabbitmq.connections.bqConnection.port", String.valueOf(rabbit.getAmqpPort()));
+                    b.bind(RabbitMqUI.class);
                 })
                 .autoLoadModules()
                 .createRuntime();

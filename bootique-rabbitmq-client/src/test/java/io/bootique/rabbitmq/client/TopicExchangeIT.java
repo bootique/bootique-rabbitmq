@@ -17,14 +17,13 @@
  * under the License.
  */
 
-package io.bootique.rabbitmq.client.integration;
+package io.bootique.rabbitmq.client;
 
 import com.rabbitmq.client.Channel;
 import com.rabbitmq.client.GetResponse;
 import io.bootique.BQCoreModule;
 import io.bootique.BQRuntime;
 import io.bootique.junit5.BQTest;
-import io.bootique.rabbitmq.client.ChannelFactory;
 import org.junit.jupiter.api.Test;
 
 import java.io.IOException;
@@ -32,18 +31,13 @@ import java.util.concurrent.TimeoutException;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-/**
- * Runs RabbitMQ and tests against real RMQ instance.
- *
- * @author Ibragimov Ruslan
- */
 @BQTest
 public class TopicExchangeIT extends RabbitMQBaseTest {
 
     @Test
     public void testAmqpConfig() throws IOException, TimeoutException {
         BQRuntime runtime = testFactory
-                .app("--config=classpath:exchange-topic.yml")
+                .app("-c", "classpath:exchange-topic.yml")
                 .module(b -> BQCoreModule.extend(b).setProperty("bq.rabbitmq.connections.c1.uri", rmq.getAmqpUrl()))
                 .autoLoadModules()
                 .createRuntime();

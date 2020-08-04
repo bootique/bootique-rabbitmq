@@ -15,24 +15,17 @@
 
 rabbitmq:
   connections:
-    bqConnection:
+    c1:
+      type: uri
       automaticRecoveryEnabled: true
       connectionTimeout: 60000
       handshakeTimeout: 60000
-      host: localhost
-      password: guest
-      username: guest
-      virtualHost: /
   exchanges:
-   bqExchange:
+   topicExchange:
      autoDelete: false
      durable: true
-     internal: true
+     internal: false
      type: TOPIC
-  queues:
-   bqQueue:
-     autoDelete: true
-     durable: true
-     exclusive: false
+
 
 

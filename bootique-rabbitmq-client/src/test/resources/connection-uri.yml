@@ -15,21 +15,10 @@
 
 rabbitmq:
   connections:
-    bqConnection:
+    c1:
       type: uri
       automaticRecoveryEnabled: true
       connectionTimeout: 60000
       handshakeTimeout: 60000
-  exchanges:
-   bqExchange:
-     autoDelete: false
-     durable: true
-     internal: true
-     type: TOPIC
-  queues:
-   bqQueue:
-     autoDelete: true
-     durable: true
-     exclusive: false
 
 

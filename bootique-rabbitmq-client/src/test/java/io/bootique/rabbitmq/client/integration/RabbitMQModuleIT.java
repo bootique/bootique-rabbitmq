@@ -23,35 +23,39 @@ import com.rabbitmq.client.Channel;
 import com.rabbitmq.client.GetResponse;
 import io.bootique.BQCoreModule;
 import io.bootique.BQRuntime;
+import io.bootique.junit5.BQTest;
+import io.bootique.junit5.BQTestFactory;
+import io.bootique.junit5.BQTestTool;
 import io.bootique.rabbitmq.client.ChannelFactory;
-import io.bootique.test.junit.BQTestFactory;
-import org.junit.ClassRule;
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.testcontainers.containers.RabbitMQContainer;
+import org.testcontainers.junit.jupiter.Container;
+import org.testcontainers.junit.jupiter.Testcontainers;
 
 import javax.inject.Inject;
 import java.io.IOException;
 import java.util.concurrent.TimeoutException;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 /**
  * Runs RabbitMQ and tests against real RMQ instance.
  *
  * @author Ibragimov Ruslan
  */
+@Testcontainers
+@BQTest
 public class RabbitMQModuleIT {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(RabbitMQModuleIT.class);
 
-    @ClassRule
-    public static final RabbitMQContainer rmq = new RabbitMQContainer("rabbitmq:3.8-alpine");
+    @Container
+    static final RabbitMQContainer rmq = new RabbitMQContainer("rabbitmq:3.8-alpine");
 
-    @Rule
-    public final BQTestFactory testFactory = new BQTestFactory();
+    @BQTestTool
+    final BQTestFactory testFactory = new BQTestFactory();
 
     @Test
     public void testAmqpConfig() throws IOException, TimeoutException {

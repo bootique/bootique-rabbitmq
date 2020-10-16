@@ -1,4 +1,8 @@
-## 2.0
+## 2.0.B1
+
+* #7 Upgrade Testcontainers to 1.15.0-rc2
+
+## 2.0.M1
 
 * #1 Migrate "bootique-rabbitmq-client" to "bootique-rabbitmq"
 * #2 More straightforward channel access

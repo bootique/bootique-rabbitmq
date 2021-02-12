@@ -45,7 +45,7 @@
     <properties>
         <bootique.version>${project.version}</bootique.version>
         <rabbitmq.version>5.9.0</rabbitmq.version>
-        <testcontainers.version>1.15.0-rc2</testcontainers.version>
+        <testcontainers.version>1.15.1</testcontainers.version>
     </properties>
 
     <scm>

@@ -30,6 +30,7 @@ import java.io.IOException;
 import java.util.concurrent.TimeoutException;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 @BQTest
 public class TopicExchangeIT extends RabbitMQBaseTest {
@@ -46,13 +47,17 @@ public class TopicExchangeIT extends RabbitMQBaseTest {
     }
 
     private void assertCanSendAndReceive(ChannelFactory channelFactory) throws IOException, TimeoutException {
-        try (Channel channel = channelFactory.openChannel("c1", "topicExchange", null, "")) {
-            String queue = channel.queueDeclare().getQueue();
-            channel.queueBind(queue, "topicExchange", "");
+        try (Channel channel = channelFactory.openChannel("c1", "topicExchange")) {
+
+            String queueName = channel.queueDeclare().getQueue();
+            channel.queueBind(queueName, "topicExchange", "a.*");
+
             String message = "Hello World!";
-            channel.basicPublish("topicExchange", "", null, message.getBytes("UTF-8"));
-            GetResponse getResponse = channel.basicGet(queue, false);
-            assertEquals(message, new String(getResponse.getBody()));
+            channel.basicPublish("topicExchange", "a.b", null, message.getBytes("UTF-8"));
+
+            GetResponse response = channel.basicGet(queueName, false);
+            assertNotNull(response);
+            assertEquals(message, new String(response.getBody()));
         }
     }
 }

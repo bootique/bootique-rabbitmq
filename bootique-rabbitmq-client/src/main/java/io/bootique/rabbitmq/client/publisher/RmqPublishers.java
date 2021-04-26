@@ -25,11 +25,11 @@ import java.util.Map;
  *
  * @since 2.0.M1
  */
-public class RmqPublisherManager {
+public class RmqPublishers {
 
     private final Map<String, RmqPublisher> publishers;
 
-    public RmqPublisherManager(Map<String, RmqPublisher> publishers) {
+    public RmqPublishers(Map<String, RmqPublisher> publishers) {
         this.publishers = publishers;
     }
 

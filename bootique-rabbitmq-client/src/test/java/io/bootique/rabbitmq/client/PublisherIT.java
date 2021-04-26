@@ -26,7 +26,7 @@ import io.bootique.Bootique;
 import io.bootique.junit5.BQApp;
 import io.bootique.junit5.BQTest;
 import io.bootique.rabbitmq.client.publisher.RmqPublisher;
-import io.bootique.rabbitmq.client.publisher.RmqPublisherManager;
+import io.bootique.rabbitmq.client.publisher.RmqPublishers;
 import org.junit.jupiter.api.Test;
 
 import java.io.IOException;
@@ -65,12 +65,12 @@ public class PublisherIT extends RabbitMQBaseTest {
                 }
             });
 
-            RmqPublisher p1 = app.getInstance(RmqPublisherManager.class).publisher("p1");
+            RmqPublisher p1 = app.getInstance(RmqPublishers.class).publisher("p1");
             p1.newMessage()
                     .properties(MessageProperties.TEXT_PLAIN.builder().messageId("2345").build())
                     .publish("M1".getBytes());
 
-            RmqPublisher p2 = app.getInstance(RmqPublisherManager.class).publisher("p2");
+            RmqPublisher p2 = app.getInstance(RmqPublishers.class).publisher("p2");
             p2.newMessage()
                     .properties(MessageProperties.TEXT_PLAIN.builder().messageId("6789").build())
                     .publish("M2".getBytes());

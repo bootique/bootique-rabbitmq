@@ -29,7 +29,7 @@ import io.bootique.rabbitmq.client.connection.ConnectionManager;
 import io.bootique.rabbitmq.client.exchange.ExchangeConfig;
 import io.bootique.rabbitmq.client.publisher.RmqPublisher;
 import io.bootique.rabbitmq.client.publisher.RmqPublisherFactory;
-import io.bootique.rabbitmq.client.publisher.RmqPublisherManager;
+import io.bootique.rabbitmq.client.publisher.RmqPublishers;
 import io.bootique.rabbitmq.client.queue.QueueConfig;
 import io.bootique.shutdown.ShutdownManager;
 
@@ -59,8 +59,8 @@ public class RmqObjectsFactory {
                 queues != null ? queues : Collections.emptyMap());
     }
 
-    public RmqPublisherManager createPublisherManager(ChannelFactory channelFactory) {
-        return new RmqPublisherManager(createPublishers(channelFactory));
+    public RmqPublishers createPublishers(ChannelFactory channelFactory) {
+        return new RmqPublishers(createPublishersMap(channelFactory));
     }
 
     protected Map<String, ConnectionFactory> createConnectionFactories(Injector injector) {
@@ -87,7 +87,7 @@ public class RmqObjectsFactory {
         return manager;
     }
 
-    protected Map<String, RmqPublisher> createPublishers(ChannelFactory channelFactory) {
+    protected Map<String, RmqPublisher> createPublishersMap(ChannelFactory channelFactory) {
         if (publishers == null || publishers.isEmpty()) {
             return Collections.emptyMap();
         }

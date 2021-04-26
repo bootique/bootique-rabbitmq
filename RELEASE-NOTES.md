@@ -1,6 +1,7 @@
 ## 2.0.B1
 
 * #7 Upgrade Testcontainers to 1.15.0-rc2
+* #8 ChannelFactory: clear unambiguous API
 
 ## 2.0.M1
 

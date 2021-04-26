@@ -27,6 +27,7 @@ import io.bootique.rabbitmq.client.queue.QueueConfig;
 
 import java.io.IOException;
 import java.util.Map;
+import java.util.Objects;
 
 /**
  * An injectable singleton that is the main access point to the RabbitMQ client.
@@ -55,30 +56,78 @@ public class ChannelFactory {
     }
 
     /**
-     * Provides a channel for communication with RabbitMQ.
+     * Opens a new RabbitMQ channel. Connection name must be referenced in configuration.
+     *
+     * @since 2.0
+     */
+    public Channel openChannel(String connectionName) {
+
+        Objects.requireNonNull(connectionName, "Null connection name");
+
+        try {
+            return connectionManager.forName(connectionName).createChannel();
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    /**
+     * Opens a new RabbitMQ channel and declares an exchange. Connection and exchange names must be referenced in
+     * configuration.
      *
      * @since 2.0
      */
     public Channel openChannel(String connectionName, String exchangeName) {
-        return doOpenChannel(connectionManager.forName(connectionName), exchangeName, null, "");
+
+        Objects.requireNonNull(exchangeName, "Null exchange name");
+        ExchangeConfig exchangeConfig = exchanges.computeIfAbsent(exchangeName, name -> {
+            throw new IllegalStateException("No configuration present for Exchange named '" + name + "'");
+        });
+
+        Channel channel = openChannel(connectionName);
+
+        try {
+            exchangeConfig.exchangeDeclare(channel, exchangeName);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+
+        return channel;
     }
 
     /**
-     * Provides a channel for communication with RabbitMQ.
+     * Opens a new RabbitMQ channel, declares an exchange and binds a named queue to the exchange. Connection, exchange
+     * and queue names must be referenced in configuration.
      *
      * @since 2.0
      */
-    public Channel openChannel(String connectionName, String exchangeName, String routingKey) {
-        return doOpenChannel(connectionManager.forName(connectionName), exchangeName, null, routingKey);
+    public Channel openChannel(String connectionName, String exchangeName, String queueName) {
+        return openChannel(connectionName, exchangeName, queueName, "");
     }
 
     /**
-     * Provides a channel for communication with RabbitMQ.
+     * Opens a new RabbitMQ channel, declares an exchange and binds a named queue to the exchange. Connection, exchange
+     * and queue names must be referenced in configuration.
      *
      * @since 2.0
      */
     public Channel openChannel(String connectionName, String exchangeName, String queueName, String routingKey) {
-        return doOpenChannel(connectionManager.forName(connectionName), exchangeName, queueName, routingKey);
+
+        Objects.requireNonNull(exchangeName, "Null queue name");
+        QueueConfig queueConfig = queues.computeIfAbsent(queueName, name -> {
+            throw new IllegalStateException("No configuration present for Queue named '" + name + "'");
+        });
+
+        Channel channel = openChannel(connectionName, exchangeName);
+        try {
+            queueConfig.queueDeclare(channel, queueName);
+            channel.queueBind(queueName, exchangeName, routingKey);
+
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+
+        return channel;
     }
 
     /**
@@ -97,19 +146,21 @@ public class ChannelFactory {
         return doOpenChannel(connection, exchangeName, queueName, routingKey);
     }
 
-    protected Channel doOpenChannel(Connection connection, String exchangeName, String queueName, String routingKey) {
+    @Deprecated
+    private Channel doOpenChannel(Connection connection, String exchangeName, String queueName, String routingKey) {
         try {
             Channel channel = connection.createChannel();
 
-            // TODO: this assumes an exchange is present. While probably rare, there are cases when producer and consumer
-            //  communicate directly over a queue, ignoring exchanges
+            // This code assumes an exchange is present. While probably rare, there are cases when producer and consumer
+            //  communicate directly over a queue, ignoring exchanges... This is why the method is deprecated
             exchangeDeclare(channel, exchangeName);
 
             if (queueName == null) {
-                // TODO: this code is suspect. There are two distinct cases for when "queueName" is null:
+                // This code is suspect. There are two distinct cases for when "queueName" is null:
                 //  1. I am a producer and sending to an exchange. I don't need a queue
                 //  2. I am a consumer for an exchange, and I need a fresh dynamically-named queue bound to an exchange
                 //  Here we are addressing case #2, and creating unneeded queue for #1
+                // This is why the method is deprecated
                 queueName = channel.queueDeclare().getQueue();
             } else {
                 queueDeclare(channel, queueName);
@@ -122,6 +173,7 @@ public class ChannelFactory {
         }
     }
 
+    @Deprecated
     private void queueDeclare(Channel channel, String queueName) throws IOException {
         QueueConfig queueConfig = queues.computeIfAbsent(queueName, name -> {
             throw new IllegalStateException("No configuration present for Queue named '" + name + "'");
@@ -130,6 +182,7 @@ public class ChannelFactory {
         queueConfig.queueDeclare(channel, queueName);
     }
 
+    @Deprecated
     private void exchangeDeclare(Channel channel, String exchangeName) throws IOException {
         ExchangeConfig exchangeConfig = exchanges.computeIfAbsent(exchangeName, name -> {
             throw new IllegalStateException("No configuration present for Exchange named '" + name + "'");
@@ -137,4 +190,5 @@ public class ChannelFactory {
 
         exchangeConfig.exchangeDeclare(channel, exchangeName);
     }
+
 }

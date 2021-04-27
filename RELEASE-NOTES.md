@@ -2,6 +2,7 @@
 
 * #7 Upgrade Testcontainers to 1.15.0-rc2
 * #8 ChannelFactory: clear unambiguous API
+* #10 Upgrade RMQ client to 5.12.0
 
 ## 2.0.M1
 

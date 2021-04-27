@@ -73,7 +73,7 @@ public class ChannelFactory {
 
     /**
      * Opens a new RabbitMQ channel and declares an exchange. Connection and exchange names must be referenced in
-     * configuration.
+     * configuration. This type of binding is common for a publisher that would send messages to the exchange.
      *
      * @since 2.0
      */
@@ -102,7 +102,8 @@ public class ChannelFactory {
 
     /**
      * Opens a new RabbitMQ channel, declares an exchange and binds a named queue to the exchange. Connection, exchange
-     * and queue names must be referenced in configuration.
+     * and queue names must be referenced in configuration. This type of binding is common for a consumer that would
+     * receive messages from the bound queue.
      *
      * @since 2.0
      */
@@ -112,7 +113,8 @@ public class ChannelFactory {
 
     /**
      * Opens a new RabbitMQ channel, declares an exchange and binds a named queue to the exchange. Connection, exchange
-     * and queue names must be referenced in configuration.
+     * and queue names must be referenced in configuration. This type of binding is common for a consumer that would
+     * receive messages from the bound queue.
      *
      * @since 2.0
      */

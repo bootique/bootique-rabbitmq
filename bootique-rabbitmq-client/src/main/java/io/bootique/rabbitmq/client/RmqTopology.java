@@ -16,36 +16,30 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-
 package io.bootique.rabbitmq.client;
 
-import io.bootique.BQModuleMetadata;
-import io.bootique.BQModuleProvider;
-import io.bootique.di.BQModule;
+/**
+ * Helps the rest of the code to validate and normalize RabbitMQ topology object names (exchanges, queue, routing
+ * keys). For RabbitMQ both empty and null names are "undefined". This class helps to deal with this logic in the
+ * Bootique code.
+ *
+ * @since 2.0.B1
+ */
+public class RmqTopology {
 
-import java.lang.reflect.Type;
-import java.util.Collections;
-import java.util.Map;
+    public static String required(String topologyObjectName, String message) {
+        if (!isDefined(topologyObjectName)) {
+            throw new IllegalArgumentException(message);
+        }
 
-public class RabbitMQModuleProvider implements BQModuleProvider {
-
-    @Override
-    public BQModule module() {
-        return new RabbitMQModule();
+        return topologyObjectName;
     }
 
-
-    @Override
-    public Map<String, Type> configs() {
-        // TODO: config prefix is hardcoded. Refactor away from ConfigModule, and make provider
-        // generate config prefix, reusing it in metadata...
-        return Collections.singletonMap("rabbitmq", RmqObjectsFactory.class);
+    public static String normalizeName(String topologyObjectName) {
+        return topologyObjectName == null ? "" : topologyObjectName;
     }
 
-    @Override
-    public BQModuleMetadata.Builder moduleBuilder() {
-        return BQModuleProvider.super
-                .moduleBuilder()
-                .description("Provides integration with RabbitMQ client library.");
+    public static boolean isDefined(String topologyObjectName) {
+        return topologyObjectName != null && topologyObjectName.length() > 0;
     }
 }

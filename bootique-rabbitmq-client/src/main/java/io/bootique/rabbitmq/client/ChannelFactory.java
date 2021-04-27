@@ -43,9 +43,9 @@ public class ChannelFactory {
             Map<String, ExchangeConfig> exchanges,
             Map<String, QueueConfig> queues) {
 
-        this.connectionManager = connectionManager;
-        this.exchanges = exchanges;
-        this.queues = queues;
+        this.connectionManager = Objects.requireNonNull(connectionManager);
+        this.exchanges = Objects.requireNonNull(exchanges);
+        this.queues = Objects.requireNonNull(queues);
     }
 
     /**
@@ -79,12 +79,17 @@ public class ChannelFactory {
      */
     public Channel openChannel(String connectionName, String exchangeName) {
 
-        Objects.requireNonNull(exchangeName, "Null exchange name");
-        ExchangeConfig exchangeConfig = exchanges.computeIfAbsent(exchangeName, name -> {
-            throw new IllegalStateException("No configuration present for Exchange named '" + name + "'");
-        });
+        RmqTopology.required(exchangeName, "No exchange name");
+        ExchangeConfig exchangeConfig = exchanges.get(exchangeName);
+        if (exchangeConfig == null) {
+            // Have to throw, as unfortunately we can't create an exchange with default parameters.
+            // We need to know its type at the minimum
+            throw new IllegalStateException("No configuration present for exchange named '" + exchangeName + "'");
+        }
 
         Channel channel = openChannel(connectionName);
+
+        // TODO: track previously open exchanges to skip potential repeat declarations that slow us down
 
         try {
             exchangeConfig.exchangeDeclare(channel, exchangeName);
@@ -113,10 +118,11 @@ public class ChannelFactory {
      */
     public Channel openChannel(String connectionName, String exchangeName, String queueName, String routingKey) {
 
-        Objects.requireNonNull(exchangeName, "Null queue name");
-        QueueConfig queueConfig = queues.computeIfAbsent(queueName, name -> {
-            throw new IllegalStateException("No configuration present for Queue named '" + name + "'");
-        });
+        RmqTopology.required(queueName, "No queue name");
+        QueueConfig queueConfig = queues.containsKey(queueName)
+                ? queues.get(queueName)
+                // create a queue on the fly with default settings. TODO: print a warning?
+                : new QueueConfig();
 
         Channel channel = openChannel(connectionName, exchangeName);
         try {

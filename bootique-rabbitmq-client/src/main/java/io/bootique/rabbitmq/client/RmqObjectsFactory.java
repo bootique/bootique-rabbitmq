@@ -24,10 +24,13 @@ import io.bootique.annotation.BQConfig;
 import io.bootique.annotation.BQConfigProperty;
 import io.bootique.di.Injector;
 import io.bootique.log.BootLogger;
+import io.bootique.rabbitmq.client.connection.ConnectionFactoryFactory;
 import io.bootique.rabbitmq.client.connection.ConnectionManager;
 import io.bootique.rabbitmq.client.exchange.ExchangeConfig;
+import io.bootique.rabbitmq.client.publisher.RmqPublisher;
+import io.bootique.rabbitmq.client.publisher.RmqPublisherFactory;
+import io.bootique.rabbitmq.client.publisher.RmqPublisherManager;
 import io.bootique.rabbitmq.client.queue.QueueConfig;
-import io.bootique.rabbitmq.client.connection.ConnectionFactoryFactory;
 import io.bootique.shutdown.ShutdownManager;
 
 import java.util.Collections;
@@ -35,19 +38,29 @@ import java.util.HashMap;
 import java.util.Map;
 
 /**
+ * A Bootique factory for RMQ connection, topology, publisher and consumer objects.
+ *
  * @since 2.0
  */
 @BQConfig
-public class ChannelFactoryFactory {
+public class RmqObjectsFactory {
 
     private Map<String, ConnectionFactoryFactory> connections;
     private Map<String, ExchangeConfig> exchanges;
     private Map<String, QueueConfig> queues;
+    private Map<String, RmqPublisherFactory> publishers;
 
     public ChannelFactory createChannelFactory(BootLogger bootLogger, ShutdownManager shutdownManager, Injector injector) {
         Map<String, ConnectionFactory> factories = createConnectionFactories(injector);
-        ConnectionManager connectionManager = createConnectionManager(factories, bootLogger, shutdownManager);
-        return new ChannelFactory(connectionManager, exchanges, queues);
+
+        return new ChannelFactory(
+                createConnectionManager(factories, bootLogger, shutdownManager),
+                exchanges != null ? exchanges : Collections.emptyMap(),
+                queues != null ? queues : Collections.emptyMap());
+    }
+
+    public RmqPublisherManager createPublisherManager(ChannelFactory channelFactory) {
+        return new RmqPublisherManager(createPublishers(channelFactory));
     }
 
     protected Map<String, ConnectionFactory> createConnectionFactories(Injector injector) {
@@ -74,6 +87,16 @@ public class ChannelFactoryFactory {
         return manager;
     }
 
+    protected Map<String, RmqPublisher> createPublishers(ChannelFactory channelFactory) {
+        if (publishers == null || publishers.isEmpty()) {
+            return Collections.emptyMap();
+        }
+
+        Map<String, RmqPublisher> map = new HashMap<>();
+        publishers.forEach((k, v) -> map.put(k, v.create(channelFactory)));
+        return map;
+    }
+
     @BQConfigProperty
     public void setConnections(Map<String, ConnectionFactoryFactory> connections) {
         this.connections = connections;
@@ -87,5 +110,10 @@ public class ChannelFactoryFactory {
     @BQConfigProperty
     public void setQueues(Map<String, QueueConfig> queues) {
         this.queues = queues;
+    }
+
+    @BQConfigProperty
+    public void setPublishers(Map<String, RmqPublisherFactory> publishers) {
+        this.publishers = publishers;
     }
 }

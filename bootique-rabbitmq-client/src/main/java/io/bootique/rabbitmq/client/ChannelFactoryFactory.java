@@ -46,8 +46,11 @@ public class ChannelFactoryFactory {
 
     public ChannelFactory createChannelFactory(BootLogger bootLogger, ShutdownManager shutdownManager, Injector injector) {
         Map<String, ConnectionFactory> factories = createConnectionFactories(injector);
-        ConnectionManager connectionManager = createConnectionManager(factories, bootLogger, shutdownManager);
-        return new ChannelFactory(connectionManager, exchanges, queues);
+
+        return new ChannelFactory(
+                createConnectionManager(factories, bootLogger, shutdownManager),
+                exchanges != null ? exchanges : Collections.emptyMap(),
+                queues != null ? queues : Collections.emptyMap());
     }
 
     protected Map<String, ConnectionFactory> createConnectionFactories(Injector injector) {

@@ -24,6 +24,7 @@ import com.rabbitmq.client.Connection;
 import io.bootique.rabbitmq.client.connection.ConnectionManager;
 import io.bootique.rabbitmq.client.exchange.ExchangeConfig;
 import io.bootique.rabbitmq.client.queue.QueueConfig;
+import io.bootique.rabbitmq.client.topology.RmqTopologyBuilder;
 
 import java.io.IOException;
 import java.util.Map;
@@ -61,85 +62,21 @@ public class ChannelFactory {
      * @since 2.0
      */
     public Channel openChannel(String connectionName) {
-
-        Objects.requireNonNull(connectionName, "Null connection name");
-
-        try {
-            return connectionManager.forName(connectionName).createChannel();
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
+        return newChannel(connectionName).open();
     }
 
     /**
-     * Opens a new RabbitMQ channel and declares an exchange. Connection and exchange names must be referenced in
-     * configuration. This type of binding is common for a publisher that would send messages to the exchange.
+     * Returns a channel builder object that allows to open a channel and configure a desired RMQ topology
+     * (exchanges, queues).
      *
      * @since 2.0
      */
-    public Channel openChannel(String connectionName, String exchangeName) {
-
-        RmqTopology.required(exchangeName, "No exchange name");
-        ExchangeConfig exchangeConfig = exchanges.get(exchangeName);
-        if (exchangeConfig == null) {
-            // Have to throw, as unfortunately we can't create an exchange with default parameters.
-            // We need to know its type at the minimum
-            throw new IllegalStateException("No configuration present for exchange named '" + exchangeName + "'");
-        }
-
-        Channel channel = openChannel(connectionName);
-
-        // TODO: track previously open exchanges to skip potential repeat declarations that slow us down
-
-        try {
-            exchangeConfig.exchangeDeclare(channel, exchangeName);
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
-
-        return channel;
+    public ChannelBuilder newChannel(String connectionName) {
+        return new ChannelBuilder(connectionManager, new RmqTopologyBuilder(exchanges, queues)).connectionName(connectionName);
     }
 
     /**
-     * Opens a new RabbitMQ channel, declares an exchange and binds a named queue to the exchange. Connection, exchange
-     * and queue names must be referenced in configuration. This type of binding is common for a consumer that would
-     * receive messages from the bound queue.
-     *
-     * @since 2.0
-     */
-    public Channel openChannel(String connectionName, String exchangeName, String queueName) {
-        return openChannel(connectionName, exchangeName, queueName, "");
-    }
-
-    /**
-     * Opens a new RabbitMQ channel, declares an exchange and binds a named queue to the exchange. Connection, exchange
-     * and queue names must be referenced in configuration. This type of binding is common for a consumer that would
-     * receive messages from the bound queue.
-     *
-     * @since 2.0
-     */
-    public Channel openChannel(String connectionName, String exchangeName, String queueName, String routingKey) {
-
-        RmqTopology.required(queueName, "No queue name");
-        QueueConfig queueConfig = queues.containsKey(queueName)
-                ? queues.get(queueName)
-                // create a queue on the fly with default settings. TODO: print a warning?
-                : new QueueConfig();
-
-        Channel channel = openChannel(connectionName, exchangeName);
-        try {
-            queueConfig.queueDeclare(channel, queueName);
-            channel.queueBind(queueName, exchangeName, routingKey);
-
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
-
-        return channel;
-    }
-
-    /**
-     * @deprecated since 2.0 in favor of {@link #openChannel(String, String, String)}
+     * @deprecated since 2.0 in favor of {@link ChannelBuilder}. See {@link #newChannel(String)}.
      */
     @Deprecated
     public Channel openChannel(Connection connection, String exchangeName, String routingKey) {
@@ -147,7 +84,7 @@ public class ChannelFactory {
     }
 
     /**
-     * @deprecated since 2.0 in favor of {@link #openChannel(String, String, String, String)}
+     * @deprecated since 2.0 in favor of {@link ChannelBuilder}. See {@link #newChannel(String)}.
      */
     @Deprecated
     public Channel openChannel(Connection connection, String exchangeName, String queueName, String routingKey) {

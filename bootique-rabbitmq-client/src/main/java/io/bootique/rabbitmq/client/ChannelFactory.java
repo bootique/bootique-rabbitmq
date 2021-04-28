@@ -20,13 +20,11 @@
 package io.bootique.rabbitmq.client;
 
 import com.rabbitmq.client.Channel;
-import com.rabbitmq.client.Connection;
 import io.bootique.rabbitmq.client.connection.ConnectionManager;
 import io.bootique.rabbitmq.client.exchange.ExchangeConfig;
 import io.bootique.rabbitmq.client.queue.QueueConfig;
 import io.bootique.rabbitmq.client.topology.RmqTopologyBuilder;
 
-import java.io.IOException;
 import java.util.Map;
 import java.util.Objects;
 
@@ -74,66 +72,4 @@ public class ChannelFactory {
     public ChannelBuilder newChannel(String connectionName) {
         return new ChannelBuilder(connectionManager, new RmqTopologyBuilder(exchanges, queues)).connectionName(connectionName);
     }
-
-    /**
-     * @deprecated since 2.0 in favor of {@link ChannelBuilder}. See {@link #newChannel(String)}.
-     */
-    @Deprecated
-    public Channel openChannel(Connection connection, String exchangeName, String routingKey) {
-        return doOpenChannel(connection, exchangeName, null, routingKey);
-    }
-
-    /**
-     * @deprecated since 2.0 in favor of {@link ChannelBuilder}. See {@link #newChannel(String)}.
-     */
-    @Deprecated
-    public Channel openChannel(Connection connection, String exchangeName, String queueName, String routingKey) {
-        return doOpenChannel(connection, exchangeName, queueName, routingKey);
-    }
-
-    @Deprecated
-    private Channel doOpenChannel(Connection connection, String exchangeName, String queueName, String routingKey) {
-        try {
-            Channel channel = connection.createChannel();
-
-            // This code assumes an exchange is present. While probably rare, there are cases when producer and consumer
-            //  communicate directly over a queue, ignoring exchanges... This is why the method is deprecated
-            exchangeDeclare(channel, exchangeName);
-
-            if (queueName == null) {
-                // This code is suspect. There are two distinct cases for when "queueName" is null:
-                //  1. I am a producer and sending to an exchange. I don't need a queue
-                //  2. I am a consumer for an exchange, and I need a fresh dynamically-named queue bound to an exchange
-                //  Here we are addressing case #2, and creating unneeded queue for #1
-                // This is why the method is deprecated
-                queueName = channel.queueDeclare().getQueue();
-            } else {
-                queueDeclare(channel, queueName);
-            }
-
-            channel.queueBind(queueName, exchangeName, routingKey);
-            return channel;
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
-    }
-
-    @Deprecated
-    private void queueDeclare(Channel channel, String queueName) throws IOException {
-        QueueConfig queueConfig = queues.computeIfAbsent(queueName, name -> {
-            throw new IllegalStateException("No configuration present for Queue named '" + name + "'");
-        });
-
-        queueConfig.queueDeclare(channel, queueName);
-    }
-
-    @Deprecated
-    private void exchangeDeclare(Channel channel, String exchangeName) throws IOException {
-        ExchangeConfig exchangeConfig = exchanges.computeIfAbsent(exchangeName, name -> {
-            throw new IllegalStateException("No configuration present for Exchange named '" + name + "'");
-        });
-
-        exchangeConfig.exchangeDeclare(channel, exchangeName);
-    }
-
 }

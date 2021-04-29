@@ -16,7 +16,7 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package io.bootique.rabbitmq.client.publisher;
+package io.bootique.rabbitmq.client.pubsub;
 
 import io.bootique.annotation.BQConfig;
 import io.bootique.annotation.BQConfigProperty;
@@ -28,15 +28,17 @@ import java.util.Objects;
  * @since 2.0.B1
  */
 @BQConfig
-public class RmqPublisherFactory {
+public class RmqSubEndpointFactory {
 
     private String connection;
     private String exchange;
+    private String queue;
     private String routingKey;
+    private boolean autoAck = true;
 
-    public RmqPublisher create(ChannelFactory channelFactory) {
-        Objects.requireNonNull(connection, "Publisher connection name is undefined");
-        return new RmqPublisher(channelFactory, connection, exchange, routingKey);
+    public RmqSubEndpoint create(ChannelFactory channelFactory) {
+        Objects.requireNonNull(connection, "Subscriber connection name is undefined");
+        return new RmqSubEndpoint(channelFactory, connection, exchange, queue, routingKey, autoAck);
     }
 
     @BQConfigProperty
@@ -50,8 +52,18 @@ public class RmqPublisherFactory {
     }
 
     @BQConfigProperty
+    public void setQueue(String queue) {
+        this.queue = queue;
+    }
+
+    @BQConfigProperty
     public void setRoutingKey(String routingKey) {
         this.routingKey = routingKey;
+    }
+
+    @BQConfigProperty("Whether to auto-acknowledge message delivery. The default is 'true'")
+    public void setAutoAck(boolean autoAck) {
+        this.autoAck = autoAck;
     }
 }
 

@@ -27,9 +27,10 @@ import io.bootique.log.BootLogger;
 import io.bootique.rabbitmq.client.connection.ConnectionFactoryFactory;
 import io.bootique.rabbitmq.client.connection.ConnectionManager;
 import io.bootique.rabbitmq.client.exchange.ExchangeConfig;
-import io.bootique.rabbitmq.client.publisher.RmqPublisher;
-import io.bootique.rabbitmq.client.publisher.RmqPublisherFactory;
-import io.bootique.rabbitmq.client.publisher.RmqPublishers;
+import io.bootique.rabbitmq.client.pubsub.RmqPubEndpoint;
+import io.bootique.rabbitmq.client.pubsub.RmqPubEndpointFactory;
+import io.bootique.rabbitmq.client.pubsub.RmqSubEndpoint;
+import io.bootique.rabbitmq.client.pubsub.RmqSubEndpointFactory;
 import io.bootique.rabbitmq.client.queue.QueueConfig;
 import io.bootique.shutdown.ShutdownManager;
 
@@ -48,7 +49,8 @@ public class RmqObjectsFactory {
     private Map<String, ConnectionFactoryFactory> connections;
     private Map<String, ExchangeConfig> exchanges;
     private Map<String, QueueConfig> queues;
-    private Map<String, RmqPublisherFactory> publishers;
+    private Map<String, RmqPubEndpointFactory> pub;
+    private Map<String, RmqSubEndpointFactory> sub;
 
     public ChannelFactory createChannelFactory(BootLogger bootLogger, ShutdownManager shutdownManager, Injector injector) {
         Map<String, ConnectionFactory> factories = createConnectionFactories(injector);
@@ -59,8 +61,10 @@ public class RmqObjectsFactory {
                 queues != null ? queues : Collections.emptyMap());
     }
 
-    public RmqPublishers createPublishers(ChannelFactory channelFactory) {
-        return new RmqPublishers(createPublishersMap(channelFactory));
+    public RmqPubSub createPubSub(ChannelFactory channelFactory) {
+        return new RmqPubSub(
+                createPubEndpoints(channelFactory),
+                createSubEndpoints(channelFactory));
     }
 
     protected Map<String, ConnectionFactory> createConnectionFactories(Injector injector) {
@@ -87,13 +91,23 @@ public class RmqObjectsFactory {
         return manager;
     }
 
-    protected Map<String, RmqPublisher> createPublishersMap(ChannelFactory channelFactory) {
-        if (publishers == null || publishers.isEmpty()) {
+    protected Map<String, RmqPubEndpoint> createPubEndpoints(ChannelFactory channelFactory) {
+        if (pub == null || pub.isEmpty()) {
             return Collections.emptyMap();
         }
 
-        Map<String, RmqPublisher> map = new HashMap<>();
-        publishers.forEach((k, v) -> map.put(k, v.create(channelFactory)));
+        Map<String, RmqPubEndpoint> map = new HashMap<>();
+        pub.forEach((k, v) -> map.put(k, v.create(channelFactory)));
+        return map;
+    }
+
+    protected Map<String, RmqSubEndpoint> createSubEndpoints(ChannelFactory channelFactory) {
+        if (sub == null || sub.isEmpty()) {
+            return Collections.emptyMap();
+        }
+
+        Map<String, RmqSubEndpoint> map = new HashMap<>();
+        sub.forEach((k, v) -> map.put(k, v.create(channelFactory)));
         return map;
     }
 
@@ -113,7 +127,12 @@ public class RmqObjectsFactory {
     }
 
     @BQConfigProperty
-    public void setPublishers(Map<String, RmqPublisherFactory> publishers) {
-        this.publishers = publishers;
+    public void setPub(Map<String, RmqPubEndpointFactory> pub) {
+        this.pub = pub;
+    }
+
+    @BQConfigProperty
+    public void setSub(Map<String, RmqSubEndpointFactory> sub) {
+        this.sub = sub;
     }
 }

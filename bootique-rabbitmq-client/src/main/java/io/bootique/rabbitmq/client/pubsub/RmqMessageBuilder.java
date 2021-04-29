@@ -16,7 +16,7 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package io.bootique.rabbitmq.client.publisher;
+package io.bootique.rabbitmq.client.pubsub;
 
 import com.rabbitmq.client.AMQP;
 import com.rabbitmq.client.Channel;
@@ -54,6 +54,9 @@ public class RmqMessageBuilder {
         return this;
     }
 
+    /**
+     * Sets routing key that should be used for message dispatching.
+     */
     public RmqMessageBuilder routingKey(String routingKey) {
         this.routingKey = RmqTopology.normalizeName(routingKey);
         return this;

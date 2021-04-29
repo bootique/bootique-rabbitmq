@@ -21,6 +21,8 @@ package io.bootique.rabbitmq.client.topology;
 import com.rabbitmq.client.Channel;
 import io.bootique.rabbitmq.client.exchange.ExchangeConfig;
 import io.bootique.rabbitmq.client.queue.QueueConfig;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.util.LinkedHashMap;
@@ -31,6 +33,8 @@ import java.util.function.Consumer;
  * @since 2.0.B1
  */
 public class RmqTopologyBuilder {
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(RmqTopologyBuilder.class);
 
     private final Map<String, ExchangeConfig> exchangeConfigs;
     private final Map<String, QueueConfig> queueConfigs;
@@ -80,6 +84,8 @@ public class RmqTopologyBuilder {
             throw new IllegalStateException("No configuration present for exchange named '" + exchangeName + "'");
         }
 
+        LOGGER.debug("declaring exchange '{}'", exchangeName);
+
         try {
             exchangeConfig.exchangeDeclare(channel, exchangeName);
         } catch (IOException e) {
@@ -94,6 +100,8 @@ public class RmqTopologyBuilder {
                 // TODO: print a warning?
                 : new QueueConfig();
 
+        LOGGER.debug("declaring queue '{}'", queueName);
+
         try {
             queueConfig.queueDeclare(channel, queueName);
         } catch (IOException e) {
@@ -102,6 +110,9 @@ public class RmqTopologyBuilder {
     }
 
     protected void queueBind(Channel channel, String queueName, String exchangeName, String routingKey) {
+
+        LOGGER.debug("binding queue '{}' to exchange '{}' with key '{}'", queueName, exchangeName, routingKey);
+
         try {
             channel.queueBind(queueName, exchangeName, routingKey);
         } catch (IOException e) {

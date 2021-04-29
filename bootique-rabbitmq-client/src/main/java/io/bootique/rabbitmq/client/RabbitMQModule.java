@@ -24,7 +24,6 @@ import io.bootique.config.ConfigurationFactory;
 import io.bootique.di.Injector;
 import io.bootique.di.Provides;
 import io.bootique.log.BootLogger;
-import io.bootique.rabbitmq.client.publisher.RmqPublishers;
 import io.bootique.shutdown.ShutdownManager;
 
 import javax.inject.Singleton;
@@ -50,7 +49,7 @@ public class RabbitMQModule extends ConfigModule {
 
     @Singleton
     @Provides
-    RmqPublishers providePublishers(RmqObjectsFactory factory, ChannelFactory channelFactory) {
-        return factory.createPublishers(channelFactory);
+    RmqPubSub providePubSub(RmqObjectsFactory factory, ChannelFactory channelFactory) {
+        return factory.createPubSub(channelFactory);
     }
 }

@@ -44,8 +44,8 @@ public class ConnectionManager {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(ConnectionManager.class);
 
-    private Map<String, ConnectionFactory> factories;
-    private Map<String, AtomicReference<Connection>> connections;
+    private final Map<String, ConnectionFactory> factories;
+    private final Map<String, AtomicReference<Connection>> connections;
     private volatile boolean shutdown;
 
     public ConnectionManager(Map<String, ConnectionFactory> factories) {
@@ -71,7 +71,7 @@ public class ConnectionManager {
 
         AtomicReference<Connection> ref = connections.get(connectionName);
         if (ref == null) {
-            throw new IllegalStateException("No configuration present for Connection named '" + connectionName + "'");
+            throw new IllegalStateException("No configuration present for RabbitMQ connection named '" + connectionName + "'");
         }
 
         Connection c = ref.get();
@@ -99,7 +99,7 @@ public class ConnectionManager {
 
     public void shutdown() {
 
-        LOGGER.info("Shutting down RabbitMQ connections...");
+        LOGGER.debug("Shutting down RabbitMQ connections...");
 
         // this will prevent new connections creation, and we'll drain the ones already created...
         this.shutdown = true;
@@ -129,7 +129,7 @@ public class ConnectionManager {
             throw new IllegalStateException("No factory present for Connection named '" + connectionName + "'");
         }
 
-        LOGGER.info("Creating named RabbitMQ connection '{}'", connectionName);
+        LOGGER.debug("Creating named RabbitMQ connection '{}'", connectionName);
         try {
             return factory.newConnection();
         } catch (IOException | TimeoutException e) {

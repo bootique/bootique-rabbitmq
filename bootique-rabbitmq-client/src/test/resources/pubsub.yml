@@ -15,22 +15,47 @@
 
 rabbitmq:
   connections:
-    c1:
+    pubConnection:
+      type: uri
+    subConnection:
       type: uri
 
   exchanges:
-   e1:
-     type: TOPIC
+    e1:
+      type: TOPIC
 
-  publishers:
+  queues:
+    queue1:
+      durable: true
+
+  pub:
     p1:
-      connection: c1
+      connection: pubConnection
       exchange: e1
-      routingKey: p1.X
+      routingKey: "p1.X"
     p2:
-      connection: c1
+      connection: pubConnection
       exchange: e1
-      routingKey: p2.X
+      routingKey: "p2.X"
 
-
-
+  sub:
+    s1:
+      connection: subConnection
+      exchange: e1
+      queue: queue1
+      routingKey: "*.X"
+    s2:
+      connection: subConnection
+      exchange: e1
+      queue: unconfigured-queue
+      routingKey: "p2.X"
+    s3:
+      connection: subConnection
+      exchange: e1
+      routingKey: "*.X"
+      # no queue, it will be created during subscription
+    s4:
+      connection: subConnection
+      exchange: e1
+      routingKey: "p2.X"
+      # no queue, it will be created during subscription

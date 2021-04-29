@@ -16,10 +16,10 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package io.bootique.rabbitmq.client.publisher;
+package io.bootique.rabbitmq.client.pubsub;
 
 import io.bootique.rabbitmq.client.ChannelFactory;
-import io.bootique.rabbitmq.client.RmqTopology;
+import io.bootique.rabbitmq.client.topology.RmqTopology;
 
 import java.util.Objects;
 
@@ -28,14 +28,14 @@ import java.util.Objects;
  *
  * @since 2.0.B1
  */
-public class RmqPublisher {
+public class RmqPubEndpoint {
 
     private final ChannelFactory channelFactory;
     private final String connectionName;
     private final String defaultExchange;
     private final String defaultRoutingKey;
 
-    public RmqPublisher(ChannelFactory channelFactory, String connectionName, String defaultExchange, String defaultRoutingKey) {
+    public RmqPubEndpoint(ChannelFactory channelFactory, String connectionName, String defaultExchange, String defaultRoutingKey) {
         this.channelFactory = Objects.requireNonNull(channelFactory);
         this.connectionName = Objects.requireNonNull(connectionName);
         this.defaultExchange = RmqTopology.normalizeName(defaultExchange);
@@ -43,7 +43,7 @@ public class RmqPublisher {
     }
 
     /**
-     * Creates a message builder initialized with this publisher settings. Callers may customize routing and send
+     * Creates a message builder initialized with this endpoint settings. Callers may customize routing and send
      * parameters before publishing a message.
      */
     public RmqMessageBuilder newMessage() {
@@ -53,7 +53,7 @@ public class RmqPublisher {
     }
 
     /**
-     * Publishes a message to RabbitMQ using the default publisher settings.
+     * Publishes a message to RabbitMQ using the default endpoint settings.
      */
     public void publish(byte[] message) {
         newMessage().publish(message);

@@ -22,7 +22,7 @@ import com.rabbitmq.client.AMQP;
 import com.rabbitmq.client.Channel;
 import com.rabbitmq.client.MessageProperties;
 import io.bootique.rabbitmq.client.ChannelFactory;
-import io.bootique.rabbitmq.client.RmqTopology;
+import io.bootique.rabbitmq.client.topology.RmqTopology;
 
 import java.io.IOException;
 import java.util.Objects;
@@ -85,7 +85,7 @@ public class RmqMessageBuilder {
         // TODO: creating and closing a new channel for just a single message is fairly inefficient,
         //  though we can transparently address it in the ChannelFactory with channel pooling
 
-        try (Channel channel = createChannel()) {
+        try (Channel channel = createChannelWithTopology()) {
             channel.basicPublish(exchange, routingKey, mandatory, immediate, properties, message);
         } catch (IOException e) {
             throw new RuntimeException("Error publishing RMQ message for connection: " + connectionName, e);
@@ -94,9 +94,9 @@ public class RmqMessageBuilder {
         }
     }
 
-    protected Channel createChannel() {
+    protected Channel createChannelWithTopology() {
         return RmqTopology.isDefined(exchange)
-                ? channelFactory.openChannel(connectionName, exchange)
+                ? channelFactory.newChannel(connectionName).ensureExchange(exchange).open()
                 : channelFactory.openChannel(connectionName);
     }
 }

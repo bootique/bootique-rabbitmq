@@ -24,6 +24,8 @@ import io.bootique.rabbitmq.client.RmqTopology;
 import java.util.Objects;
 
 /**
+ * A stateless RabbitMQ message publisher with preconfigured target exchange and routing key.
+ *
  * @since 2.0.B1
  */
 public class RmqPublisher {

@@ -102,12 +102,12 @@ public class RmqObjectsFactory {
         this.connections = connections;
     }
 
-    @BQConfigProperty
+    @BQConfigProperty("Configuration for RMQ exchanges. Exchanges are created lazily only when a channel is open that requires it")
     public void setExchanges(Map<String, ExchangeConfig> exchanges) {
         this.exchanges = exchanges;
     }
 
-    @BQConfigProperty
+    @BQConfigProperty("Configuration for RMQ queues. Queues are created lazily only when a channel is open that requires it")
     public void setQueues(Map<String, QueueConfig> queues) {
         this.queues = queues;
     }

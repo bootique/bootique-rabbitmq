@@ -25,7 +25,7 @@ import com.rabbitmq.client.GetResponse;
 import io.bootique.BQCoreModule;
 import io.bootique.BQRuntime;
 import io.bootique.rabbitmq.client.ChannelFactory;
-import io.bootique.rabbitmq.client.RabbitMQBaseTest;
+import io.bootique.rabbitmq.client.unit.RabbitMQBaseTest;
 import org.junit.jupiter.api.Test;
 
 import java.io.IOException;

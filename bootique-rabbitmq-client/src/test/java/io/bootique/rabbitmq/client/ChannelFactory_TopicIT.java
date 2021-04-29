@@ -24,6 +24,7 @@ import com.rabbitmq.client.GetResponse;
 import io.bootique.BQCoreModule;
 import io.bootique.BQRuntime;
 import io.bootique.junit5.BQTest;
+import io.bootique.rabbitmq.client.unit.RabbitMQBaseTest;
 import org.junit.jupiter.api.Test;
 
 import java.io.IOException;
@@ -33,7 +34,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 @BQTest
-public class TopicExchangeIT extends RabbitMQBaseTest {
+public class ChannelFactory_TopicIT extends RabbitMQBaseTest {
 
     @Test
     public void testAmqpConfig() throws IOException, TimeoutException {
@@ -47,15 +48,14 @@ public class TopicExchangeIT extends RabbitMQBaseTest {
     }
 
     private void assertCanSendAndReceive(ChannelFactory channelFactory) throws IOException, TimeoutException {
-        try (Channel channel = channelFactory.openChannel("c1", "topicExchange")) {
-
-            String queueName = channel.queueDeclare().getQueue();
-            channel.queueBind(queueName, "topicExchange", "a.*");
+        try (Channel channel = channelFactory.newChannel("c1")
+                .ensureQueueBoundToExchange("new_queue", "topicExchange", "a.*")
+                .open()) {
 
             String message = "Hello World!";
             channel.basicPublish("topicExchange", "a.b", null, message.getBytes("UTF-8"));
 
-            GetResponse response = channel.basicGet(queueName, false);
+            GetResponse response = channel.basicGet("new_queue", false);
             assertNotNull(response);
             assertEquals(message, new String(response.getBody()));
         }

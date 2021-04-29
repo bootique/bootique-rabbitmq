@@ -16,7 +16,7 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package io.bootique.rabbitmq.client;
+package io.bootique.rabbitmq.client.topology;
 
 /**
  * Helps the rest of the code to validate and normalize RabbitMQ topology object names (exchanges, queue, routing

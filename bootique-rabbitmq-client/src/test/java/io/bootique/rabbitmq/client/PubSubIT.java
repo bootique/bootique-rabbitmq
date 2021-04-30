@@ -25,6 +25,7 @@ import io.bootique.BQRuntime;
 import io.bootique.Bootique;
 import io.bootique.junit5.BQApp;
 import io.bootique.junit5.BQTest;
+import io.bootique.rabbitmq.client.pubsub.RmqSubEndpoint;
 import io.bootique.rabbitmq.client.unit.RabbitMQBaseTest;
 import org.junit.jupiter.api.Test;
 
@@ -53,8 +54,8 @@ public class PubSubIT extends RabbitMQBaseTest {
         Sub s1 = new Sub();
         Sub s2 = new Sub();
 
-        pubSub.subEndpoint("s1").consume(s1);
-        pubSub.subEndpoint("s2").consume(s2);
+        pubSub.subEndpoint("s1").subscribe(s1);
+        pubSub.subEndpoint("s2").subscribe(s2);
 
         pubSub.pubEndpoint("p1")
                 .newMessage()
@@ -79,8 +80,8 @@ public class PubSubIT extends RabbitMQBaseTest {
         Sub s3 = new Sub();
         Sub s4 = new Sub();
 
-        pubSub.subEndpoint("s3").newSubscription().queue("s3-queue").consume(s3);
-        pubSub.subEndpoint("s4").newSubscription().queue("s4-queue").consume(s4);
+        pubSub.subEndpoint("s3").newSubscription().queue("s3-queue").subscribe(s3);
+        pubSub.subEndpoint("s4").newSubscription().queue("s4-queue").subscribe(s4);
 
         pubSub.pubEndpoint("p2")
                 .newMessage()
@@ -101,6 +102,27 @@ public class PubSubIT extends RabbitMQBaseTest {
         s4.assertReceived("M4,40,p2.X", "Second message not received");
     }
 
+    @Test
+    public void testCancelSubscription() {
+        RmqPubSub pubSub = app.getInstance(RmqPubSub.class);
+
+        RmqSubEndpoint s1Endpoint = pubSub.subEndpoint("s1");
+
+        Sub s1 = new Sub();
+        String consumerTag = s1Endpoint.subscribe(s1);
+        assertEquals(1, s1Endpoint.getSubscriptionsCount());
+
+        pubSub.pubEndpoint("p1").publish("M1".getBytes());
+        s1.waitUntilDelivered(1);
+        s1.assertReceived("M1,p1.X", "First message not received");
+
+        s1Endpoint.cancelSubscription(consumerTag);
+        assertEquals(0, s1Endpoint.getSubscriptionsCount());
+
+        pubSub.pubEndpoint("p1").publish("M2".getBytes());
+        s1.ensureNotDelivered(1);
+    }
+
     static class Sub implements DeliverCallback {
 
         Map<Integer, String> received = new ConcurrentHashMap<>();
@@ -109,7 +131,12 @@ public class PubSubIT extends RabbitMQBaseTest {
         @Override
         public void handle(String consumerTag, Delivery message) {
             String decoded = new String(message.getBody());
-            String withMeta = decoded + "," + message.getProperties().getMessageId() + "," + message.getEnvelope().getRoutingKey();
+
+            String id = message.getProperties().getMessageId() != null
+                    ? message.getProperties().getMessageId() + ","
+                    : "";
+
+            String withMeta = decoded + "," + id + message.getEnvelope().getRoutingKey();
             received.put(counter.incrementAndGet(), withMeta);
         }
 
@@ -119,6 +146,16 @@ public class PubSubIT extends RabbitMQBaseTest {
                     Thread.sleep(100);
                 }
             }, "Expected " + expectedMessageCount + ", delivered: " + received.size());
+        }
+
+        void ensureNotDelivered(int expectedMessageCount) {
+            assertDeliveryCount(expectedMessageCount);
+            try {
+                Thread.sleep(200);
+            } catch (InterruptedException e) {
+                fail(e);
+            }
+            assertDeliveryCount(expectedMessageCount);
         }
 
         void assertReceived(String expected, String message) {

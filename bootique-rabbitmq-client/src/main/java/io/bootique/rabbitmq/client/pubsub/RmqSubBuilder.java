@@ -26,8 +26,13 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
+import java.util.Map;
 
 /**
+ * Builds a single RMQ subscription for a queue. Allows to configure RMQ topology for that queue. Internally manages
+ * opening one Channel per subscription. The open Cannel is registered with the parent endpoint and can be closed if
+ * the subscription is canceled.
+ *
  * @since 2.0.B1
  */
 public class RmqSubBuilder {
@@ -36,15 +41,17 @@ public class RmqSubBuilder {
 
     private final ChannelFactory channelFactory;
     private final String connectionName;
+    private final Map<String, Channel> consumerChannels;
 
     private String exchange;
     private String queue;
     private String routingKey;
     private boolean autoAck;
 
-    public RmqSubBuilder(ChannelFactory channelFactory, String connectionName) {
+    protected RmqSubBuilder(ChannelFactory channelFactory, String connectionName, Map<String, Channel> consumerChannels) {
         this.channelFactory = channelFactory;
         this.connectionName = connectionName;
+        this.consumerChannels = consumerChannels;
     }
 
     public RmqSubBuilder exchange(String exchange) {
@@ -72,8 +79,8 @@ public class RmqSubBuilder {
      *
      * @return consumer tag returned by the server that can be used to cancel a consumer.
      */
-    public String consume(DeliverCallback onDeliver) {
-        return consume(onDeliver, t -> LOGGER.debug("Subscription was canceled for '{}'", t));
+    public String subscribe(DeliverCallback onDeliver) {
+        return subscribe(onDeliver, t -> LOGGER.debug("Subscription was canceled for '{}'", t));
     }
 
     /**
@@ -81,39 +88,8 @@ public class RmqSubBuilder {
      *
      * @return consumer tag returned by the server that can be used to cancel a consumer.
      */
-    public String consume(DeliverCallback onDeliver, CancelCallback onCancel) {
-
-       return consume(new Consumer() {
-           @Override
-           public void handleConsumeOk(String consumerTag) {
-
-           }
-
-           @Override
-           public void handleCancelOk(String consumerTag) {
-
-           }
-
-           @Override
-           public void handleCancel(String consumerTag) throws IOException {
-               onCancel.handle(consumerTag);
-           }
-
-           @Override
-           public void handleShutdownSignal(String consumerTag, ShutdownSignalException sig) {
-
-           }
-
-           @Override
-           public void handleRecoverOk(String consumerTag) {
-
-           }
-
-           @Override
-           public void handleDelivery(String consumerTag, Envelope envelope, AMQP.BasicProperties properties, byte[] body) throws IOException {
-               onDeliver.handle(consumerTag, new Delivery(envelope, properties, body));
-           }
-       });
+    public String subscribe(DeliverCallback onDeliver, CancelCallback onCancel) {
+        return subscribe(new DeliverOrCancelConsumer(onDeliver, onCancel));
     }
 
     /**
@@ -121,17 +97,21 @@ public class RmqSubBuilder {
      *
      * @return consumer tag returned by the server that can be used to cancel a consumer.
      */
-    public String consume(Consumer consumer) {
+    public String subscribe(Consumer consumer) {
 
-        // TODO: Channel leak. We are using a dedicated channel to register a consumer, and must keep it open for as
-        //  long as the consumer is alive. How do we avoid Channel leak and close it when the consumer is gone?
-        //  Suppose we need an unsubscribe API...
+        Channel channel = createChannelWithTopology();
+        String consumerTag;
 
         try {
-            return createChannelWithTopology().basicConsume(queue, autoAck, consumer);
+            consumerTag = channel.basicConsume(queue, autoAck, consumer);
         } catch (IOException e) {
             throw new RuntimeException("Error publishing RMQ message for connection: " + connectionName, e);
         }
+
+        // track consumer channel to be able to stop consumers and close channels
+        consumerChannels.put(consumerTag, channel);
+
+        return consumerTag;
     }
 
     protected Channel createChannelWithTopology() {
@@ -148,4 +128,43 @@ public class RmqSubBuilder {
         return builder.open();
     }
 
+    private static class DeliverOrCancelConsumer implements Consumer {
+        private final CancelCallback onCancel;
+        private final DeliverCallback onDeliver;
+
+        public DeliverOrCancelConsumer(DeliverCallback onDeliver, CancelCallback onCancel) {
+            this.onCancel = onCancel;
+            this.onDeliver = onDeliver;
+        }
+
+        @Override
+        public void handleConsumeOk(String consumerTag) {
+
+        }
+
+        @Override
+        public void handleCancelOk(String consumerTag) {
+
+        }
+
+        @Override
+        public void handleCancel(String consumerTag) throws IOException {
+            onCancel.handle(consumerTag);
+        }
+
+        @Override
+        public void handleShutdownSignal(String consumerTag, ShutdownSignalException sig) {
+
+        }
+
+        @Override
+        public void handleRecoverOk(String consumerTag) {
+
+        }
+
+        @Override
+        public void handleDelivery(String consumerTag, Envelope envelope, AMQP.BasicProperties properties, byte[] body) throws IOException {
+            onDeliver.handle(consumerTag, new Delivery(envelope, properties, body));
+        }
+    }
 }

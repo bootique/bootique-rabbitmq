@@ -61,10 +61,10 @@ public class RmqObjectsFactory {
                 queues != null ? queues : Collections.emptyMap());
     }
 
-    public RmqPubSub createPubSub(ChannelFactory channelFactory) {
+    public RmqPubSub createPubSub(ChannelFactory channelFactory, ShutdownManager shutdownManager) {
         return new RmqPubSub(
                 createPubEndpoints(channelFactory),
-                createSubEndpoints(channelFactory));
+                createSubEndpoints(channelFactory, shutdownManager));
     }
 
     protected Map<String, ConnectionFactory> createConnectionFactories(Injector injector) {
@@ -101,13 +101,13 @@ public class RmqObjectsFactory {
         return map;
     }
 
-    protected Map<String, RmqSubEndpoint> createSubEndpoints(ChannelFactory channelFactory) {
+    protected Map<String, RmqSubEndpoint> createSubEndpoints(ChannelFactory channelFactory, ShutdownManager shutdownManager) {
         if (sub == null || sub.isEmpty()) {
             return Collections.emptyMap();
         }
 
         Map<String, RmqSubEndpoint> map = new HashMap<>();
-        sub.forEach((k, v) -> map.put(k, v.create(channelFactory)));
+        sub.forEach((k, v) -> map.put(k, v.create(channelFactory, shutdownManager)));
         return map;
     }
 

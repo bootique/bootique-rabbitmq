@@ -19,17 +19,25 @@
 package io.bootique.rabbitmq.client.pubsub;
 
 import com.rabbitmq.client.CancelCallback;
+import com.rabbitmq.client.Channel;
 import com.rabbitmq.client.Consumer;
 import com.rabbitmq.client.DeliverCallback;
 import io.bootique.rabbitmq.client.ChannelFactory;
 import io.bootique.rabbitmq.client.topology.RmqTopology;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
-import java.util.Objects;
+import java.io.IOException;
+import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.TimeoutException;
 
 /**
  * @since 2.0.B1
  */
 public class RmqSubEndpoint {
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(RmqSubEndpoint.class);
 
     private final ChannelFactory channelFactory;
     private final String connectionName;
@@ -37,6 +45,8 @@ public class RmqSubEndpoint {
     private final String defaultQueue;
     private final String defaultRoutingKey;
     private final boolean defaultAutoAck;
+
+    private final Map<String, Channel> consumerChannels;
 
     public RmqSubEndpoint(
             ChannelFactory channelFactory,
@@ -52,6 +62,55 @@ public class RmqSubEndpoint {
         this.defaultExchange = RmqTopology.normalizeName(defaultExchange);
         this.defaultRoutingKey = RmqTopology.normalizeName(defaultRoutingKey);
         this.defaultAutoAck = defaultAutoAck;
+
+        // this stores channels that were assigned to consumers (one per consumer),
+        // so that we can control closing them..
+        this.consumerChannels = new ConcurrentHashMap<>();
+    }
+
+    public int getSubscriptionsCount() {
+        return consumerChannels.size();
+    }
+
+    /**
+     * Closes all endpoint consumer channels
+     */
+    public void close() {
+
+        if (consumerChannels.size() > 0) {
+            LOGGER.debug("Closing {} subscriber channels", consumerChannels.size());
+
+            // presumably it is ok to close channels without canceling subscriptions
+            consumerChannels.values().forEach(c -> {
+                try {
+                    c.close();
+                } catch (IOException e) {
+                    LOGGER.warn("Error closing a Channel", e);
+                } catch (TimeoutException e) {
+                    LOGGER.warn("Timeout closing a Channel", e);
+                }
+            });
+
+            // TODO: no mechanism to prevent new subs during shutdown
+            consumerChannels.clear();
+        }
+    }
+
+    /**
+     * Cancels previously created subscription identified by "consumerTag" returned from one of the "consume" methods.
+     */
+    public void cancelSubscription(String consumerTag) {
+
+        // must close the channel after cancel, as endpoints are based on "one channel per subscription" model
+        try (Channel channel = consumerChannels.remove(consumerTag)) {
+            if (channel != null) {
+                channel.basicCancel(consumerTag);
+            }
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        } catch (TimeoutException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     /**
@@ -59,7 +118,7 @@ public class RmqSubEndpoint {
      * before subscribing a consumer.
      */
     public RmqSubBuilder newSubscription() {
-        return new RmqSubBuilder(channelFactory, connectionName)
+        return new RmqSubBuilder(channelFactory, connectionName, consumerChannels)
                 .exchange(defaultExchange)
                 .queue(defaultQueue)
                 .routingKey(defaultRoutingKey)
@@ -71,8 +130,8 @@ public class RmqSubEndpoint {
      *
      * @return consumer tag returned by the server that can be used to cancel a consumer.
      */
-    public String consume(DeliverCallback onDeliver) {
-        return newSubscription().consume(onDeliver);
+    public String subscribe(DeliverCallback onDeliver) {
+        return newSubscription().subscribe(onDeliver);
     }
 
     /**
@@ -80,8 +139,8 @@ public class RmqSubEndpoint {
      *
      * @return consumer tag returned by the server that can be used to cancel a consumer.
      */
-    public String consume(DeliverCallback onDeliver, CancelCallback onCancel) {
-        return newSubscription().consume(onDeliver, onCancel);
+    public String subscribe(DeliverCallback onDeliver, CancelCallback onCancel) {
+        return newSubscription().subscribe(onDeliver, onCancel);
     }
 
     /**
@@ -89,7 +148,7 @@ public class RmqSubEndpoint {
      *
      * @return consumer tag returned by the server that can be used to cancel a consumer.
      */
-    public String consume(Consumer consumer) {
-        return newSubscription().consume(consumer);
+    public String subscribe(Consumer consumer) {
+        return newSubscription().subscribe(consumer);
     }
 }

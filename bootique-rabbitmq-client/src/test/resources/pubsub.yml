@@ -47,6 +47,8 @@ rabbitmq:
     s2:
       connection: subConnection
       exchange: e1
+      # queue name defined, but not references in config.
+      # ok: it will be created during subscription
       queue: unconfigured-queue
       routingKey: "p2.X"
     s3:

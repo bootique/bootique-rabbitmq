@@ -30,7 +30,7 @@ import java.util.Map;
 
 /**
  * Builds a single RMQ subscription for a queue. Allows to configure RMQ topology for that queue. Internally manages
- * opening one Channel per subscription. The open Cannel is registered with the parent endpoint and can be closed if
+ * opening one Channel per subscription. The open Channel is registered with the parent endpoint and can be closed if
  * the subscription is canceled.
  *
  * @since 2.0.B1

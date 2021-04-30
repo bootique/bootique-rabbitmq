@@ -106,9 +106,7 @@ public class RmqSubEndpoint {
             if (channel != null) {
                 channel.basicCancel(consumerTag);
             }
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        } catch (TimeoutException e) {
+        } catch (IOException | TimeoutException e) {
             throw new RuntimeException(e);
         }
     }

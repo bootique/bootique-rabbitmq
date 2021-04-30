@@ -37,22 +37,22 @@ public class RmqQueue {
         channel.queueDeclare(queueName, durable, exclusive, autoDelete, arguments);
     }
 
-    @BQConfigProperty
+    @BQConfigProperty("Sets queue durability. The default is 'true'")
     public void setDurable(boolean durable) {
         this.durable = durable;
     }
 
-    @BQConfigProperty
+    @BQConfigProperty("Sets queue exclusivity. The default is 'false'")
     public void setExclusive(boolean exclusive) {
         this.exclusive = exclusive;
     }
 
-    @BQConfigProperty
+    @BQConfigProperty("Sets queue auto-delete behavior. The default is 'false'")
     public void setAutoDelete(boolean autoDelete) {
         this.autoDelete = autoDelete;
     }
 
-    @BQConfigProperty
+    @BQConfigProperty("Sets additional arguments passed to the queue declaration. E.g. 'x-message-ttl', etc.")
     public void setArguments(Map<String, Object> arguments) {
         this.arguments = arguments;
     }

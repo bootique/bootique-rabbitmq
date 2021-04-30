@@ -20,7 +20,7 @@ package io.bootique.rabbitmq.client.pubsub;
 
 import io.bootique.annotation.BQConfig;
 import io.bootique.annotation.BQConfigProperty;
-import io.bootique.rabbitmq.client.ChannelFactory;
+import io.bootique.rabbitmq.client.channel.RmqChannelFactory;
 import io.bootique.shutdown.ShutdownManager;
 
 import java.util.Objects;
@@ -37,7 +37,7 @@ public class RmqSubEndpointFactory {
     private String routingKey;
     private boolean autoAck = true;
 
-    public RmqSubEndpoint create(ChannelFactory channelFactory, ShutdownManager shutdownManager) {
+    public RmqSubEndpoint create(RmqChannelFactory channelFactory, ShutdownManager shutdownManager) {
         Objects.requireNonNull(connection, "Subscriber connection name is undefined");
         RmqSubEndpoint endpoint = new RmqSubEndpoint(channelFactory, connection, exchange, queue, routingKey, autoAck);
         shutdownManager.addShutdownHook(() -> endpoint.close());

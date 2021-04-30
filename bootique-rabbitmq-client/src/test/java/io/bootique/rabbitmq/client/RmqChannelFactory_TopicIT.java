@@ -24,6 +24,7 @@ import com.rabbitmq.client.GetResponse;
 import io.bootique.BQCoreModule;
 import io.bootique.BQRuntime;
 import io.bootique.junit5.BQTest;
+import io.bootique.rabbitmq.client.channel.RmqChannelFactory;
 import io.bootique.rabbitmq.client.unit.RabbitMQBaseTest;
 import org.junit.jupiter.api.Test;
 
@@ -34,7 +35,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 @BQTest
-public class ChannelFactory_TopicIT extends RabbitMQBaseTest {
+public class RmqChannelFactory_TopicIT extends RabbitMQBaseTest {
 
     @Test
     public void testAmqpConfig() throws IOException, TimeoutException {
@@ -44,10 +45,10 @@ public class ChannelFactory_TopicIT extends RabbitMQBaseTest {
                 .autoLoadModules()
                 .createRuntime();
 
-        assertCanSendAndReceive(runtime.getInstance(ChannelFactory.class));
+        assertCanSendAndReceive(runtime.getInstance(RmqChannelFactory.class));
     }
 
-    private void assertCanSendAndReceive(ChannelFactory channelFactory) throws IOException, TimeoutException {
+    private void assertCanSendAndReceive(RmqChannelFactory channelFactory) throws IOException, TimeoutException {
         try (Channel channel = channelFactory.newChannel("c1")
                 .ensureQueueBoundToExchange("new_queue", "topicExchange", "a.*")
                 .open()) {

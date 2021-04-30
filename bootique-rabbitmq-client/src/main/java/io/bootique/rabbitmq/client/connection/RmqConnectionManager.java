@@ -21,7 +21,7 @@ package io.bootique.rabbitmq.client.connection;
 
 import com.rabbitmq.client.Connection;
 import com.rabbitmq.client.ConnectionFactory;
-import io.bootique.rabbitmq.client.ChannelFactory;
+import io.bootique.rabbitmq.client.channel.RmqChannelFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -35,20 +35,20 @@ import java.util.concurrent.atomic.AtomicReference;
 
 /**
  * A map of named RabbitMQ connections. Connections are created on demand and cached for further reuse. Configured via
- * YAML and accessed via {@link ChannelFactory#getConnectionManager()}. Though you'd rarely need to access connections
- * directly. It is too low-level and RabbitMQ access in Bootique is done via {@link ChannelFactory}.
+ * YAML and accessed via {@link RmqChannelFactory#getConnectionManager()}. Though you'd rarely need to access connections
+ * directly. It is too low-level and RabbitMQ access in Bootique is done via {@link RmqChannelFactory}.
  *
  * @since 2.0
  */
-public class ConnectionManager {
+public class RmqConnectionManager {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(ConnectionManager.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(RmqConnectionManager.class);
 
     private final Map<String, ConnectionFactory> factories;
     private final Map<String, AtomicReference<Connection>> connections;
     private volatile boolean shutdown;
 
-    public ConnectionManager(Map<String, ConnectionFactory> factories) {
+    public RmqConnectionManager(Map<String, ConnectionFactory> factories) {
         this.factories = Objects.requireNonNull(factories);
 
         // RabbitMQ connections are thread-safe and we can reuse them for parallel calls

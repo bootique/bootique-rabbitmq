@@ -20,7 +20,7 @@ package io.bootique.rabbitmq.client.pubsub;
 
 import io.bootique.annotation.BQConfig;
 import io.bootique.annotation.BQConfigProperty;
-import io.bootique.rabbitmq.client.ChannelFactory;
+import io.bootique.rabbitmq.client.channel.RmqChannelFactory;
 
 import java.util.Objects;
 
@@ -34,7 +34,7 @@ public class RmqPubEndpointFactory {
     private String exchange;
     private String routingKey;
 
-    public RmqPubEndpoint create(ChannelFactory channelFactory) {
+    public RmqPubEndpoint create(RmqChannelFactory channelFactory) {
         Objects.requireNonNull(connection, "Publisher connection name is undefined");
         return new RmqPubEndpoint(channelFactory, connection, exchange, routingKey);
     }

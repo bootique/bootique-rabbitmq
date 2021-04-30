@@ -24,7 +24,7 @@ import com.rabbitmq.client.Connection;
 import com.rabbitmq.client.GetResponse;
 import io.bootique.BQCoreModule;
 import io.bootique.BQRuntime;
-import io.bootique.rabbitmq.client.ChannelFactory;
+import io.bootique.rabbitmq.client.channel.RmqChannelFactory;
 import io.bootique.rabbitmq.client.unit.RabbitMQBaseTest;
 import org.junit.jupiter.api.Test;
 
@@ -33,7 +33,7 @@ import java.util.concurrent.TimeoutException;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-public class ConnectionManagerIT extends RabbitMQBaseTest {
+public class RmqConnectionManagerIT extends RabbitMQBaseTest {
 
     @Test
     public void testUri_Defaults() throws IOException, TimeoutException {
@@ -46,7 +46,7 @@ public class ConnectionManagerIT extends RabbitMQBaseTest {
                 .autoLoadModules()
                 .createRuntime();
 
-        assertCanSendAndReceive(runtime.getInstance(ChannelFactory.class).getConnectionManager());
+        assertCanSendAndReceive(runtime.getInstance(RmqChannelFactory.class).getConnectionManager());
     }
 
     @Test
@@ -58,7 +58,7 @@ public class ConnectionManagerIT extends RabbitMQBaseTest {
                 .autoLoadModules()
                 .createRuntime();
 
-        assertCanSendAndReceive(runtime.getInstance(ChannelFactory.class).getConnectionManager());
+        assertCanSendAndReceive(runtime.getInstance(RmqChannelFactory.class).getConnectionManager());
     }
 
     @Test
@@ -69,10 +69,10 @@ public class ConnectionManagerIT extends RabbitMQBaseTest {
                 .autoLoadModules()
                 .createRuntime();
 
-        assertCanSendAndReceive(runtime.getInstance(ChannelFactory.class).getConnectionManager());
+        assertCanSendAndReceive(runtime.getInstance(RmqChannelFactory.class).getConnectionManager());
     }
 
-    private void assertCanSendAndReceive(ConnectionManager connectionManager) throws IOException, TimeoutException {
+    private void assertCanSendAndReceive(RmqConnectionManager connectionManager) throws IOException, TimeoutException {
         try (Connection connection = connectionManager.forName("c1")) {
             try (Channel channel = connection.openChannel().get()) {
 

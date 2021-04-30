@@ -17,12 +17,12 @@
  * under the License.
  */
 
-package io.bootique.rabbitmq.client;
+package io.bootique.rabbitmq.client.channel;
 
 import com.rabbitmq.client.Channel;
-import io.bootique.rabbitmq.client.connection.ConnectionManager;
-import io.bootique.rabbitmq.client.exchange.ExchangeConfig;
-import io.bootique.rabbitmq.client.queue.QueueConfig;
+import io.bootique.rabbitmq.client.connection.RmqConnectionManager;
+import io.bootique.rabbitmq.client.topology.RmqExchange;
+import io.bootique.rabbitmq.client.topology.RmqQueue;
 import io.bootique.rabbitmq.client.topology.RmqTopologyBuilder;
 
 import java.util.Map;
@@ -31,16 +31,16 @@ import java.util.Objects;
 /**
  * An injectable singleton that is the main access point to the RabbitMQ client.
  */
-public class ChannelFactory {
+public class RmqChannelFactory {
 
-    private ConnectionManager connectionManager;
-    private Map<String, ExchangeConfig> exchanges;
-    private Map<String, QueueConfig> queues;
+    private RmqConnectionManager connectionManager;
+    private Map<String, RmqExchange> exchanges;
+    private Map<String, RmqQueue> queues;
 
-    public ChannelFactory(
-            ConnectionManager connectionManager,
-            Map<String, ExchangeConfig> exchanges,
-            Map<String, QueueConfig> queues) {
+    public RmqChannelFactory(
+            RmqConnectionManager connectionManager,
+            Map<String, RmqExchange> exchanges,
+            Map<String, RmqQueue> queues) {
 
         this.connectionManager = Objects.requireNonNull(connectionManager);
         this.exchanges = Objects.requireNonNull(exchanges);
@@ -50,7 +50,7 @@ public class ChannelFactory {
     /**
      * @since 2.0
      */
-    public ConnectionManager getConnectionManager() {
+    public RmqConnectionManager getConnectionManager() {
         return connectionManager;
     }
 
@@ -69,7 +69,7 @@ public class ChannelFactory {
      *
      * @since 2.0
      */
-    public ChannelBuilder newChannel(String connectionName) {
-        return new ChannelBuilder(connectionManager, new RmqTopologyBuilder(exchanges, queues)).connectionName(connectionName);
+    public RmqChannelBuilder newChannel(String connectionName) {
+        return new RmqChannelBuilder(connectionManager, new RmqTopologyBuilder(exchanges, queues)).connectionName(connectionName);
     }
 }

@@ -22,7 +22,7 @@ import com.rabbitmq.client.CancelCallback;
 import com.rabbitmq.client.Channel;
 import com.rabbitmq.client.Consumer;
 import com.rabbitmq.client.DeliverCallback;
-import io.bootique.rabbitmq.client.ChannelFactory;
+import io.bootique.rabbitmq.client.channel.RmqChannelFactory;
 import io.bootique.rabbitmq.client.topology.RmqTopology;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -39,7 +39,7 @@ public class RmqSubEndpoint {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(RmqSubEndpoint.class);
 
-    private final ChannelFactory channelFactory;
+    private final RmqChannelFactory channelFactory;
     private final String connectionName;
     private final String defaultExchange;
     private final String defaultQueue;
@@ -49,7 +49,7 @@ public class RmqSubEndpoint {
     private final Map<String, Channel> consumerChannels;
 
     public RmqSubEndpoint(
-            ChannelFactory channelFactory,
+            RmqChannelFactory channelFactory,
             String connectionName,
             String defaultExchange,
             String defaultQueue,

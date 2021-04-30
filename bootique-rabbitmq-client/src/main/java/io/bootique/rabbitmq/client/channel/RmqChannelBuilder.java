@@ -16,10 +16,10 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package io.bootique.rabbitmq.client;
+package io.bootique.rabbitmq.client.channel;
 
 import com.rabbitmq.client.Channel;
-import io.bootique.rabbitmq.client.connection.ConnectionManager;
+import io.bootique.rabbitmq.client.connection.RmqConnectionManager;
 import io.bootique.rabbitmq.client.topology.RmqTopologyBuilder;
 
 import java.io.IOException;
@@ -30,37 +30,37 @@ import java.util.Objects;
  *
  * @since 2.0.B1
  */
-public class ChannelBuilder {
+public class RmqChannelBuilder {
 
-    private final ConnectionManager connectionManager;
+    private final RmqConnectionManager connectionManager;
     private final RmqTopologyBuilder topologyBuilder;
 
     private String connectionName;
 
-    public ChannelBuilder(
-            ConnectionManager connectionManager,
+    public RmqChannelBuilder(
+            RmqConnectionManager connectionManager,
             RmqTopologyBuilder topologyBuilder) {
 
         this.connectionManager = connectionManager;
         this.topologyBuilder = topologyBuilder;
     }
 
-    public ChannelBuilder connectionName(String connectionName) {
+    public RmqChannelBuilder connectionName(String connectionName) {
         this.connectionName = connectionName;
         return this;
     }
 
-    public ChannelBuilder ensureExchange(String exchangeName) {
+    public RmqChannelBuilder ensureExchange(String exchangeName) {
         topologyBuilder.ensureExchange(exchangeName);
         return this;
     }
 
-    public ChannelBuilder ensureQueue(String queueName) {
+    public RmqChannelBuilder ensureQueue(String queueName) {
         topologyBuilder.ensureQueue(queueName);
         return this;
     }
 
-    public ChannelBuilder ensureQueueBoundToExchange(String queueName, String exchangeName, String routingKey) {
+    public RmqChannelBuilder ensureQueueBoundToExchange(String queueName, String exchangeName, String routingKey) {
         topologyBuilder.ensureQueueBoundToExchange(queueName, exchangeName, routingKey);
         return this;
     }

@@ -19,8 +19,6 @@
 package io.bootique.rabbitmq.client.topology;
 
 import com.rabbitmq.client.Channel;
-import io.bootique.rabbitmq.client.exchange.ExchangeConfig;
-import io.bootique.rabbitmq.client.queue.QueueConfig;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -36,12 +34,12 @@ public class RmqTopologyBuilder {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(RmqTopologyBuilder.class);
 
-    private final Map<String, ExchangeConfig> exchangeConfigs;
-    private final Map<String, QueueConfig> queueConfigs;
+    private final Map<String, RmqExchange> exchangeConfigs;
+    private final Map<String, RmqQueue> queueConfigs;
 
     private Map<String, Consumer<Channel>> topologyActions;
 
-    public RmqTopologyBuilder(Map<String, ExchangeConfig> exchangeConfigs, Map<String, QueueConfig> queueConfigs) {
+    public RmqTopologyBuilder(Map<String, RmqExchange> exchangeConfigs, Map<String, RmqQueue> queueConfigs) {
         this.exchangeConfigs = exchangeConfigs;
         this.queueConfigs = queueConfigs;
         this.topologyActions = new LinkedHashMap<>();
@@ -77,8 +75,8 @@ public class RmqTopologyBuilder {
 
     protected void exchangeDeclare(Channel channel, String exchangeName) {
 
-        ExchangeConfig exchangeConfig = exchangeConfigs.get(exchangeName);
-        if (exchangeConfig == null) {
+        RmqExchange exchange = exchangeConfigs.get(exchangeName);
+        if (exchange == null) {
             // Have to throw, as unfortunately we can't create an exchange with default parameters.
             // We need to know its type at the minimum
             throw new IllegalStateException("No configuration present for exchange named '" + exchangeName + "'");
@@ -87,23 +85,23 @@ public class RmqTopologyBuilder {
         LOGGER.debug("declaring exchange '{}'", exchangeName);
 
         try {
-            exchangeConfig.exchangeDeclare(channel, exchangeName);
+            exchange.exchangeDeclare(channel, exchangeName);
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
     }
 
     protected void queueDeclare(Channel channel, String queueName) {
-        QueueConfig queueConfig = queueConfigs.containsKey(queueName)
+        RmqQueue queue = queueConfigs.containsKey(queueName)
                 ? queueConfigs.get(queueName)
                 // create a queue on the fly with default settings.
                 // TODO: print a warning?
-                : new QueueConfig();
+                : new RmqQueue();
 
         LOGGER.debug("declaring queue '{}'", queueName);
 
         try {
-            queueConfig.queueDeclare(channel, queueName);
+            queue.queueDeclare(channel, queueName);
         } catch (IOException e) {
             throw new RuntimeException(e);
         }

@@ -18,7 +18,7 @@
  */
 package io.bootique.rabbitmq.client.pubsub;
 
-import io.bootique.rabbitmq.client.ChannelFactory;
+import io.bootique.rabbitmq.client.channel.RmqChannelFactory;
 import io.bootique.rabbitmq.client.topology.RmqTopology;
 
 import java.util.Objects;
@@ -30,12 +30,12 @@ import java.util.Objects;
  */
 public class RmqPubEndpoint {
 
-    private final ChannelFactory channelFactory;
+    private final RmqChannelFactory channelFactory;
     private final String connectionName;
     private final String defaultExchange;
     private final String defaultRoutingKey;
 
-    public RmqPubEndpoint(ChannelFactory channelFactory, String connectionName, String defaultExchange, String defaultRoutingKey) {
+    public RmqPubEndpoint(RmqChannelFactory channelFactory, String connectionName, String defaultExchange, String defaultRoutingKey) {
         this.channelFactory = Objects.requireNonNull(channelFactory);
         this.connectionName = Objects.requireNonNull(connectionName);
         this.defaultExchange = RmqTopology.normalizeName(defaultExchange);

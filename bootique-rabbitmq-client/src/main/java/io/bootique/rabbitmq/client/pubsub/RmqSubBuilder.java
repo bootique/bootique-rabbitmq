@@ -19,8 +19,8 @@
 package io.bootique.rabbitmq.client.pubsub;
 
 import com.rabbitmq.client.*;
-import io.bootique.rabbitmq.client.ChannelBuilder;
-import io.bootique.rabbitmq.client.ChannelFactory;
+import io.bootique.rabbitmq.client.channel.RmqChannelBuilder;
+import io.bootique.rabbitmq.client.channel.RmqChannelFactory;
 import io.bootique.rabbitmq.client.topology.RmqTopology;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -39,7 +39,7 @@ public class RmqSubBuilder {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(RmqSubBuilder.class);
 
-    private final ChannelFactory channelFactory;
+    private final RmqChannelFactory channelFactory;
     private final String connectionName;
     private final Map<String, Channel> consumerChannels;
 
@@ -48,7 +48,7 @@ public class RmqSubBuilder {
     private String routingKey;
     private boolean autoAck;
 
-    protected RmqSubBuilder(ChannelFactory channelFactory, String connectionName, Map<String, Channel> consumerChannels) {
+    protected RmqSubBuilder(RmqChannelFactory channelFactory, String connectionName, Map<String, Channel> consumerChannels) {
         this.channelFactory = channelFactory;
         this.connectionName = connectionName;
         this.consumerChannels = consumerChannels;
@@ -118,7 +118,7 @@ public class RmqSubBuilder {
 
         RmqTopology.required(queue, "Consumer queue is not defined");
 
-        ChannelBuilder builder = channelFactory.newChannel(connectionName);
+        RmqChannelBuilder builder = channelFactory.newChannel(connectionName);
         if (RmqTopology.isDefined(exchange)) {
             builder.ensureQueueBoundToExchange(queue, exchange, routingKey);
         } else {

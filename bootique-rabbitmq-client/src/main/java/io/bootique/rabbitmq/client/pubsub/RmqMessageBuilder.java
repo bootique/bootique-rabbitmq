@@ -21,7 +21,7 @@ package io.bootique.rabbitmq.client.pubsub;
 import com.rabbitmq.client.AMQP;
 import com.rabbitmq.client.Channel;
 import com.rabbitmq.client.MessageProperties;
-import io.bootique.rabbitmq.client.ChannelFactory;
+import io.bootique.rabbitmq.client.channel.RmqChannelFactory;
 import io.bootique.rabbitmq.client.topology.RmqTopology;
 
 import java.io.IOException;
@@ -33,7 +33,7 @@ import java.util.concurrent.TimeoutException;
  */
 public class RmqMessageBuilder {
 
-    private final ChannelFactory channelFactory;
+    private final RmqChannelFactory channelFactory;
     private final String connectionName;
 
     private String exchange;
@@ -42,7 +42,7 @@ public class RmqMessageBuilder {
     private boolean immediate;
     private AMQP.BasicProperties properties;
 
-    protected RmqMessageBuilder(ChannelFactory channelFactory, String connectionName) {
+    protected RmqMessageBuilder(RmqChannelFactory channelFactory, String connectionName) {
         this.channelFactory = Objects.requireNonNull(channelFactory);
         this.connectionName = Objects.requireNonNull(connectionName);
         this.exchange = "";

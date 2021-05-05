@@ -104,6 +104,25 @@ public class EndpointsIT extends RabbitMQBaseTest {
     }
 
     @Test
+    public void testConsumerExceptions() {
+        RmqEndpoints endpoints = app.getInstance(RmqEndpoints.class);
+
+        ThrowingSub s3 = new ThrowingSub();
+        endpoints.sub("s3")
+                .newSubscription()
+                .queue("s3-exception-queue")
+                .subscribe(s3);
+
+        endpoints.pub("p1").publish("M1".getBytes());
+        s3.waitUntilDelivered(1);
+        s3.assertReceived("M1,p1.X", "First message not received");
+
+        // by default RabbitMQ closes the Channel on consumer exceptions
+        endpoints.pub("p1").publish("M2".getBytes());
+        s3.ensureNotDelivered(1);
+    }
+
+    @Test
     public void testCancelSubscription() {
         RmqEndpoints endpoints = app.getInstance(RmqEndpoints.class);
 
@@ -200,6 +219,15 @@ public class EndpointsIT extends RabbitMQBaseTest {
         public void handleDelivery(String consumerTag, Envelope envelope, AMQP.BasicProperties properties, byte[] body) throws IOException {
             delegate.handle(consumerTag, new Delivery(envelope, properties, body));
             getChannel().basicAck(envelope.getDeliveryTag(), false);
+        }
+    }
+
+    static class ThrowingSub extends Sub {
+
+        @Override
+        public void handle(String consumerTag, Delivery message) {
+            super.handle(consumerTag, message);
+            throw new RuntimeException("Emulating consumer exception for " + consumerTag);
         }
     }
 }

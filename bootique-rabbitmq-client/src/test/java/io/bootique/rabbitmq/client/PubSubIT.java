@@ -29,6 +29,7 @@ import io.bootique.rabbitmq.client.pubsub.RmqSubEndpoint;
 import io.bootique.rabbitmq.client.unit.RabbitMQBaseTest;
 import org.junit.jupiter.api.Test;
 
+import java.io.IOException;
 import java.time.Duration;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
@@ -123,6 +124,25 @@ public class PubSubIT extends RabbitMQBaseTest {
         s1.ensureNotDelivered(1);
     }
 
+    @Test
+    public void testSubWithAck() {
+        RmqPubSub pubSub = app.getInstance(RmqPubSub.class);
+        Sub s3 = new Sub();
+
+        pubSub.subEndpoint("s3").newSubscription()
+                .queue("s3-ack-queue")
+                .autoAck(false)
+                .subscribe(c -> new AckConsumer(c, s3));
+
+        pubSub.pubEndpoint("p2")
+                .newMessage()
+                .properties(MessageProperties.TEXT_PLAIN.builder().messageId("50").build())
+                .publish("M3".getBytes());
+
+        s3.waitUntilDelivered(1);
+        s3.assertReceived("M3,50,p2.X", "Message not received");
+    }
+
     static class Sub implements DeliverCallback {
 
         Map<Integer, String> received = new ConcurrentHashMap<>();
@@ -164,6 +184,22 @@ public class PubSubIT extends RabbitMQBaseTest {
 
         void assertDeliveryCount(int expected) {
             assertEquals(expected, received.size());
+        }
+    }
+
+    static class AckConsumer extends DefaultConsumer {
+
+        private final Sub delegate;
+
+        public AckConsumer(Channel channel, Sub delegate) {
+            super(channel);
+            this.delegate = delegate;
+        }
+
+        @Override
+        public void handleDelivery(String consumerTag, Envelope envelope, AMQP.BasicProperties properties, byte[] body) throws IOException {
+            delegate.handle(consumerTag, new Delivery(envelope, properties, body));
+            getChannel().basicAck(envelope.getDeliveryTag(), false);
         }
     }
 }

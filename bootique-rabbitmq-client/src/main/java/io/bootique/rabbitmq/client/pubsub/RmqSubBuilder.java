@@ -27,6 +27,7 @@ import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.util.Map;
+import java.util.function.Function;
 
 /**
  * Builds a single RMQ subscription for a queue. Allows to configure RMQ topology for that queue. Internally manages
@@ -98,8 +99,18 @@ public class RmqSubBuilder {
      * @return consumer tag returned by the server that can be used to cancel a consumer.
      */
     public String subscribe(Consumer consumer) {
+        return subscribe(c -> consumer);
+    }
 
+    /**
+     * Registers a consumer to listen to messages on the queue configured by this builder. A consumer is created using
+     * the provided lambda, and can reference the subscription Channel (e.g. for explicit delivery "ack").
+     *
+     * @return consumer tag returned by the server that can be used to cancel a consumer.
+     */
+    public String subscribe(Function<Channel, Consumer> consumerFactory) {
         Channel channel = createChannelWithTopology();
+        Consumer consumer = consumerFactory.apply(channel);
         String consumerTag;
 
         try {

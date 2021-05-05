@@ -28,9 +28,11 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
-import java.util.*;
+import java.util.Map;
+import java.util.Objects;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.TimeoutException;
+import java.util.function.Function;
 
 /**
  * @since 2.0.B1
@@ -148,5 +150,15 @@ public class RmqSubEndpoint {
      */
     public String subscribe(Consumer consumer) {
         return newSubscription().subscribe(consumer);
+    }
+
+    /**
+     * Registers a consumer to listen to messages on the queue described by this endpoint. A consumer is created using
+     * the provided lambda, and can reference the subscription Channel (e.g. for explicit delivery "ack").
+     *
+     * @return consumer tag returned by the server that can be used to cancel a consumer.
+     */
+    public String subscribe(Function<Channel, Consumer> consumerFactory) {
+        return newSubscription().subscribe(consumerFactory);
     }
 }

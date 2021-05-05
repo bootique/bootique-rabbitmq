@@ -116,7 +116,7 @@ public class RmqConnectionManager {
                         if (c.isOpen()) {
                             c.close();
                         }
-                        
+
                     } catch (IOException e) {
                         // ignore...
                     }

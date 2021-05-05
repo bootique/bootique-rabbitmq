@@ -38,10 +38,10 @@ import java.util.concurrent.atomic.AtomicInteger;
 import static org.junit.jupiter.api.Assertions.*;
 
 @BQTest
-public class PubSubIT extends RabbitMQBaseTest {
+public class EndpointsIT extends RabbitMQBaseTest {
 
     @BQApp(skipRun = true)
-    static final BQRuntime app = Bootique.app("-c", "classpath:pubsub.yml")
+    static final BQRuntime app = Bootique.app("-c", "classpath:endpoints.yml")
             .module(b -> BQCoreModule.extend(b)
                     // emulating suggested best practices - 1 connection for pub, 1 - for sub
                     .setProperty("bq.rabbitmq.connections.pubConnection.uri", rmq.getAmqpUrl())
@@ -51,19 +51,19 @@ public class PubSubIT extends RabbitMQBaseTest {
 
     @Test
     public void testP1Route() {
-        RmqPubSub pubSub = app.getInstance(RmqPubSub.class);
+        RmqEndpoints endpoints = app.getInstance(RmqEndpoints.class);
         Sub s1 = new Sub();
         Sub s2 = new Sub();
 
-        pubSub.subEndpoint("s1").subscribe(s1);
-        pubSub.subEndpoint("s2").subscribe(s2);
+        endpoints.sub("s1").subscribe(s1);
+        endpoints.sub("s2").subscribe(s2);
 
-        pubSub.pubEndpoint("p1")
+        endpoints.pub("p1")
                 .newMessage()
                 .properties(MessageProperties.TEXT_PLAIN.builder().messageId("10").build())
                 .publish("M1".getBytes());
 
-        pubSub.pubEndpoint("p1")
+        endpoints.pub("p1")
                 .newMessage()
                 .properties(MessageProperties.TEXT_PLAIN.builder().messageId("20").build())
                 .publish("M2".getBytes());
@@ -77,19 +77,19 @@ public class PubSubIT extends RabbitMQBaseTest {
 
     @Test
     public void testP2Route() {
-        RmqPubSub pubSub = app.getInstance(RmqPubSub.class);
+        RmqEndpoints endpoints = app.getInstance(RmqEndpoints.class);
         Sub s3 = new Sub();
         Sub s4 = new Sub();
 
-        pubSub.subEndpoint("s3").newSubscription().queue("s3-queue").subscribe(s3);
-        pubSub.subEndpoint("s4").newSubscription().queue("s4-queue").subscribe(s4);
+        endpoints.sub("s3").newSubscription().queue("s3-queue").subscribe(s3);
+        endpoints.sub("s4").newSubscription().queue("s4-queue").subscribe(s4);
 
-        pubSub.pubEndpoint("p2")
+        endpoints.pub("p2")
                 .newMessage()
                 .properties(MessageProperties.TEXT_PLAIN.builder().messageId("30").build())
                 .publish("M3".getBytes());
 
-        pubSub.pubEndpoint("p2")
+        endpoints.pub("p2")
                 .newMessage()
                 .properties(MessageProperties.TEXT_PLAIN.builder().messageId("40").build())
                 .publish("M4".getBytes());
@@ -105,36 +105,36 @@ public class PubSubIT extends RabbitMQBaseTest {
 
     @Test
     public void testCancelSubscription() {
-        RmqPubSub pubSub = app.getInstance(RmqPubSub.class);
+        RmqEndpoints endpoints = app.getInstance(RmqEndpoints.class);
 
-        RmqSubEndpoint s1Endpoint = pubSub.subEndpoint("s1");
+        RmqSubEndpoint s1Endpoint = endpoints.sub("s1");
 
         Sub s1 = new Sub();
         String consumerTag = s1Endpoint.subscribe(s1);
         assertEquals(1, s1Endpoint.getSubscriptionsCount());
 
-        pubSub.pubEndpoint("p1").publish("M1".getBytes());
+        endpoints.pub("p1").publish("M1".getBytes());
         s1.waitUntilDelivered(1);
         s1.assertReceived("M1,p1.X", "First message not received");
 
         s1Endpoint.cancelSubscription(consumerTag);
         assertEquals(0, s1Endpoint.getSubscriptionsCount());
 
-        pubSub.pubEndpoint("p1").publish("M2".getBytes());
+        endpoints.pub("p1").publish("M2".getBytes());
         s1.ensureNotDelivered(1);
     }
 
     @Test
     public void testSubWithAck() {
-        RmqPubSub pubSub = app.getInstance(RmqPubSub.class);
+        RmqEndpoints endpoints = app.getInstance(RmqEndpoints.class);
         Sub s3 = new Sub();
 
-        pubSub.subEndpoint("s3").newSubscription()
+        endpoints.sub("s3").newSubscription()
                 .queue("s3-ack-queue")
                 .autoAck(false)
                 .subscribe(c -> new AckConsumer(c, s3));
 
-        pubSub.pubEndpoint("p2")
+        endpoints.pub("p2")
                 .newMessage()
                 .properties(MessageProperties.TEXT_PLAIN.builder().messageId("50").build())
                 .publish("M3".getBytes());

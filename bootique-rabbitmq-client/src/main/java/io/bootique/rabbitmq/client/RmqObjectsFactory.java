@@ -62,8 +62,8 @@ public class RmqObjectsFactory {
                 queues != null ? queues : Collections.emptyMap());
     }
 
-    public RmqPubSub createPubSub(RmqChannelFactory channelFactory, ShutdownManager shutdownManager) {
-        return new RmqPubSub(
+    public RmqEndpoints createEndpoints(RmqChannelFactory channelFactory, ShutdownManager shutdownManager) {
+        return new RmqEndpoints(
                 createPubEndpoints(channelFactory),
                 createSubEndpoints(channelFactory, shutdownManager));
     }

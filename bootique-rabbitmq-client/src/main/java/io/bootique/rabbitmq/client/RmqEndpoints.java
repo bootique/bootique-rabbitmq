@@ -30,17 +30,20 @@ import java.util.Map;
  *
  * @since 2.0.B1
  */
-public class RmqPubSub {
+public class RmqEndpoints {
 
     private final Map<String, RmqPubEndpoint> pubEndpoints;
     private final Map<String, RmqSubEndpoint> subEndpoints;
 
-    public RmqPubSub(Map<String, RmqPubEndpoint> pubEndpoints, Map<String, RmqSubEndpoint> subEndpoints) {
+    public RmqEndpoints(Map<String, RmqPubEndpoint> pubEndpoints, Map<String, RmqSubEndpoint> subEndpoints) {
         this.pubEndpoints = pubEndpoints;
         this.subEndpoints = subEndpoints;
     }
 
-    public RmqPubEndpoint pubEndpoint(String name) {
+    /**
+     * Returns a named publishing endpoint.
+     */
+    public RmqPubEndpoint pub(String name) {
         RmqPubEndpoint endpoint = pubEndpoints.get(name);
         if (endpoint == null) {
             throw new IllegalArgumentException("Unmapped RMQ publish endpoint: " + name);
@@ -49,7 +52,10 @@ public class RmqPubSub {
         return endpoint;
     }
 
-    public RmqSubEndpoint subEndpoint(String name) {
+    /**
+     * Returns a named subscription endpoint.
+     */
+    public RmqSubEndpoint sub(String name) {
         RmqSubEndpoint endpoint = subEndpoints.get(name);
         if (endpoint == null) {
             throw new IllegalArgumentException("Unmapped RMQ subscription endpoint: " + name);

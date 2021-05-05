@@ -50,7 +50,10 @@ public class RabbitMQModule extends ConfigModule {
 
     @Singleton
     @Provides
-    RmqPubSub providePubSub(RmqObjectsFactory factory, RmqChannelFactory channelFactory, ShutdownManager shutdownManager) {
-        return factory.createPubSub(channelFactory, shutdownManager);
+    RmqEndpoints provideEndpoints(
+            RmqObjectsFactory factory,
+            RmqChannelFactory channelFactory,
+            ShutdownManager shutdownManager) {
+        return factory.createEndpoints(channelFactory, shutdownManager);
     }
 }

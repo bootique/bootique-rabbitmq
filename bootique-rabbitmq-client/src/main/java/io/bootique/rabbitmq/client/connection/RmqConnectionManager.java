@@ -109,8 +109,14 @@ public class RmqConnectionManager {
                 .map(AtomicReference::get)
                 .filter(r -> r != null && r.isOpen())
                 .forEach(c -> {
+
                     try {
-                        c.close();
+
+                        // checking for open state, as RMQ connections are verbose about multiple close attempts
+                        if (c.isOpen()) {
+                            c.close();
+                        }
+                        
                     } catch (IOException e) {
                         // ignore...
                     }

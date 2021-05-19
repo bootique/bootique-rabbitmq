@@ -18,7 +18,7 @@
   -->
 
 [![build test deploy](https://github.com/bootique/bootique-rabbitmq/actions/workflows/maven.yml/badge.svg)](https://github.com/bootique/bootique-rabbitmq/actions/workflows/maven.yml)
-[![Maven Central](https://img.shields.io/maven-central/v/io.bootique.rabbitmq/bootique-rabbitmq.svg?colorB=brightgreen)](https://search.maven.org/artifact/io.bootique.rabbitmq/bootique-rabbitmq/)
+[![Maven Central](https://img.shields.io/maven-central/v/io.bootique.rabbitmq/bootique-rabbitmq-client.svg?colorB=brightgreen)](https://search.maven.org/artifact/io.bootique.rabbitmq/bootique-rabbitmq-client)
 
 
 # Bootique RabbitMQ

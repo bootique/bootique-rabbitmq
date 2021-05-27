@@ -164,6 +164,26 @@ public class EndpointsIT extends RabbitMQBaseTest {
         s3.assertReceived("M3,50,p2.X", "Message not received");
     }
 
+    @Test
+    public void testP1QueueWithTTL() {
+        RmqEndpoints endpoints = app.getInstance(RmqEndpoints.class);
+        Sub s5 = new Sub();
+
+        endpoints.sub("s5").subscribe(s5);
+
+        endpoints.pub("p1")
+                .newMessage()
+                .routingKey("p1.ttl")
+                .properties(MessageProperties.TEXT_PLAIN.builder().messageId("60").build())
+                .publish("M5".getBytes());
+
+        s5.waitUntilDelivered(1);
+        s5.assertReceived("M5,60,p1.ttl", "First message not received");
+
+        // TODO: actually verify that TTL results in message expiration
+        //   for now only verifying that the TTL argument didn't cause RMQ exceptions
+    }
+
     static class Sub implements DeliverCallback {
 
         Map<Integer, String> received = new ConcurrentHashMap<>();

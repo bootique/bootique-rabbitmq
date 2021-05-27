@@ -30,7 +30,8 @@ rabbitmq:
     queue-ttl:
       durable: true
       arguments:
-        x-message-ttl: 1000
+        # intentionally binding as String, not an Integer. Config must take care of conversion
+        x-message-ttl: "1000"
 
   pub:
     p1:

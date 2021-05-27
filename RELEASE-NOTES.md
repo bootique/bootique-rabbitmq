@@ -1,3 +1,7 @@
+## 2.0.RC1
+
+* #12 String value for "x-message-ttl" causes exception on "declareQueue"
+
 ## 2.0.B1
 
 * #4 Configurable Publishers / Consumers

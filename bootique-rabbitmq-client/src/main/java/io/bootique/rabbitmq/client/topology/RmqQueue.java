@@ -24,17 +24,22 @@ import io.bootique.annotation.BQConfig;
 import io.bootique.annotation.BQConfigProperty;
 
 import java.io.IOException;
+import java.util.Collections;
+import java.util.HashMap;
 import java.util.Map;
 
 @BQConfig
 public class RmqQueue {
+
+    private static final String X_MESSAGE_TTL = "x-message-ttl";
+
     private boolean durable = true;
     private boolean exclusive = false;
     private boolean autoDelete = false;
     private Map<String, Object> arguments;
 
     public void queueDeclare(Channel channel, String queueName) throws IOException {
-        channel.queueDeclare(queueName, durable, exclusive, autoDelete, arguments);
+        channel.queueDeclare(queueName, durable, exclusive, autoDelete, cleanArguments());
     }
 
     @BQConfigProperty("Sets queue durability. The default is 'true'")
@@ -55,5 +60,29 @@ public class RmqQueue {
     @BQConfigProperty("Sets additional arguments passed to the queue declaration. E.g. 'x-message-ttl', etc.")
     public void setArguments(Map<String, Object> arguments) {
         this.arguments = arguments;
+    }
+
+    // certain arguments can be bound as Strings in the map, whereas RMQ expects numbers for them.
+    // Perform conversion for the known args
+    protected Map<String, Object> cleanArguments() {
+
+        if (arguments == null || arguments.isEmpty()) {
+            return Collections.emptyMap();
+        }
+
+        Object xMessageTTL = arguments.get(X_MESSAGE_TTL);
+        if (xMessageTTL == null || xMessageTTL instanceof Integer) {
+            return arguments;
+        }
+
+        Map<String, Object> clean = new HashMap<>(arguments);
+
+        try {
+            clean.put(X_MESSAGE_TTL, Integer.valueOf(xMessageTTL.toString()));
+        } catch (NumberFormatException e) {
+            throw new RuntimeException("Error converting '" + X_MESSAGE_TTL + "' queue argument to an Integer: " + xMessageTTL, e);
+        }
+
+        return clean;
     }
 }

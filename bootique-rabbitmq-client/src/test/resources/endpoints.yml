@@ -27,6 +27,10 @@ rabbitmq:
   queues:
     queue1:
       durable: true
+    queue-ttl:
+      durable: true
+      arguments:
+        x-message-ttl: 1000
 
   pub:
     p1:
@@ -61,3 +65,8 @@ rabbitmq:
       exchange: e1
       routingKey: "p2.X"
       # no queue, it will be created during subscription
+    s5:
+      connection: subConnection
+      exchange: e1
+      queue: queue-ttl
+      routingKey: "p1.ttl"

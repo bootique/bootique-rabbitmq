@@ -18,10 +18,7 @@
  */
 package io.bootique.rabbitmq.client.pubsub;
 
-import com.rabbitmq.client.CancelCallback;
-import com.rabbitmq.client.Channel;
-import com.rabbitmq.client.Consumer;
-import com.rabbitmq.client.DeliverCallback;
+import com.rabbitmq.client.*;
 import io.bootique.rabbitmq.client.channel.RmqChannelFactory;
 import io.bootique.rabbitmq.client.topology.RmqTopology;
 import org.slf4j.Logger;
@@ -86,6 +83,9 @@ public class RmqSubEndpoint {
             consumerChannels.values().forEach(c -> {
                 try {
                     c.close();
+                } catch (AlreadyClosedException e) {
+                    // This will likely happen every time, as the underlying RmqConnectionManager is
+                    //  shutdown before the endpoints are.
                 } catch (IOException e) {
                     LOGGER.warn("Error closing a Channel", e);
                 } catch (TimeoutException e) {

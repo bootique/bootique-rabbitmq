@@ -1,5 +1,6 @@
 ## 2.0.RC1
 
+* #11 Cleaner shutdown
 * #12 String value for "x-message-ttl" causes exception on "declareQueue"
 
 ## 2.0.B1

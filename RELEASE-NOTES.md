@@ -2,6 +2,7 @@
 
 * #11 Cleaner shutdown
 * #12 String value for "x-message-ttl" causes exception on "declareQueue"
+* #13 Upgrade amqp-client from 5.12.0 to 5.14.0
 
 ## 2.0.B1
 

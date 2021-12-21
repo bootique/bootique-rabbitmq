@@ -37,7 +37,7 @@ public class RmqTopologyBuilder {
     private final Map<String, RmqExchange> exchangeConfigs;
     private final Map<String, RmqQueue> queueConfigs;
 
-    private Map<String, Consumer<Channel>> topologyActions;
+    private final Map<String, Consumer<Channel>> topologyActions;
 
     public RmqTopologyBuilder(Map<String, RmqExchange> exchangeConfigs, Map<String, RmqQueue> queueConfigs) {
         this.exchangeConfigs = exchangeConfigs;
@@ -45,9 +45,8 @@ public class RmqTopologyBuilder {
         this.topologyActions = new LinkedHashMap<>();
     }
 
-    public Channel buildTopology(Channel channel) {
-        topologyActions.values().forEach(ta -> ta.accept(channel));
-        return channel;
+    public RmqTopology build() {
+        return new RmqTopology(topologyActions);
     }
 
     public RmqTopologyBuilder ensureExchange(String exchangeName) {
@@ -67,7 +66,7 @@ public class RmqTopologyBuilder {
         ensureExchange(exchangeName);
         ensureQueue(queueName);
 
-        topologyActions.computeIfAbsent("eq:" + exchangeName + ":" + queueName,
+        topologyActions.computeIfAbsent("eq:" + exchangeName + ":" + queueName + ":" + routingKey,
                 k -> c -> queueBind(c, queueName, exchangeName, routingKey));
 
         return this;

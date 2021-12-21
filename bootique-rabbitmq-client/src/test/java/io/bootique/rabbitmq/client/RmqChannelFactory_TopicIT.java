@@ -29,6 +29,7 @@ import io.bootique.rabbitmq.client.unit.RabbitMQBaseTest;
 import org.junit.jupiter.api.Test;
 
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 import java.util.concurrent.TimeoutException;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -45,20 +46,44 @@ public class RmqChannelFactory_TopicIT extends RabbitMQBaseTest {
                 .autoLoadModules()
                 .createRuntime();
 
-        assertCanSendAndReceive(runtime.getInstance(RmqChannelFactory.class));
-    }
-
-    private void assertCanSendAndReceive(RmqChannelFactory channelFactory) throws IOException, TimeoutException {
-        try (Channel channel = channelFactory.newChannel("c1")
+        try (Channel channel = runtime.getInstance(RmqChannelFactory.class).newChannel("c1")
                 .ensureQueueBoundToExchange("new_queue", "topicExchange", "a.*")
                 .open()) {
 
             String message = "Hello World!";
-            channel.basicPublish("topicExchange", "a.b", null, message.getBytes("UTF-8"));
+            channel.basicPublish("topicExchange", "a.b", null, message.getBytes(StandardCharsets.UTF_8));
 
             GetResponse response = channel.basicGet("new_queue", false);
             assertNotNull(response);
             assertEquals(message, new String(response.getBody()));
         }
     }
+
+    @Test
+    public void testRoutingKeys() throws IOException, TimeoutException {
+        BQRuntime runtime = testFactory
+                .app("-c", "classpath:exchange-topic.yml")
+                .module(b -> BQCoreModule.extend(b).setProperty("bq.rabbitmq.connections.c1.uri", rmq.getAmqpUrl()))
+                .autoLoadModules()
+                .createRuntime();
+
+        try (Channel channel = runtime.getInstance(RmqChannelFactory.class).newChannel("c1")
+                .ensureQueueBoundToExchange("rq_queue", "topicExchange", "a.*")
+                .ensureQueueBoundToExchange("rq_queue", "topicExchange", "b.*")
+                .open()) {
+
+            String messageA = "For A";
+            channel.basicPublish("topicExchange", "a.x", null, messageA.getBytes(StandardCharsets.UTF_8));
+            GetResponse rA = channel.basicGet("rq_queue", false);
+            assertNotNull(rA);
+            assertEquals(messageA, new String(rA.getBody()));
+
+            String messageB = "For B";
+            channel.basicPublish("topicExchange", "b.x", null, messageB.getBytes(StandardCharsets.UTF_8));
+            GetResponse rB = channel.basicGet("rq_queue", false);
+            assertNotNull(rB);
+            assertEquals(messageB, new String(rB.getBody()));
+        }
+    }
+
 }

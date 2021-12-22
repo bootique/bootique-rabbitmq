@@ -81,10 +81,7 @@ public class RmqMessageBuilder {
         AMQP.BasicProperties properties = this.properties != null
                 ? this.properties
                 : MessageProperties.MINIMAL_BASIC;
-
-        // TODO: creating and closing a new channel for just a single message is fairly inefficient,
-        //  though we can transparently address it in the ChannelFactory with channel pooling
-
+        
         try (Channel channel = createChannelWithTopology()) {
             channel.basicPublish(exchange, routingKey, mandatory, immediate, properties, message);
         } catch (IOException e) {

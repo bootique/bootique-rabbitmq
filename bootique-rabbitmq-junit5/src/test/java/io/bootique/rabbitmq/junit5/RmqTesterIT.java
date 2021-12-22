@@ -25,7 +25,6 @@ import io.bootique.Bootique;
 import io.bootique.junit5.BQApp;
 import io.bootique.junit5.BQTest;
 import io.bootique.junit5.BQTestTool;
-import io.bootique.rabbitmq.client.channel.RmqChannelFactory;
 import io.bootique.rabbitmq.client.connection.RmqConnectionManager;
 import org.junit.jupiter.api.Test;
 
@@ -47,7 +46,7 @@ public class RmqTesterIT {
 
     @Test
     public void testAppInitialized() throws IOException, TimeoutException {
-        assertCanOpenChannel(app.getInstance(RmqChannelFactory.class).getConnectionManager());
+        assertCanOpenChannel(app.getInstance(RmqConnectionManager.class));
     }
 
     private void assertCanOpenChannel(RmqConnectionManager connectionManager) throws IOException, TimeoutException {

@@ -24,7 +24,6 @@ import com.rabbitmq.client.Connection;
 import com.rabbitmq.client.GetResponse;
 import io.bootique.BQCoreModule;
 import io.bootique.BQRuntime;
-import io.bootique.rabbitmq.client.channel.RmqChannelFactory;
 import io.bootique.rabbitmq.client.unit.RabbitMQBaseTest;
 import org.junit.jupiter.api.Test;
 
@@ -46,7 +45,7 @@ public class RmqConnectionManagerIT extends RabbitMQBaseTest {
                 .autoLoadModules()
                 .createRuntime();
 
-        assertCanSendAndReceive(runtime.getInstance(RmqChannelFactory.class).getConnectionManager());
+        assertCanSendAndReceive(runtime.getInstance(RmqConnectionManager.class));
     }
 
     @Test
@@ -58,7 +57,7 @@ public class RmqConnectionManagerIT extends RabbitMQBaseTest {
                 .autoLoadModules()
                 .createRuntime();
 
-        assertCanSendAndReceive(runtime.getInstance(RmqChannelFactory.class).getConnectionManager());
+        assertCanSendAndReceive(runtime.getInstance(RmqConnectionManager.class));
     }
 
     @Test
@@ -69,7 +68,7 @@ public class RmqConnectionManagerIT extends RabbitMQBaseTest {
                 .autoLoadModules()
                 .createRuntime();
 
-        assertCanSendAndReceive(runtime.getInstance(RmqChannelFactory.class).getConnectionManager());
+        assertCanSendAndReceive(runtime.getInstance(RmqConnectionManager.class));
     }
 
     private void assertCanSendAndReceive(RmqConnectionManager connectionManager) throws IOException, TimeoutException {

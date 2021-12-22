@@ -35,8 +35,8 @@ import java.util.concurrent.atomic.AtomicReference;
 
 /**
  * A map of named RabbitMQ connections. Connections are created on demand and cached for further reuse. Configured via
- * YAML and accessed via {@link RmqChannelFactory#getConnectionManager()}. Though you'd rarely need to access connections
- * directly. It is too low-level and RabbitMQ access in Bootique is done via {@link RmqChannelFactory}.
+ * YAML and injectable via DI. Though you'd rarely need to access connections directly. It is too low-level and
+ * RabbitMQ access in Bootique is done via {@link RmqChannelFactory}.
  *
  * @since 2.0
  */

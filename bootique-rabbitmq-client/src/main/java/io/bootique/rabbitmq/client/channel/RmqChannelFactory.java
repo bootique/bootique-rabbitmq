@@ -49,7 +49,9 @@ public class RmqChannelFactory {
 
     /**
      * @since 2.0
+     * @deprecated since 3.0.M1, as RmqConnectionManager is injectable directly
      */
+    @Deprecated
     public RmqConnectionManager getConnectionManager() {
         return connectionManager;
     }

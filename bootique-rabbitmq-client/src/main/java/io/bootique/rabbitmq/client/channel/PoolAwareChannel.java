@@ -33,7 +33,7 @@ import java.util.concurrent.TimeoutException;
  */
 public class PoolAwareChannel implements Channel {
 
-    private final Channel delegate;
+    final Channel delegate;
     private final BlockingQueue<Channel> pool;
 
     public PoolAwareChannel(Channel delegate, BlockingQueue<Channel> pool) {
@@ -45,7 +45,7 @@ public class PoolAwareChannel implements Channel {
     @Override
     public void close() throws IOException, TimeoutException {
         // instead of closing, return to the pool
-        boolean accepted = pool.offer(this);
+        boolean accepted = pool.offer(delegate);
         if (!accepted) {
             delegate.close();
         }

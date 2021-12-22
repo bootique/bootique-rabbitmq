@@ -67,7 +67,7 @@ public class PoolingChannelManager implements RmqChannelManager {
 
         channel.clearConfirmListeners();
         channel.clearReturnListeners();
-        return channel;
+        return new PoolAwareChannel(channel, pool);
     }
 
     public void close() {
@@ -77,7 +77,7 @@ public class PoolingChannelManager implements RmqChannelManager {
     protected void closePool(BlockingQueue<Channel> pool) {
         List<Channel> localChannels = new ArrayList<>();
         pool.drainTo(localChannels);
-        pool.forEach(this::closeChannel);
+        localChannels.forEach(this::closeChannel);
     }
 
     protected Channel createPoolableChannel(BlockingQueue<Channel> pool, String connectionName) {

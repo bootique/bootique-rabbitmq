@@ -28,13 +28,14 @@ import io.bootique.rabbitmq.client.channel.RmqChannelManager;
 import io.bootique.rabbitmq.client.topology.RmqTopologyManager;
 import io.bootique.rabbitmq.client.unit.RabbitMQBaseTest;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.ValueSource;
 
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.util.concurrent.TimeoutException;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.*;
 
 @BQTest
 public class RmqChannelManager_TopicIT extends RabbitMQBaseTest {
@@ -93,4 +94,49 @@ public class RmqChannelManager_TopicIT extends RabbitMQBaseTest {
         }
     }
 
+    @ParameterizedTest
+    @ValueSource(strings = {"ex_durable", "ex_non_durable"})
+    public void testChannelCache(String exchange) throws IOException, TimeoutException, InterruptedException {
+        BQRuntime runtime = testFactory
+                .app("-c", "classpath:channel-cache.yml")
+                .module(b -> BQCoreModule.extend(b).setProperty("bq.rabbitmq.connections.c.uri", rmq.getAmqpUrl()))
+                .autoLoadModules()
+                .createRuntime();
+
+        RmqChannelManager channelManager = runtime.getInstance(RmqChannelManager.class);
+
+        // preallocate read channels
+        Channel cr1 = channelManager.createChannel("c");
+        Channel cr2 = channelManager.createChannel("c");
+        assertNotEquals(cr1.getChannelNumber(), cr2.getChannelNumber(), "Channel is still open and should not be reused");
+
+        Channel cw1 = channelManager.createChannel("c");
+        assertNotEquals(cr2.getChannelNumber(), cw1.getChannelNumber(), "Channel is still open and should not be reused");
+
+        String queue = exchange + "_q";
+        runtime.getInstance(RmqTopologyManager.class).newTopology()
+                .ensureQueueBoundToExchange(queue, exchange, "a.*")
+                .build()
+                .apply(cw1);
+
+        cw1.basicPublish(exchange, "a.x", null, "M1".getBytes(StandardCharsets.UTF_8));
+        Thread.sleep(300L);
+        assertResponse("M1", cr1.basicGet(queue, true));
+
+        // close c2 and see if it gets reused
+        cw1.close();
+        Channel throwaway = channelManager.createChannel("c");
+        assertEquals(cw1.getChannelNumber(), throwaway.getChannelNumber(), "Channel must be reused after close");
+
+        // open a new (non-reused) channel and see if it can work with the existing topology
+        Channel cw2 = channelManager.createChannel("c");
+        cw2.basicPublish(exchange, "a.x", null, "M2".getBytes(StandardCharsets.UTF_8));
+        Thread.sleep(300L);
+        assertResponse("M2", cr2.basicGet(queue, true));
+    }
+
+    private void assertResponse(String expected, GetResponse response) {
+        assertNotNull(response);
+        assertEquals(expected, new String(response.getBody()));
+    }
 }

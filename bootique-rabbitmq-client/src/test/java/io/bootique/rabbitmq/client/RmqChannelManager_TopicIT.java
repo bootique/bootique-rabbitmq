@@ -24,7 +24,8 @@ import com.rabbitmq.client.GetResponse;
 import io.bootique.BQCoreModule;
 import io.bootique.BQRuntime;
 import io.bootique.junit5.BQTest;
-import io.bootique.rabbitmq.client.channel.RmqChannelFactory;
+import io.bootique.rabbitmq.client.channel.RmqChannelManager;
+import io.bootique.rabbitmq.client.topology.RmqTopologyManager;
 import io.bootique.rabbitmq.client.unit.RabbitMQBaseTest;
 import org.junit.jupiter.api.Test;
 
@@ -35,21 +36,23 @@ import java.util.concurrent.TimeoutException;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 
-@Deprecated
 @BQTest
-public class RmqChannelFactory_TopicIT extends RabbitMQBaseTest {
+public class RmqChannelManager_TopicIT extends RabbitMQBaseTest {
 
     @Test
-    public void testAmqpConfig() throws IOException, TimeoutException {
+    public void testSingleRoutingKey() throws IOException, TimeoutException {
         BQRuntime runtime = testFactory
                 .app("-c", "classpath:exchange-topic.yml")
                 .module(b -> BQCoreModule.extend(b).setProperty("bq.rabbitmq.connections.c1.uri", rmq.getAmqpUrl()))
                 .autoLoadModules()
                 .createRuntime();
 
-        try (Channel channel = runtime.getInstance(RmqChannelFactory.class).newChannel("c1")
-                .ensureQueueBoundToExchange("new_queue", "topicExchange", "a.*")
-                .open()) {
+        try (Channel channel = runtime.getInstance(RmqChannelManager.class).createChannel("c1")) {
+
+            runtime.getInstance(RmqTopologyManager.class).newTopology()
+                    .ensureQueueBoundToExchange("new_queue", "topicExchange", "a.*")
+                    .build()
+                    .apply(channel);
 
             String message = "Hello World!";
             channel.basicPublish("topicExchange", "a.b", null, message.getBytes(StandardCharsets.UTF_8));
@@ -61,17 +64,20 @@ public class RmqChannelFactory_TopicIT extends RabbitMQBaseTest {
     }
 
     @Test
-    public void testRoutingKeys() throws IOException, TimeoutException {
+    public void testMultiRoutingKeys() throws IOException, TimeoutException {
         BQRuntime runtime = testFactory
                 .app("-c", "classpath:exchange-topic.yml")
                 .module(b -> BQCoreModule.extend(b).setProperty("bq.rabbitmq.connections.c1.uri", rmq.getAmqpUrl()))
                 .autoLoadModules()
                 .createRuntime();
 
-        try (Channel channel = runtime.getInstance(RmqChannelFactory.class).newChannel("c1")
-                .ensureQueueBoundToExchange("rq_queue", "topicExchange", "a.*")
-                .ensureQueueBoundToExchange("rq_queue", "topicExchange", "b.*")
-                .open()) {
+        try (Channel channel = runtime.getInstance(RmqChannelManager.class).createChannel("c1")) {
+
+            runtime.getInstance(RmqTopologyManager.class).newTopology()
+                    .ensureQueueBoundToExchange("rq_queue", "topicExchange", "a.*")
+                    .ensureQueueBoundToExchange("rq_queue", "topicExchange", "b.*")
+                    .build()
+                    .apply(channel);
 
             String messageA = "For A";
             channel.basicPublish("topicExchange", "a.x", null, messageA.getBytes(StandardCharsets.UTF_8));

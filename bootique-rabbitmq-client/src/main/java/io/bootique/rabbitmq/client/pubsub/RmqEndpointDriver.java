@@ -19,7 +19,7 @@
 package io.bootique.rabbitmq.client.pubsub;
 
 import com.rabbitmq.client.Channel;
-import io.bootique.rabbitmq.client.connection.RmqConnectionManager;
+import io.bootique.rabbitmq.client.channel.RmqChannelManager;
 import io.bootique.rabbitmq.client.topology.RmqTopologyBuilder;
 import io.bootique.rabbitmq.client.topology.RmqTopologyManager;
 
@@ -28,15 +28,15 @@ import io.bootique.rabbitmq.client.topology.RmqTopologyManager;
  */
 public class RmqEndpointDriver {
 
-    private final RmqConnectionManager connectionManager;
+    private final RmqChannelManager channelManager;
     private final RmqTopologyManager topologyManager;
     private final String connectionName;
 
     public RmqEndpointDriver(
-            RmqConnectionManager connectionManager,
+            RmqChannelManager channelManager,
             RmqTopologyManager topologyManager,
             String connectionName) {
-        this.connectionManager = connectionManager;
+        this.channelManager = channelManager;
         this.topologyManager = topologyManager;
         this.connectionName = connectionName;
     }
@@ -46,7 +46,7 @@ public class RmqEndpointDriver {
     }
 
     public Channel createChannel() {
-        return connectionManager.createChannel(connectionName);
+        return channelManager.createChannel(connectionName);
     }
 
     public RmqTopologyBuilder newTopology() {

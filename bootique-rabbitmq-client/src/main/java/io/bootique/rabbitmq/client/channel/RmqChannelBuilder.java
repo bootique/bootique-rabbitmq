@@ -35,16 +35,16 @@ import java.util.Objects;
 @Deprecated
 public class RmqChannelBuilder {
 
-    private final RmqConnectionManager connectionManager;
+    private final RmqChannelManager channelManager;
     private final RmqTopologyBuilder topologyBuilder;
 
     private String connectionName;
 
     public RmqChannelBuilder(
-            RmqConnectionManager connectionManager,
+            RmqChannelManager channelManager,
             RmqTopologyBuilder topologyBuilder) {
 
-        this.connectionManager = connectionManager;
+        this.channelManager = channelManager;
         this.topologyBuilder = topologyBuilder;
     }
 
@@ -77,6 +77,6 @@ public class RmqChannelBuilder {
 
     protected Channel createChannel() {
         Objects.requireNonNull(connectionName, "'connectionName' is not set");
-        return connectionManager.createChannel(connectionName);
+        return channelManager.createChannel(connectionName);
     }
 }

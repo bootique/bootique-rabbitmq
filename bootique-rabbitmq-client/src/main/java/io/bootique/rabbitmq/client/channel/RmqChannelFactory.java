@@ -20,7 +20,6 @@
 package io.bootique.rabbitmq.client.channel;
 
 import com.rabbitmq.client.Channel;
-import io.bootique.rabbitmq.client.connection.RmqConnectionManager;
 import io.bootique.rabbitmq.client.topology.RmqTopologyManager;
 
 import java.util.Objects;
@@ -28,25 +27,21 @@ import java.util.Objects;
 /**
  * An injectable singleton that is the main access point to the RabbitMQ client.
  *
- * @deprecated since 3.0.M1, as channels (without topology) are created via {@link RmqConnectionManager}, and topology
- * is created via {@link RmqTopologyManager}.
+ * @deprecated since 3.0.M1, as channels (without topology) are created via {@link RmqChannelManager}, and topologies
+ * are created via {@link RmqTopologyManager}.
  */
 @Deprecated
 public class RmqChannelFactory {
 
-    private final RmqConnectionManager connectionManager;
+    private final RmqChannelManager channelManager;
     private final RmqTopologyManager topologyManager;
 
     public RmqChannelFactory(
-            RmqConnectionManager connectionManager,
+            RmqChannelManager channelManager,
             RmqTopologyManager topologyManager) {
 
-        this.connectionManager = Objects.requireNonNull(connectionManager);
+        this.channelManager = Objects.requireNonNull(channelManager);
         this.topologyManager = Objects.requireNonNull(topologyManager);
-    }
-
-    public RmqConnectionManager getConnectionManager() {
-        return connectionManager;
     }
 
     /**
@@ -65,6 +60,6 @@ public class RmqChannelFactory {
      * @since 2.0
      */
     public RmqChannelBuilder newChannel(String connectionName) {
-        return new RmqChannelBuilder(connectionManager, topologyManager.newTopology()).connectionName(connectionName);
+        return new RmqChannelBuilder(channelManager, topologyManager.newTopology()).connectionName(connectionName);
     }
 }

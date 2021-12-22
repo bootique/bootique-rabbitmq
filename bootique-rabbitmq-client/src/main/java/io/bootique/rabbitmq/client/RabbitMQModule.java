@@ -25,6 +25,8 @@ import io.bootique.di.Injector;
 import io.bootique.di.Provides;
 import io.bootique.log.BootLogger;
 import io.bootique.rabbitmq.client.channel.RmqChannelFactory;
+import io.bootique.rabbitmq.client.channel.RmqChannelManager;
+import io.bootique.rabbitmq.client.channel.SimpleChannelManager;
 import io.bootique.rabbitmq.client.connection.RmqConnectionManager;
 import io.bootique.rabbitmq.client.topology.RmqTopologyManager;
 import io.bootique.shutdown.ShutdownManager;
@@ -51,6 +53,12 @@ public class RabbitMQModule extends ConfigModule {
 
     @Singleton
     @Provides
+    RmqChannelManager provideChannelManager(RmqConnectionManager connectionManager) {
+        return new SimpleChannelManager(connectionManager);
+    }
+
+    @Singleton
+    @Provides
     RmqTopologyManager provideTopologyManager(RmqObjectsFactory factory) {
         return factory.createTopologyManager();
     }
@@ -58,17 +66,17 @@ public class RabbitMQModule extends ConfigModule {
     @Deprecated
     @Singleton
     @Provides
-    RmqChannelFactory provideChannelFactory(RmqConnectionManager connectionManager, RmqTopologyManager topologyManager) {
-        return new RmqChannelFactory(connectionManager, topologyManager);
+    RmqChannelFactory provideChannelFactory(RmqChannelManager channelManager, RmqTopologyManager topologyManager) {
+        return new RmqChannelFactory(channelManager, topologyManager);
     }
 
     @Singleton
     @Provides
     RmqEndpoints provideEndpoints(
             RmqObjectsFactory factory,
-            RmqConnectionManager connectionManager,
+            RmqChannelManager channelManager,
             RmqTopologyManager topologyManager,
             ShutdownManager shutdownManager) {
-        return factory.createEndpoints(connectionManager, topologyManager, shutdownManager);
+        return factory.createEndpoints(channelManager, topologyManager, shutdownManager);
     }
 }

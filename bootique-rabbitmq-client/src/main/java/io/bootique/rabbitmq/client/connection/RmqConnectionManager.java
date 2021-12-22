@@ -35,8 +35,9 @@ import java.util.concurrent.atomic.AtomicReference;
 
 /**
  * A map of named RabbitMQ connections. Connections are created on demand and cached for further reuse. Configured via
- * YAML and injectable via DI. You'd rarely need to access connections directly, so the most useful method here is
- * {@link #createChannel(String)}.
+ * YAML and injectable via DI. You'd rarely need to access connections directly.
+ * {@link io.bootique.rabbitmq.client.channel.RmqChannelManager}, {@link io.bootique.rabbitmq.client.topology.RmqTopologyManager}
+ * and especially "endpoint" classes provide more high-level APIs to talk to RabbitMQ.
  *
  * @since 2.0
  */

@@ -3,7 +3,7 @@
 * #14 Allow multiple routing keys for a combination of exhcnage and queue
 * #15 Make RmqConnectionManager injectable
 * #16 Injectable RmqTopologyManager
-* #17 Split RmqChannelManager functions between RmqConnectionManager and RmqTopologyManager
+* #17 Split RmqChannelFactory functions between RmqChannelManager and RmqTopologyManager
 
 ## 2.0.RC1
 

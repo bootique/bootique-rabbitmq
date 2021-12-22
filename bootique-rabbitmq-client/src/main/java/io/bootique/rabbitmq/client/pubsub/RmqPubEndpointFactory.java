@@ -20,7 +20,7 @@ package io.bootique.rabbitmq.client.pubsub;
 
 import io.bootique.annotation.BQConfig;
 import io.bootique.annotation.BQConfigProperty;
-import io.bootique.rabbitmq.client.connection.RmqConnectionManager;
+import io.bootique.rabbitmq.client.channel.RmqChannelManager;
 import io.bootique.rabbitmq.client.topology.RmqTopologyManager;
 
 import java.util.Objects;
@@ -35,10 +35,10 @@ public class RmqPubEndpointFactory {
     private String exchange;
     private String routingKey;
 
-    public RmqPubEndpoint create(RmqConnectionManager connectionManager, RmqTopologyManager topologyManager) {
+    public RmqPubEndpoint create(RmqChannelManager channelManager, RmqTopologyManager topologyManager) {
         Objects.requireNonNull(connection, "Publisher connection name is undefined");
 
-        RmqEndpointDriver driver = new RmqEndpointDriver(connectionManager, topologyManager, connection);
+        RmqEndpointDriver driver = new RmqEndpointDriver(channelManager, topologyManager, connection);
         return new RmqPubEndpoint(driver, exchange, routingKey);
     }
 

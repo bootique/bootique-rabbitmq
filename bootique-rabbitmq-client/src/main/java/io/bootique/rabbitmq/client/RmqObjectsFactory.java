@@ -24,6 +24,7 @@ import io.bootique.annotation.BQConfig;
 import io.bootique.annotation.BQConfigProperty;
 import io.bootique.di.Injector;
 import io.bootique.log.BootLogger;
+import io.bootique.rabbitmq.client.channel.RmqChannelManager;
 import io.bootique.rabbitmq.client.connection.ConnectionFactoryFactory;
 import io.bootique.rabbitmq.client.connection.RmqConnectionManager;
 import io.bootique.rabbitmq.client.pubsub.RmqPubEndpoint;
@@ -62,10 +63,10 @@ public class RmqObjectsFactory {
                 queues != null ? queues : Collections.emptyMap());
     }
 
-    public RmqEndpoints createEndpoints(RmqConnectionManager connectionManager, RmqTopologyManager topologyManager, ShutdownManager shutdownManager) {
+    public RmqEndpoints createEndpoints(RmqChannelManager channelManager, RmqTopologyManager topologyManager, ShutdownManager shutdownManager) {
         return new RmqEndpoints(
-                createPubEndpoints(connectionManager, topologyManager),
-                createSubEndpoints(connectionManager, topologyManager, shutdownManager));
+                createPubEndpoints(channelManager, topologyManager),
+                createSubEndpoints(channelManager, topologyManager, shutdownManager));
     }
 
     public RmqConnectionManager createConnectionManager(
@@ -95,7 +96,7 @@ public class RmqObjectsFactory {
     }
 
     protected Map<String, RmqPubEndpoint> createPubEndpoints(
-            RmqConnectionManager connectionManager,
+            RmqChannelManager channelManager,
             RmqTopologyManager topologyManager) {
 
         if (pub == null || pub.isEmpty()) {
@@ -103,12 +104,12 @@ public class RmqObjectsFactory {
         }
 
         Map<String, RmqPubEndpoint> map = new HashMap<>();
-        pub.forEach((k, v) -> map.put(k, v.create(connectionManager, topologyManager)));
+        pub.forEach((k, v) -> map.put(k, v.create(channelManager, topologyManager)));
         return map;
     }
 
     protected Map<String, RmqSubEndpoint> createSubEndpoints(
-            RmqConnectionManager connectionManager,
+            RmqChannelManager channelManager,
             RmqTopologyManager topologyManager,
             ShutdownManager shutdownManager) {
 
@@ -117,7 +118,7 @@ public class RmqObjectsFactory {
         }
 
         Map<String, RmqSubEndpoint> map = new HashMap<>();
-        sub.forEach((k, v) -> map.put(k, v.create(connectionManager, topologyManager, shutdownManager)));
+        sub.forEach((k, v) -> map.put(k, v.create(channelManager, topologyManager, shutdownManager)));
         return map;
     }
 

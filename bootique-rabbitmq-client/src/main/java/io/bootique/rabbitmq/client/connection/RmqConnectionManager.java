@@ -22,7 +22,6 @@ package io.bootique.rabbitmq.client.connection;
 import com.rabbitmq.client.Channel;
 import com.rabbitmq.client.Connection;
 import com.rabbitmq.client.ConnectionFactory;
-import io.bootique.rabbitmq.client.channel.RmqChannelFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -36,8 +35,8 @@ import java.util.concurrent.atomic.AtomicReference;
 
 /**
  * A map of named RabbitMQ connections. Connections are created on demand and cached for further reuse. Configured via
- * YAML and injectable via DI. Though you'd rarely need to access connections directly. It is too low-level and
- * RabbitMQ access in Bootique is done via {@link RmqChannelFactory}.
+ * YAML and injectable via DI. You'd rarely need to access connections directly, so the most useful method here is
+ * {@link #createChannel(String)}.
  *
  * @since 2.0
  */

@@ -24,7 +24,9 @@ import io.bootique.annotation.BQConfig;
 import io.bootique.annotation.BQConfigProperty;
 import io.bootique.di.Injector;
 import io.bootique.log.BootLogger;
+import io.bootique.rabbitmq.client.channel.PoolingChannelManager;
 import io.bootique.rabbitmq.client.channel.RmqChannelManager;
+import io.bootique.rabbitmq.client.channel.SimpleChannelManager;
 import io.bootique.rabbitmq.client.connection.ConnectionFactoryFactory;
 import io.bootique.rabbitmq.client.connection.RmqConnectionManager;
 import io.bootique.rabbitmq.client.pubsub.RmqPubEndpoint;
@@ -53,6 +55,17 @@ public class RmqObjectsFactory {
     private Map<String, RmqQueue> queues;
     private Map<String, RmqPubEndpointFactory> pub;
     private Map<String, RmqSubEndpointFactory> sub;
+    private int channelPoolCapacity;
+
+    /**
+     * @since 3.0.M1
+     */
+    public RmqChannelManager createChannelManager(RmqConnectionManager connectionManager) {
+        SimpleChannelManager nonPoolingManager = new SimpleChannelManager(connectionManager);
+        return channelPoolCapacity > 0
+                ? new PoolingChannelManager(nonPoolingManager, channelPoolCapacity)
+                : nonPoolingManager;
+    }
 
     /**
      * @since 3.0.M1
@@ -145,5 +158,14 @@ public class RmqObjectsFactory {
     @BQConfigProperty
     public void setSub(Map<String, RmqSubEndpointFactory> sub) {
         this.sub = sub;
+    }
+
+    /**
+     * @since 3.0.M1
+     */
+    @BQConfigProperty("Per-Connection Channel pool capacity. If set to a value greater than zero, Bootique would pool " +
+            "and reuse Channels. Default is zero, i.e. no pooling")
+    public void setChannelPoolCapacity(int channelPoolCapacity) {
+        this.channelPoolCapacity = channelPoolCapacity;
     }
 }

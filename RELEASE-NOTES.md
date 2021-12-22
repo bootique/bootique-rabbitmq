@@ -1,6 +1,7 @@
 ## 3.0.M1
 
 * #14 Allow multiple routing keys for a combination of exhcnage and queue
+* #15 Make RmqConnectionManager injectable
 
 ## 2.0.RC1
 

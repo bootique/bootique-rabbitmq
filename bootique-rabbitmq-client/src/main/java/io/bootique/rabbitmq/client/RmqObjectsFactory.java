@@ -53,11 +53,10 @@ public class RmqObjectsFactory {
     private Map<String, RmqPubEndpointFactory> pub;
     private Map<String, RmqSubEndpointFactory> sub;
 
-    public RmqChannelFactory createChannelFactory(BootLogger bootLogger, ShutdownManager shutdownManager, Injector injector) {
-        Map<String, ConnectionFactory> factories = createConnectionFactories(injector);
+    public RmqChannelFactory createChannelFactory(RmqConnectionManager connectionManager) {
 
         return new RmqChannelFactory(
-                createConnectionManager(factories, bootLogger, shutdownManager),
+                connectionManager,
                 exchanges != null ? exchanges : Collections.emptyMap(),
                 queues != null ? queues : Collections.emptyMap());
     }
@@ -68,6 +67,22 @@ public class RmqObjectsFactory {
                 createSubEndpoints(channelFactory, shutdownManager));
     }
 
+    public RmqConnectionManager createConnectionManager(
+            Injector injector,
+            BootLogger bootLogger,
+            ShutdownManager shutdownManager) {
+
+        Map<String, ConnectionFactory> factories = createConnectionFactories(injector);
+
+        RmqConnectionManager manager = new RmqConnectionManager(factories);
+        shutdownManager.addShutdownHook(() -> {
+            bootLogger.trace(() -> "shutting down RabbitMQ ConnectionManager...");
+            manager.shutdown();
+        });
+
+        return manager;
+    }
+
     protected Map<String, ConnectionFactory> createConnectionFactories(Injector injector) {
         if (connections == null || connections.isEmpty()) {
             return Collections.emptyMap();
@@ -76,20 +91,6 @@ public class RmqObjectsFactory {
         Map<String, ConnectionFactory> map = new HashMap<>();
         connections.forEach((k, v) -> map.put(k, v.createConnectionFactory(k, injector)));
         return map;
-    }
-
-    protected RmqConnectionManager createConnectionManager(
-            Map<String, ConnectionFactory> connectionFactories,
-            BootLogger bootLogger,
-            ShutdownManager shutdownManager) {
-
-        RmqConnectionManager manager = new RmqConnectionManager(connectionFactories);
-        shutdownManager.addShutdownHook(() -> {
-            bootLogger.trace(() -> "shutting down RabbitMQ ConnectionManager...");
-            manager.shutdown();
-        });
-
-        return manager;
     }
 
     protected Map<String, RmqPubEndpoint> createPubEndpoints(RmqChannelFactory channelFactory) {

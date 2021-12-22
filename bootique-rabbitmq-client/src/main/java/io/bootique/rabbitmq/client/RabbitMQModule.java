@@ -25,6 +25,7 @@ import io.bootique.di.Injector;
 import io.bootique.di.Provides;
 import io.bootique.log.BootLogger;
 import io.bootique.rabbitmq.client.channel.RmqChannelFactory;
+import io.bootique.rabbitmq.client.connection.RmqConnectionManager;
 import io.bootique.shutdown.ShutdownManager;
 
 import javax.inject.Singleton;
@@ -39,13 +40,18 @@ public class RabbitMQModule extends ConfigModule {
 
     @Singleton
     @Provides
-    RmqChannelFactory provideChannelFactory(
+    RmqConnectionManager provideConnectionManager(
             RmqObjectsFactory factory,
             BootLogger bootLogger,
             ShutdownManager shutdownManager,
             Injector injector) {
+        return factory.createConnectionManager(injector, bootLogger, shutdownManager);
+    }
 
-        return factory.createChannelFactory(bootLogger, shutdownManager, injector);
+    @Singleton
+    @Provides
+    RmqChannelFactory provideChannelFactory(RmqObjectsFactory factory, RmqConnectionManager connectionManager) {
+        return factory.createChannelFactory(connectionManager);
     }
 
     @Singleton

@@ -33,6 +33,7 @@ import io.bootique.rabbitmq.client.pubsub.RmqPubEndpointFactory;
 import io.bootique.rabbitmq.client.pubsub.RmqSubEndpoint;
 import io.bootique.rabbitmq.client.pubsub.RmqSubEndpointFactory;
 import io.bootique.rabbitmq.client.topology.RmqQueue;
+import io.bootique.rabbitmq.client.topology.RmqTopologyManager;
 import io.bootique.shutdown.ShutdownManager;
 
 import java.util.Collections;
@@ -53,10 +54,11 @@ public class RmqObjectsFactory {
     private Map<String, RmqPubEndpointFactory> pub;
     private Map<String, RmqSubEndpointFactory> sub;
 
-    public RmqChannelFactory createChannelFactory(RmqConnectionManager connectionManager) {
-
-        return new RmqChannelFactory(
-                connectionManager,
+    /**
+     * @since 3.0.M1
+     */
+    public RmqTopologyManager createTopologyManager() {
+        return new RmqTopologyManager(
                 exchanges != null ? exchanges : Collections.emptyMap(),
                 queues != null ? queues : Collections.emptyMap());
     }

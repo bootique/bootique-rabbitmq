@@ -21,11 +21,8 @@ package io.bootique.rabbitmq.client.channel;
 
 import com.rabbitmq.client.Channel;
 import io.bootique.rabbitmq.client.connection.RmqConnectionManager;
-import io.bootique.rabbitmq.client.topology.RmqExchange;
-import io.bootique.rabbitmq.client.topology.RmqQueue;
-import io.bootique.rabbitmq.client.topology.RmqTopologyBuilder;
+import io.bootique.rabbitmq.client.topology.RmqTopologyManager;
 
-import java.util.Map;
 import java.util.Objects;
 
 /**
@@ -33,18 +30,15 @@ import java.util.Objects;
  */
 public class RmqChannelFactory {
 
-    private RmqConnectionManager connectionManager;
-    private Map<String, RmqExchange> exchanges;
-    private Map<String, RmqQueue> queues;
+    private final RmqConnectionManager connectionManager;
+    private final RmqTopologyManager topologyManager;
 
     public RmqChannelFactory(
             RmqConnectionManager connectionManager,
-            Map<String, RmqExchange> exchanges,
-            Map<String, RmqQueue> queues) {
+            RmqTopologyManager topologyManager) {
 
         this.connectionManager = Objects.requireNonNull(connectionManager);
-        this.exchanges = Objects.requireNonNull(exchanges);
-        this.queues = Objects.requireNonNull(queues);
+        this.topologyManager = Objects.requireNonNull(topologyManager);
     }
 
     /**
@@ -72,6 +66,6 @@ public class RmqChannelFactory {
      * @since 2.0
      */
     public RmqChannelBuilder newChannel(String connectionName) {
-        return new RmqChannelBuilder(connectionManager, new RmqTopologyBuilder(exchanges, queues)).connectionName(connectionName);
+        return new RmqChannelBuilder(connectionManager, topologyManager.newTopology()).connectionName(connectionName);
     }
 }

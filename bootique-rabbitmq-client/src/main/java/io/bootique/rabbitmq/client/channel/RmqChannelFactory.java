@@ -27,7 +27,11 @@ import java.util.Objects;
 
 /**
  * An injectable singleton that is the main access point to the RabbitMQ client.
+ *
+ * @deprecated since 3.0.M1, as channels (without topology) are created via {@link RmqConnectionManager}, and topology
+ * is created via {@link RmqTopologyManager}.
  */
+@Deprecated
 public class RmqChannelFactory {
 
     private final RmqConnectionManager connectionManager;
@@ -41,11 +45,6 @@ public class RmqChannelFactory {
         this.topologyManager = Objects.requireNonNull(topologyManager);
     }
 
-    /**
-     * @since 2.0
-     * @deprecated since 3.0.M1, as RmqConnectionManager is injectable directly
-     */
-    @Deprecated
     public RmqConnectionManager getConnectionManager() {
         return connectionManager;
     }

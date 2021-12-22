@@ -21,7 +21,6 @@ package io.bootique.rabbitmq.client.pubsub;
 import com.rabbitmq.client.AMQP;
 import com.rabbitmq.client.Channel;
 import com.rabbitmq.client.MessageProperties;
-import io.bootique.rabbitmq.client.channel.RmqChannelFactory;
 import io.bootique.rabbitmq.client.topology.RmqTopology;
 
 import java.io.IOException;
@@ -33,8 +32,7 @@ import java.util.concurrent.TimeoutException;
  */
 public class RmqMessageBuilder {
 
-    private final RmqChannelFactory channelFactory;
-    private final String connectionName;
+    private final RmqEndpointDriver driver;
 
     private String exchange;
     private String routingKey;
@@ -42,9 +40,8 @@ public class RmqMessageBuilder {
     private boolean immediate;
     private AMQP.BasicProperties properties;
 
-    protected RmqMessageBuilder(RmqChannelFactory channelFactory, String connectionName) {
-        this.channelFactory = Objects.requireNonNull(channelFactory);
-        this.connectionName = Objects.requireNonNull(connectionName);
+    protected RmqMessageBuilder(RmqEndpointDriver driver) {
+        this.driver = Objects.requireNonNull(driver);
         this.exchange = "";
         this.routingKey = "";
     }
@@ -91,15 +88,19 @@ public class RmqMessageBuilder {
         try (Channel channel = createChannelWithTopology()) {
             channel.basicPublish(exchange, routingKey, mandatory, immediate, properties, message);
         } catch (IOException e) {
-            throw new RuntimeException("Error publishing RMQ message for connection: " + connectionName, e);
+            throw new RuntimeException("Error publishing RMQ message for connection: " + driver.getConnectionName(), e);
         } catch (TimeoutException e) {
-            throw new RuntimeException("Timeout opening channel or publishing RMQ message for connection: " + connectionName, e);
+            throw new RuntimeException("Timeout opening channel or publishing RMQ message for connection: " + driver.getConnectionName(), e);
         }
     }
 
     protected Channel createChannelWithTopology() {
-        return RmqTopology.isDefined(exchange)
-                ? channelFactory.newChannel(connectionName).ensureExchange(exchange).open()
-                : channelFactory.openChannel(connectionName);
+        Channel channel = driver.createChannel();
+
+        if (RmqTopology.isDefined(exchange)) {
+            driver.newTopology().ensureExchange(exchange).build().apply(channel);
+        }
+
+        return channel;
     }
 }

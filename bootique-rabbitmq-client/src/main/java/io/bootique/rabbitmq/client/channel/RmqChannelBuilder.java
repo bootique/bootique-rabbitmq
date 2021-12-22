@@ -23,14 +23,16 @@ import io.bootique.rabbitmq.client.connection.RmqConnectionManager;
 import io.bootique.rabbitmq.client.topology.RmqTopology;
 import io.bootique.rabbitmq.client.topology.RmqTopologyBuilder;
 
-import java.io.IOException;
 import java.util.Objects;
 
 /**
  * Builder of a Channel and the underlying exchange and queue topology.
  *
  * @since 2.0.B1
+ * @deprecated since 3.0.M1, as channels (without topology) are created via {@link RmqConnectionManager}, and topology
+ * is created via {@link io.bootique.rabbitmq.client.topology.RmqTopologyManager}.
  */
+@Deprecated
 public class RmqChannelBuilder {
 
     private final RmqConnectionManager connectionManager;
@@ -69,17 +71,12 @@ public class RmqChannelBuilder {
     public Channel open() {
         RmqTopology topology = topologyBuilder.build();
         Channel channel = createChannel();
-        topology.ensureTopology(channel);
+        topology.apply(channel);
         return channel;
     }
 
     protected Channel createChannel() {
         Objects.requireNonNull(connectionName, "'connectionName' is not set");
-
-        try {
-            return connectionManager.forName(connectionName).createChannel();
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
+        return connectionManager.createChannel(connectionName);
     }
 }

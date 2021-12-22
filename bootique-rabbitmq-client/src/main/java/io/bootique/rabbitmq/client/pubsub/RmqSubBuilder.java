@@ -19,14 +19,14 @@
 package io.bootique.rabbitmq.client.pubsub;
 
 import com.rabbitmq.client.*;
-import io.bootique.rabbitmq.client.channel.RmqChannelBuilder;
-import io.bootique.rabbitmq.client.channel.RmqChannelFactory;
 import io.bootique.rabbitmq.client.topology.RmqTopology;
+import io.bootique.rabbitmq.client.topology.RmqTopologyBuilder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.util.Map;
+import java.util.Objects;
 import java.util.function.Function;
 
 /**
@@ -40,8 +40,7 @@ public class RmqSubBuilder {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(RmqSubBuilder.class);
 
-    private final RmqChannelFactory channelFactory;
-    private final String connectionName;
+    private final RmqEndpointDriver driver;
     private final Map<String, Channel> consumerChannels;
 
     private String exchange;
@@ -49,9 +48,9 @@ public class RmqSubBuilder {
     private String routingKey;
     private boolean autoAck;
 
-    protected RmqSubBuilder(RmqChannelFactory channelFactory, String connectionName, Map<String, Channel> consumerChannels) {
-        this.channelFactory = channelFactory;
-        this.connectionName = connectionName;
+    protected RmqSubBuilder(RmqEndpointDriver driver, Map<String, Channel> consumerChannels) {
+
+        this.driver = Objects.requireNonNull(driver);
         this.consumerChannels = consumerChannels;
     }
 
@@ -116,7 +115,7 @@ public class RmqSubBuilder {
         try {
             consumerTag = channel.basicConsume(queue, autoAck, consumer);
         } catch (IOException e) {
-            throw new RuntimeException("Error publishing RMQ message for connection: " + connectionName, e);
+            throw new RuntimeException("Error publishing RMQ message for connection: " + driver.getConnectionName(), e);
         }
 
         // track consumer channel to be able to stop consumers and close channels
@@ -129,14 +128,17 @@ public class RmqSubBuilder {
 
         RmqTopology.required(queue, "Consumer queue is not defined");
 
-        RmqChannelBuilder builder = channelFactory.newChannel(connectionName);
+        Channel channel = driver.createChannel();
+        RmqTopologyBuilder topologyBuilder = driver.newTopology();
         if (RmqTopology.isDefined(exchange)) {
-            builder.ensureQueueBoundToExchange(queue, exchange, routingKey);
+            topologyBuilder.ensureQueueBoundToExchange(queue, exchange, routingKey);
         } else {
-            builder.ensureQueue(queue);
+            topologyBuilder.ensureQueue(queue);
         }
 
-        return builder.open();
+        topologyBuilder.build().apply(channel);
+
+        return channel;
     }
 
     private static class DeliverOrCancelConsumer implements Consumer {

@@ -19,6 +19,7 @@
 
 package io.bootique.rabbitmq.client.connection;
 
+import com.rabbitmq.client.Channel;
 import com.rabbitmq.client.Connection;
 import com.rabbitmq.client.ConnectionFactory;
 import io.bootique.rabbitmq.client.channel.RmqChannelFactory;
@@ -95,6 +96,21 @@ public class RmqConnectionManager {
         }
 
         return c;
+    }
+
+    /**
+     * Creates and returns a new channel for a named connection.
+     *
+     * @since 3.0.M1
+     */
+    public Channel createChannel(String connectionName) {
+        Objects.requireNonNull(connectionName, "'connectionName' is null");
+
+        try {
+            return forName(connectionName).createChannel();
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     public void shutdown() {

@@ -19,7 +19,6 @@
 package io.bootique.rabbitmq.client.pubsub;
 
 import com.rabbitmq.client.*;
-import io.bootique.rabbitmq.client.channel.RmqChannelFactory;
 import io.bootique.rabbitmq.client.topology.RmqTopology;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -38,8 +37,7 @@ public class RmqSubEndpoint {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(RmqSubEndpoint.class);
 
-    private final RmqChannelFactory channelFactory;
-    private final String connectionName;
+    private final RmqEndpointDriver driver;
     private final String defaultExchange;
     private final String defaultQueue;
     private final String defaultRoutingKey;
@@ -48,15 +46,13 @@ public class RmqSubEndpoint {
     private final Map<String, Channel> consumerChannels;
 
     public RmqSubEndpoint(
-            RmqChannelFactory channelFactory,
-            String connectionName,
+            RmqEndpointDriver driver,
             String defaultExchange,
             String defaultQueue,
             String defaultRoutingKey,
             boolean defaultAutoAck) {
 
-        this.channelFactory = Objects.requireNonNull(channelFactory);
-        this.connectionName = Objects.requireNonNull(connectionName);
+        this.driver = Objects.requireNonNull(driver);
         this.defaultQueue = RmqTopology.normalizeName(defaultQueue);
         this.defaultExchange = RmqTopology.normalizeName(defaultExchange);
         this.defaultRoutingKey = RmqTopology.normalizeName(defaultRoutingKey);
@@ -118,7 +114,7 @@ public class RmqSubEndpoint {
      * before subscribing a consumer.
      */
     public RmqSubBuilder newSubscription() {
-        return new RmqSubBuilder(channelFactory, connectionName, consumerChannels)
+        return new RmqSubBuilder(driver, consumerChannels)
                 .exchange(defaultExchange)
                 .queue(defaultQueue)
                 .routingKey(defaultRoutingKey)

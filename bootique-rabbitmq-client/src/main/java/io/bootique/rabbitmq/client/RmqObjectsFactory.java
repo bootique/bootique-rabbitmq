@@ -24,14 +24,13 @@ import io.bootique.annotation.BQConfig;
 import io.bootique.annotation.BQConfigProperty;
 import io.bootique.di.Injector;
 import io.bootique.log.BootLogger;
-import io.bootique.rabbitmq.client.channel.RmqChannelFactory;
 import io.bootique.rabbitmq.client.connection.ConnectionFactoryFactory;
 import io.bootique.rabbitmq.client.connection.RmqConnectionManager;
-import io.bootique.rabbitmq.client.topology.RmqExchange;
 import io.bootique.rabbitmq.client.pubsub.RmqPubEndpoint;
 import io.bootique.rabbitmq.client.pubsub.RmqPubEndpointFactory;
 import io.bootique.rabbitmq.client.pubsub.RmqSubEndpoint;
 import io.bootique.rabbitmq.client.pubsub.RmqSubEndpointFactory;
+import io.bootique.rabbitmq.client.topology.RmqExchange;
 import io.bootique.rabbitmq.client.topology.RmqQueue;
 import io.bootique.rabbitmq.client.topology.RmqTopologyManager;
 import io.bootique.shutdown.ShutdownManager;
@@ -63,10 +62,10 @@ public class RmqObjectsFactory {
                 queues != null ? queues : Collections.emptyMap());
     }
 
-    public RmqEndpoints createEndpoints(RmqChannelFactory channelFactory, ShutdownManager shutdownManager) {
+    public RmqEndpoints createEndpoints(RmqConnectionManager connectionManager, RmqTopologyManager topologyManager, ShutdownManager shutdownManager) {
         return new RmqEndpoints(
-                createPubEndpoints(channelFactory),
-                createSubEndpoints(channelFactory, shutdownManager));
+                createPubEndpoints(connectionManager, topologyManager),
+                createSubEndpoints(connectionManager, topologyManager, shutdownManager));
     }
 
     public RmqConnectionManager createConnectionManager(
@@ -95,23 +94,30 @@ public class RmqObjectsFactory {
         return map;
     }
 
-    protected Map<String, RmqPubEndpoint> createPubEndpoints(RmqChannelFactory channelFactory) {
+    protected Map<String, RmqPubEndpoint> createPubEndpoints(
+            RmqConnectionManager connectionManager,
+            RmqTopologyManager topologyManager) {
+
         if (pub == null || pub.isEmpty()) {
             return Collections.emptyMap();
         }
 
         Map<String, RmqPubEndpoint> map = new HashMap<>();
-        pub.forEach((k, v) -> map.put(k, v.create(channelFactory)));
+        pub.forEach((k, v) -> map.put(k, v.create(connectionManager, topologyManager)));
         return map;
     }
 
-    protected Map<String, RmqSubEndpoint> createSubEndpoints(RmqChannelFactory channelFactory, ShutdownManager shutdownManager) {
+    protected Map<String, RmqSubEndpoint> createSubEndpoints(
+            RmqConnectionManager connectionManager,
+            RmqTopologyManager topologyManager,
+            ShutdownManager shutdownManager) {
+
         if (sub == null || sub.isEmpty()) {
             return Collections.emptyMap();
         }
 
         Map<String, RmqSubEndpoint> map = new HashMap<>();
-        sub.forEach((k, v) -> map.put(k, v.create(channelFactory, shutdownManager)));
+        sub.forEach((k, v) -> map.put(k, v.create(connectionManager, topologyManager, shutdownManager)));
         return map;
     }
 

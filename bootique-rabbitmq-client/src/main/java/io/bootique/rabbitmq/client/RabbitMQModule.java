@@ -55,6 +55,7 @@ public class RabbitMQModule extends ConfigModule {
         return factory.createTopologyManager();
     }
 
+    @Deprecated
     @Singleton
     @Provides
     RmqChannelFactory provideChannelFactory(RmqConnectionManager connectionManager, RmqTopologyManager topologyManager) {
@@ -65,8 +66,9 @@ public class RabbitMQModule extends ConfigModule {
     @Provides
     RmqEndpoints provideEndpoints(
             RmqObjectsFactory factory,
-            RmqChannelFactory channelFactory,
+            RmqConnectionManager connectionManager,
+            RmqTopologyManager topologyManager,
             ShutdownManager shutdownManager) {
-        return factory.createEndpoints(channelFactory, shutdownManager);
+        return factory.createEndpoints(connectionManager, topologyManager, shutdownManager);
     }
 }

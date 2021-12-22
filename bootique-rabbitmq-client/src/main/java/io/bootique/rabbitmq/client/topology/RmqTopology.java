@@ -63,9 +63,11 @@ public class RmqTopology {
     }
 
     /**
+     * Applies topology encapsulated in this object to the RabbitMQ broker using the provided Channel.
+     *
      * @since 3.0.M1
      */
-    public void ensureTopology(Channel channel) {
+    public void apply(Channel channel) {
         actionsByTopologyObject.values().forEach(ta -> ta.accept(channel));
     }
 

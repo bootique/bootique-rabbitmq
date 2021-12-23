@@ -95,7 +95,7 @@ public class RmqMessageBuilder {
         Channel channel = driver.createChannel();
 
         if (RmqTopology.isDefined(exchange)) {
-            driver.newTopology().ensureExchange(exchange).build().apply(channel);
+            driver.newTopology().ensureExchange(exchange).build(channel);
         }
 
         return channel;

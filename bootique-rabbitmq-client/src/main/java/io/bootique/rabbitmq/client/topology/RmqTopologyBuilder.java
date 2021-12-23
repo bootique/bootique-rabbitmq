@@ -45,8 +45,20 @@ public class RmqTopologyBuilder {
         this.topologyActions = new LinkedHashMap<>();
     }
 
-    public RmqTopology build() {
-        return new RmqTopology(topologyActions);
+    /**
+     * @deprecated since 3.0.M1 in favor of {@link #build(Channel)}
+     */
+    @Deprecated
+    public Channel buildTopology(Channel channel) {
+        build(channel);
+        return channel;
+    }
+
+    /**
+     * @since 3.0.M1
+     */
+    public void build(Channel channel) {
+        topologyActions.values().forEach(ta -> ta.accept(channel));
     }
 
     public RmqTopologyBuilder ensureExchange(String exchangeName) {

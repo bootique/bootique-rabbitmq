@@ -136,7 +136,7 @@ public class RmqSubBuilder {
             topologyBuilder.ensureQueue(queue);
         }
 
-        topologyBuilder.build().apply(channel);
+        topologyBuilder.build(channel);
 
         return channel;
     }

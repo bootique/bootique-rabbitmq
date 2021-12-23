@@ -20,7 +20,6 @@ package io.bootique.rabbitmq.client.channel;
 
 import com.rabbitmq.client.Channel;
 import io.bootique.rabbitmq.client.connection.RmqConnectionManager;
-import io.bootique.rabbitmq.client.topology.RmqTopology;
 import io.bootique.rabbitmq.client.topology.RmqTopologyBuilder;
 
 import java.util.Objects;
@@ -69,10 +68,7 @@ public class RmqChannelBuilder {
     }
 
     public Channel open() {
-        RmqTopology topology = topologyBuilder.build();
-        Channel channel = createChannel();
-        topology.apply(channel);
-        return channel;
+        return topologyBuilder.buildTopology(createChannel());
     }
 
     protected Channel createChannel() {

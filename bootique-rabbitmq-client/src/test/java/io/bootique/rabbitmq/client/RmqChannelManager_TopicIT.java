@@ -52,8 +52,7 @@ public class RmqChannelManager_TopicIT extends RabbitMQBaseTest {
 
             runtime.getInstance(RmqTopologyManager.class).newTopology()
                     .ensureQueueBoundToExchange("new_queue", "topicExchange", "a.*")
-                    .build()
-                    .apply(channel);
+                    .build(channel);
 
             String message = "Hello World!";
             channel.basicPublish("topicExchange", "a.b", null, message.getBytes(StandardCharsets.UTF_8));
@@ -77,8 +76,7 @@ public class RmqChannelManager_TopicIT extends RabbitMQBaseTest {
             runtime.getInstance(RmqTopologyManager.class).newTopology()
                     .ensureQueueBoundToExchange("rq_queue", "topicExchange", "a.*")
                     .ensureQueueBoundToExchange("rq_queue", "topicExchange", "b.*")
-                    .build()
-                    .apply(channel);
+                    .build(channel);
 
             String messageA = "For A";
             channel.basicPublish("topicExchange", "a.x", null, messageA.getBytes(StandardCharsets.UTF_8));
@@ -116,8 +114,7 @@ public class RmqChannelManager_TopicIT extends RabbitMQBaseTest {
         String queue = exchange + "_q";
         runtime.getInstance(RmqTopologyManager.class).newTopology()
                 .ensureQueueBoundToExchange(queue, exchange, "a.*")
-                .build()
-                .apply(cw1);
+                .build(cw1);
 
         cw1.basicPublish(exchange, "a.x", null, "M1".getBytes(StandardCharsets.UTF_8));
         Thread.sleep(300L);

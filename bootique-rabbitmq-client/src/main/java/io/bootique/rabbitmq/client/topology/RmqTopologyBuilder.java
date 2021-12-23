@@ -36,17 +36,59 @@ public class RmqTopologyBuilder {
 
     private final Map<String, RmqExchange> exchangeConfigs;
     private final Map<String, RmqQueue> queueConfigs;
+    private final TopologyCache topologyCache;
 
     private final Map<String, Consumer<Channel>> topologyActions;
 
-    public RmqTopologyBuilder(Map<String, RmqExchange> exchangeConfigs, Map<String, RmqQueue> queueConfigs) {
+    public RmqTopologyBuilder(
+            Map<String, RmqExchange> exchangeConfigs,
+            Map<String, RmqQueue> queueConfigs,
+            TopologyCache topologyCache) {
         this.exchangeConfigs = exchangeConfigs;
         this.queueConfigs = queueConfigs;
         this.topologyActions = new LinkedHashMap<>();
+        this.topologyCache = topologyCache;
     }
 
-    public RmqTopology build() {
-        return new RmqTopology(topologyActions);
+    protected RmqTopologyActions buildActions() {
+        return new RmqTopologyActions(topologyActions.keySet(), topologyActions.values());
+    }
+
+    /**
+     * @deprecated since 3.0.M1 in favor of {@link #create(Channel, boolean)}
+     */
+    @Deprecated
+    public Channel buildTopology(Channel channel) {
+        create(channel, true);
+        return channel;
+    }
+
+    /**
+     * Creates the topology defined in the builder on the broker. Will do nothing if "force" is "false", and the
+     * topology was previously created in the app.
+     *
+     * @since 3.0.M1
+     */
+    public boolean create(Channel channel, boolean force) {
+        RmqTopologyActions actions = buildActions();
+
+        if (topologyCache.save(actions) || force) {
+
+            LOGGER.debug("Creating or updating an RMQ topology {}", actions.getKey());
+
+            try {
+                actions.apply(channel);
+            } catch (Exception e) {
+                topologyCache.evict(actions);
+                LOGGER.warn("error creating topology", e);
+                throw new RuntimeException(e);
+            }
+            return true;
+
+        } else {
+            LOGGER.debug("Reusing an existing RMQ topology {}", actions.getKey());
+            return false;
+        }
     }
 
     public RmqTopologyBuilder ensureExchange(String exchangeName) {

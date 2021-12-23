@@ -18,16 +18,10 @@
  */
 package io.bootique.rabbitmq.client.topology;
 
-import com.rabbitmq.client.Channel;
-
-import java.util.Map;
-import java.util.Objects;
-import java.util.function.Consumer;
-
 /**
- * A set of actions to generate or restore a certains RabbitMQ exchanges/queues topology. Also contains static helper
- * methods to validate and normalize topology object names (exchanges, queue, routing keys). For RabbitMQ both empty
- * and null names are "undefined". This class helps to deal with this logic in the Bootique code.
+ * Helps the rest of the code to validate and normalize RabbitMQ topology object names (exchanges, queue, routing
+ * keys). For RabbitMQ both empty and null names are "undefined". This class helps to deal with this logic in the
+ * Bootique code.
  *
  * @since 2.0.B1
  */
@@ -50,45 +44,5 @@ public class RmqTopology {
 
     public static boolean isDefined(String topologyObjectName) {
         return topologyObjectName != null && topologyObjectName.length() > 0;
-    }
-
-    private final Map<String, Consumer<Channel>> actionsByTopologyObject;
-
-    /**
-     * @since 3.0.M1
-     */
-    // keeping constructor non-public, as the keys in the provided map have special meaning defined in RmqTopologyBuilder
-    protected RmqTopology(Map<String, Consumer<Channel>> actionsByTopologyObject) {
-        this.actionsByTopologyObject = actionsByTopologyObject;
-    }
-
-    /**
-     * Applies topology encapsulated in this object to the RabbitMQ broker using the provided Channel.
-     *
-     * @since 3.0.M1
-     */
-    public void apply(Channel channel) {
-        actionsByTopologyObject.values().forEach(ta -> ta.accept(channel));
-    }
-
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        RmqTopology that = (RmqTopology) o;
-
-        // comparing topologies by the key set. Unique topology action names  are defined by the RmqTopologyBuilder
-        return actionsByTopologyObject.keySet().equals(that.actionsByTopologyObject.keySet());
-    }
-
-    @Override
-    public int hashCode() {
-        // comparing topologies by the key set. Unique topology action names  are defined by the RmqTopologyBuilder
-        return Objects.hash(actionsByTopologyObject.keySet());
-    }
-
-    @Override
-    public String toString() {
-        return String.valueOf(actionsByTopologyObject.keySet());
     }
 }

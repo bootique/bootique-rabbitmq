@@ -22,7 +22,7 @@ import java.util.Map;
 import java.util.Objects;
 
 /**
- * Allows creating RabbitMQ queue/exchange topologies with bindings between them. Exhange and queue properties are
+ * Allows creating RabbitMQ queue/exchange topologies with bindings between them. Exchange and queue properties are
  * taken from configuration.
  *
  * @since 3.0.M1
@@ -31,13 +31,21 @@ public class RmqTopologyManager {
 
     private final Map<String, RmqExchange> exchanges;
     private final Map<String, RmqQueue> queues;
+    private final TopologyCache topologyCache;
 
     public RmqTopologyManager(Map<String, RmqExchange> exchanges, Map<String, RmqQueue> queues) {
         this.exchanges = Objects.requireNonNull(exchanges);
         this.queues = Objects.requireNonNull(queues);
+
+        // TODO: make this configurable?
+        this.topologyCache = new TopologyCache(100);
     }
 
     public RmqTopologyBuilder newTopology() {
-        return new RmqTopologyBuilder(exchanges, queues);
+        return new RmqTopologyBuilder(exchanges, queues, topologyCache);
+    }
+
+    public void clearCache() {
+        topologyCache.clear();
     }
 }

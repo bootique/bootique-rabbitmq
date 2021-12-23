@@ -38,7 +38,7 @@ import java.util.concurrent.TimeoutException;
 import static org.junit.jupiter.api.Assertions.*;
 
 @BQTest
-public class RmqChannelManager_TopicIT extends RabbitMQBaseTest {
+public class RmqChannelManagerIT extends RabbitMQBaseTest {
 
     @Test
     public void testSingleRoutingKey() throws IOException, TimeoutException {
@@ -52,8 +52,7 @@ public class RmqChannelManager_TopicIT extends RabbitMQBaseTest {
 
             runtime.getInstance(RmqTopologyManager.class).newTopology()
                     .ensureQueueBoundToExchange("new_queue", "topicExchange", "a.*")
-                    .build()
-                    .apply(channel);
+                    .create(channel, true);
 
             String message = "Hello World!";
             channel.basicPublish("topicExchange", "a.b", null, message.getBytes(StandardCharsets.UTF_8));
@@ -77,8 +76,7 @@ public class RmqChannelManager_TopicIT extends RabbitMQBaseTest {
             runtime.getInstance(RmqTopologyManager.class).newTopology()
                     .ensureQueueBoundToExchange("rq_queue", "topicExchange", "a.*")
                     .ensureQueueBoundToExchange("rq_queue", "topicExchange", "b.*")
-                    .build()
-                    .apply(channel);
+                    .create(channel, true);
 
             String messageA = "For A";
             channel.basicPublish("topicExchange", "a.x", null, messageA.getBytes(StandardCharsets.UTF_8));
@@ -116,8 +114,7 @@ public class RmqChannelManager_TopicIT extends RabbitMQBaseTest {
         String queue = exchange + "_q";
         runtime.getInstance(RmqTopologyManager.class).newTopology()
                 .ensureQueueBoundToExchange(queue, exchange, "a.*")
-                .build()
-                .apply(cw1);
+                .create(cw1, true);
 
         cw1.basicPublish(exchange, "a.x", null, "M1".getBytes(StandardCharsets.UTF_8));
         Thread.sleep(300L);
@@ -133,6 +130,46 @@ public class RmqChannelManager_TopicIT extends RabbitMQBaseTest {
         cw2.basicPublish(exchange, "a.x", null, "M2".getBytes(StandardCharsets.UTF_8));
         Thread.sleep(300L);
         assertResponse("M2", cr2.basicGet(queue, true));
+    }
+
+    @Test
+    public void testTopologyCache() throws IOException, InterruptedException {
+        BQRuntime runtime = testFactory
+                .app("-c", "classpath:topology-cache.yml")
+                .module(b -> BQCoreModule.extend(b).setProperty("bq.rabbitmq.connections.c.uri", rmq.getAmqpUrl()))
+                .autoLoadModules()
+                .createRuntime();
+
+        RmqChannelManager channelManager = runtime.getInstance(RmqChannelManager.class);
+        RmqTopologyManager topologyManager = runtime.getInstance(RmqTopologyManager.class);
+
+        Channel cr = channelManager.createChannel("c");
+        Channel cw = channelManager.createChannel("c");
+
+        assertTrue(topologyManager.newTopology()
+                .ensureQueueBoundToExchange("ex_q", "ex", "a.*")
+                .create(cr, false));
+
+        cw.basicPublish("ex", "a.x", null, "M1".getBytes(StandardCharsets.UTF_8));
+        Thread.sleep(300L);
+        assertResponse("M1", cr.basicGet("ex_q", true));
+
+        assertFalse(topologyManager.newTopology()
+                .ensureQueueBoundToExchange("ex_q", "ex", "a.*")
+                .create(cr, false));
+
+        cw.basicPublish("ex", "a.x", null, "M2".getBytes(StandardCharsets.UTF_8));
+        Thread.sleep(300L);
+        assertResponse("M2", cr.basicGet("ex_q", true));
+
+        topologyManager.clearCache();
+        assertTrue(topologyManager.newTopology()
+                .ensureQueueBoundToExchange("ex_q", "ex", "a.*")
+                .create(cr, false));
+
+        cw.basicPublish("ex", "a.x", null, "M3".getBytes(StandardCharsets.UTF_8));
+        Thread.sleep(300L);
+        assertResponse("M3", cr.basicGet("ex_q", true));
     }
 
     private void assertResponse(String expected, GetResponse response) {

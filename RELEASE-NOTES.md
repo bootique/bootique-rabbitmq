@@ -5,6 +5,7 @@
 * #15 Make RmqConnectionManager injectable
 * #16 Injectable RmqTopologyManager
 * #17 Split RmqChannelFactory functions between RmqChannelManager and RmqTopologyManager
+* #18 Cache created topologies to avoid recreating them on every call
 
 ## 2.0.RC1
 

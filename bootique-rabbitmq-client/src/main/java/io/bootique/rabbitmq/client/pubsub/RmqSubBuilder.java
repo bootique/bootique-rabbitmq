@@ -108,7 +108,9 @@ public class RmqSubBuilder {
      * @return consumer tag returned by the server that can be used to cancel a consumer.
      */
     public String subscribe(Function<Channel, Consumer> consumerFactory) {
-        Channel channel = createChannelWithTopology();
+        Channel channel = driver.createChannel();
+
+        createTopology(channel);
         Consumer consumer = consumerFactory.apply(channel);
         String consumerTag;
 
@@ -124,11 +126,9 @@ public class RmqSubBuilder {
         return consumerTag;
     }
 
-    protected Channel createChannelWithTopology() {
-
+    protected void createTopology(Channel channel) {
         RmqTopology.required(queue, "Consumer queue is not defined");
 
-        Channel channel = driver.createChannel();
         RmqTopologyBuilder topologyBuilder = driver.newTopology();
         if (RmqTopology.isDefined(exchange)) {
             topologyBuilder.ensureQueueBoundToExchange(queue, exchange, routingKey);
@@ -136,9 +136,9 @@ public class RmqSubBuilder {
             topologyBuilder.ensureQueue(queue);
         }
 
-        topologyBuilder.build().apply(channel);
-
-        return channel;
+        // force topology refresh, as queue scopes can be quite varied, and previously created queues may no longer
+        // be around
+        topologyBuilder.create(channel, true);
     }
 
     private static class DeliverOrCancelConsumer implements Consumer {

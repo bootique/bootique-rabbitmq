@@ -81,8 +81,9 @@ public class RmqMessageBuilder {
         AMQP.BasicProperties properties = this.properties != null
                 ? this.properties
                 : MessageProperties.MINIMAL_BASIC;
-        
-        try (Channel channel = createChannelWithTopology()) {
+
+        try (Channel channel = driver.createChannel()) {
+            createTopologyIfNeeded(channel);
             channel.basicPublish(exchange, routingKey, mandatory, immediate, properties, message);
         } catch (IOException e) {
             throw new RuntimeException("Error publishing RMQ message for connection: " + driver.getConnectionName(), e);
@@ -91,13 +92,9 @@ public class RmqMessageBuilder {
         }
     }
 
-    protected Channel createChannelWithTopology() {
-        Channel channel = driver.createChannel();
-
+    protected void createTopologyIfNeeded(Channel channel) {
         if (RmqTopology.isDefined(exchange)) {
-            driver.newTopology().ensureExchange(exchange).build().apply(channel);
+            driver.newTopology().ensureExchange(exchange).create(channel, false);
         }
-
-        return channel;
     }
 }

@@ -94,6 +94,9 @@ public class RmqMessageBuilder {
     protected Channel createChannelWithTopology() {
         Channel channel = driver.createChannel();
 
+        // We have to ensure the exchange exists on every message...
+        // Otherwise, auto-deletabale exchanges would go away without notice between calls to "basicPublish"
+
         if (RmqTopology.isDefined(exchange)) {
             driver.newTopology().ensureExchange(exchange).build(channel);
         }

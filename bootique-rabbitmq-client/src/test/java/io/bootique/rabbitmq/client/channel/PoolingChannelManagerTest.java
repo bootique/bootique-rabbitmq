@@ -90,10 +90,10 @@ public class PoolingChannelManagerTest {
         pc2.close();
         pc3.close();
 
-        verifyNoInteractions(c1);
-        verifyNoInteractions(c2);
-        verifyNoInteractions(c3);
-
+        verify(c1, times(0)).close();
+        verify(c2, times(0)).close();
+        verify(c3, times(0)).close();
+        
         m.close();
 
         verify(c1).close();

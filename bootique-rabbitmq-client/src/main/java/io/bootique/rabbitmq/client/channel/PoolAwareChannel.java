@@ -35,26 +35,35 @@ public class PoolAwareChannel implements Channel {
 
     final Channel delegate;
     private final BlockingQueue<Channel> pool;
+    private boolean open;
 
     public PoolAwareChannel(Channel delegate, BlockingQueue<Channel> pool) {
         this.delegate = delegate;
         this.pool = pool;
+        this.open = delegate.isOpen();
     }
 
+    @Override
+    public boolean isOpen() {
+        return open;
+    }
 
     @Override
     public void close() throws IOException, TimeoutException {
-        // instead of closing, return to the pool
+        // return open to the pool if we can, otherwise close
         boolean accepted = pool.offer(delegate);
         if (!accepted) {
             delegate.close();
         }
+
+        this.open = false;
     }
 
     @Override
     public void close(int closeCode, String closeMessage) throws IOException, TimeoutException {
         // if we are closing with code and message, do not return to the pool, instead do the real close
-        delegate.close(closeCode, closeMessage);
+        this.delegate.close(closeCode, closeMessage);
+        this.open = false;
     }
 
     @Override
@@ -545,10 +554,5 @@ public class PoolAwareChannel implements Channel {
     @Override
     public void notifyListeners() {
         delegate.notifyListeners();
-    }
-
-    @Override
-    public boolean isOpen() {
-        return delegate.isOpen();
     }
 }

@@ -24,7 +24,7 @@ rabbitmq:
     e1:
       type: TOPIC
 
-  queues:
+  queueTemplates:
     queue1:
       durable: true
     queue2:
@@ -50,31 +50,27 @@ rabbitmq:
     s1:
       connection: subConnection
       exchange: e1
-      queue: queue1
+      queueTemplate: queue1
+      queue: xqueue1
       routingKey: "*.X"
     s2:
       connection: subConnection
       exchange: e1
-      queue: queue2
+      queueTemplate: queue2
+      queue: xqueue2
       routingKey: "p2.X"
     s3:
       connection: subConnection
       exchange: e1
       routingKey: "*.X"
-      # no queue, it will be created during subscription
     s4:
       connection: subConnection
       exchange: e1
       routingKey: "p2.X"
-      # no queue, it will be created during subscription
     s5:
       connection: subConnection
       exchange: e1
-      queue: queue-ttl
+      queueTemplate: queue-ttl
+      queue: xqueue-ttl
       routingKey: "p1.ttl"
-    s6:
-      connection: subConnection
-      exchange: e1
-      # queue name defined, but not references in config. Will result in an exception
-      queue: unconfigured-queue
-      routingKey: "p2.X"
+

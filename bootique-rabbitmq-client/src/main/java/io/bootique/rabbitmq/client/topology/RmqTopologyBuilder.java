@@ -25,6 +25,7 @@ import org.slf4j.LoggerFactory;
 import java.io.IOException;
 import java.util.LinkedHashMap;
 import java.util.Map;
+import java.util.Objects;
 import java.util.function.Consumer;
 
 /**
@@ -35,13 +36,12 @@ public class RmqTopologyBuilder {
     private static final Logger LOGGER = LoggerFactory.getLogger(RmqTopologyBuilder.class);
 
     private final Map<String, RmqExchange> exchangeConfigs;
-    private final Map<String, RmqQueue> queueConfigs;
-
+    private final Map<String, RmqQueueTemplate> queueTemplates;
     private final Map<String, Consumer<Channel>> topologyActions;
 
-    public RmqTopologyBuilder(Map<String, RmqExchange> exchangeConfigs, Map<String, RmqQueue> queueConfigs) {
+    public RmqTopologyBuilder(Map<String, RmqExchange> exchangeConfigs, Map<String, RmqQueueTemplate> queueTemplates) {
         this.exchangeConfigs = exchangeConfigs;
-        this.queueConfigs = queueConfigs;
+        this.queueTemplates = queueTemplates;
         this.topologyActions = new LinkedHashMap<>();
     }
 
@@ -67,20 +67,24 @@ public class RmqTopologyBuilder {
         return this;
     }
 
+    /**
+     * Adds a topology action to establish a named queue with default settings (durable, non-exclusive, non-auto-delete).
+     */
     public RmqTopologyBuilder ensureQueue(String queueName) {
-        return ensureQueue(queueName, null);
+        return ensureQueue(queueName, new RmqQueueTemplateFactory().createTemplate());
     }
 
     /**
-     * Creates a topology action to create a named queue. Queue configuration is looked up using "queueTemplateName"
+     * Adds a topology action to create a named queue. Queue configuration is taken from "queueTemplate"
      * parameter. If the template is null, an implicit default configuration is used. If the template name doesn't
      * correspond to an existing configuration, an exception is thrown.
      *
      * @since 3.0.M1
      */
-    public RmqTopologyBuilder ensureQueue(String queueName, String queueTemplateName) {
+    public RmqTopologyBuilder ensureQueue(String queueName, RmqQueueTemplate queueTemplate) {
         RmqTopology.required(queueName, "Undefined queue name");
-        topologyActions.computeIfAbsent("q:" + queueName, k -> c -> queueDeclare(c, queueName, queueTemplateName));
+        Objects.requireNonNull(queueTemplate, "'queueTemplate' is null");
+        topologyActions.computeIfAbsent("q:" + queueName, k -> c -> queueTemplate.queueDeclare(c, queueName));
         return this;
     }
 
@@ -116,34 +120,18 @@ public class RmqTopologyBuilder {
         }
     }
 
-    protected void queueDeclare(Channel channel, String queueName, String queueTemplateName) {
-        RmqQueue queue = findQueueTemplate(queueName, queueTemplateName);
-
-        LOGGER.debug("declaring queue '{}'", queueName);
-
-        try {
-            queue.queueDeclare(channel, queueName);
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
-    }
-
-    protected RmqQueue findQueueTemplate(String queueName, String queueTemplateName) {
+    protected RmqQueueTemplate getOrCreateQueueTemplate(String queueTemplateName) {
 
         if (RmqTopology.isDefined(queueTemplateName)) {
-            if (!queueConfigs.containsKey(queueTemplateName)) {
+            if (!queueTemplates.containsKey(queueTemplateName)) {
                 throw new IllegalStateException("No configuration present for the queue template '" + queueTemplateName + "'");
             }
 
-            return queueConfigs.get(queueTemplateName);
+            return queueTemplates.get(queueTemplateName);
         }
 
-        if (queueConfigs.containsKey(queueName)) {
-            return queueConfigs.get(queueName);
-        }
-
-        LOGGER.info("No configuration present for the queue template {}, will use the default settings", queueName);
-        return new RmqQueue();
+        LOGGER.info("No configuration present for queue template {}, will use the default settings", queueTemplateName);
+        return new RmqQueueTemplateFactory().createTemplate();
     }
 
     protected void queueBind(Channel channel, String queueName, String exchangeName, String routingKey) {

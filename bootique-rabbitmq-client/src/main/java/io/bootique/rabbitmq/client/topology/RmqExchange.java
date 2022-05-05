@@ -29,10 +29,11 @@ import java.util.Map;
 
 @BQConfig
 public class RmqExchange {
+
     private BuiltinExchangeType type;
-    private boolean durable = false;
-    private boolean autoDelete = false;
-    private boolean internal = false;
+    private boolean durable;
+    private boolean autoDelete;
+    private boolean internal;
     private Map<String, Object> arguments;
 
     public void exchangeDeclare(Channel channel, String exchangeName) throws IOException {

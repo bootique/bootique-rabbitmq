@@ -19,6 +19,7 @@
 package io.bootique.rabbitmq.client.pubsub;
 
 import com.rabbitmq.client.*;
+import io.bootique.rabbitmq.client.topology.RmqQueueTemplate;
 import io.bootique.rabbitmq.client.topology.RmqTopology;
 import io.bootique.rabbitmq.client.topology.RmqTopologyBuilder;
 import org.slf4j.Logger;
@@ -42,21 +43,23 @@ public class RmqSubBuilder {
 
     private final RmqEndpointDriver driver;
     private final Map<String, Channel> consumerChannels;
-    private final String queueTemplate;
+    private final RmqQueueTemplate queueTemplate;
 
     private String exchange;
     private String queue;
     private String routingKey;
     private boolean autoAck;
 
-    protected RmqSubBuilder(RmqEndpointDriver driver, Map<String, Channel> consumerChannels, String queueTemplate) {
-        this.driver = Objects.requireNonNull(driver);
-        this.consumerChannels = consumerChannels;
+    protected RmqSubBuilder(
+            RmqEndpointDriver driver,
+            Map<String, Channel> consumerChannels,
+            RmqQueueTemplate queueTemplate,
+            String queue) {
 
-        // TODO: should we also track the default exchange and use it as a template for custom exchange defined
-        //  in the builder?
-        this.queueTemplate = queueTemplate;
-        this.queue = queueTemplate;
+        this.driver = Objects.requireNonNull(driver);
+        this.consumerChannels = Objects.requireNonNull(consumerChannels);
+        this.queueTemplate = Objects.requireNonNull(queueTemplate);
+        this.queue = queue;
     }
 
     public RmqSubBuilder exchange(String exchange) {
@@ -135,6 +138,11 @@ public class RmqSubBuilder {
     }
 
     protected Channel createChannelWithTopology() {
+
+        // TODO: empty queues names are quite valid in RMQ. The broker would assign the name in this case
+        //   https://www.rabbitmq.com/queues.html#server-named-queues
+        //   Though for server-named queues to work, we'd need to capture the generated queue name
+        //   to bind it to the exchange
 
         RmqTopology.required(queue, "Consumer queue is not defined");
 

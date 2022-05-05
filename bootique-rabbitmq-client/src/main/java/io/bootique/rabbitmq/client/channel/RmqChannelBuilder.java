@@ -62,14 +62,6 @@ public class RmqChannelBuilder {
         return this;
     }
 
-    /**
-     * @since 3.0.M1
-     */
-    public RmqChannelBuilder ensureQueue(String queueName, String queueTemplateName) {
-        topologyBuilder.ensureQueue(queueName, queueTemplateName);
-        return this;
-    }
-
     public RmqChannelBuilder ensureQueueBoundToExchange(String queueName, String exchangeName, String routingKey) {
         topologyBuilder.ensureQueueBoundToExchange(queueName, exchangeName, routingKey);
         return this;

@@ -21,6 +21,8 @@ package io.bootique.rabbitmq.client.pubsub;
 import io.bootique.annotation.BQConfig;
 import io.bootique.annotation.BQConfigProperty;
 import io.bootique.rabbitmq.client.channel.RmqChannelManager;
+import io.bootique.rabbitmq.client.topology.RmqQueueTemplate;
+import io.bootique.rabbitmq.client.topology.RmqQueueTemplateFactory;
 import io.bootique.rabbitmq.client.topology.RmqTopologyManager;
 import io.bootique.shutdown.ShutdownManager;
 
@@ -34,17 +36,35 @@ public class RmqSubEndpointFactory {
 
     private String connection;
     private String exchange;
+    private String queueTemplate;
     private String queue;
     private String routingKey;
     private boolean autoAck = true;
 
-    public RmqSubEndpoint create(RmqChannelManager channelManager, RmqTopologyManager topologyManager, ShutdownManager shutdownManager) {
+    public RmqSubEndpoint create(
+            RmqChannelManager channelManager,
+            RmqTopologyManager topologyManager,
+            ShutdownManager shutdownManager) {
+
         Objects.requireNonNull(connection, "Subscriber connection name is undefined");
         RmqEndpointDriver driver = new RmqEndpointDriver(channelManager, topologyManager, connection);
 
-        RmqSubEndpoint endpoint = new RmqSubEndpoint(driver, exchange, queue, routingKey, autoAck);
+        RmqSubEndpoint endpoint = new RmqSubEndpoint(
+                driver,
+                createQueueTemplate(topologyManager),
+                queue,
+                exchange,
+                routingKey,
+                autoAck);
+
         shutdownManager.addShutdownHook(() -> endpoint.close());
         return endpoint;
+    }
+
+    protected RmqQueueTemplate createQueueTemplate(RmqTopologyManager topologyManager) {
+        return this.queueTemplate != null
+                ? topologyManager.getQueueTemplate(queueTemplate)
+                : new RmqQueueTemplateFactory().createTemplate();
     }
 
     @BQConfigProperty
@@ -55,6 +75,14 @@ public class RmqSubEndpointFactory {
     @BQConfigProperty
     public void setExchange(String exchange) {
         this.exchange = exchange;
+    }
+
+    /**
+     * @since 3.0.M1
+     */
+    @BQConfigProperty("An optional reference to a queue template declared elsewhere in config")
+    public void setQueueTemplate(String queueTemplate) {
+        this.queueTemplate = queueTemplate;
     }
 
     @BQConfigProperty

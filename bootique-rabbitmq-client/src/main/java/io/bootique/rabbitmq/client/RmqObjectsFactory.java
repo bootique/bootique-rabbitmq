@@ -34,7 +34,8 @@ import io.bootique.rabbitmq.client.pubsub.RmqPubEndpointFactory;
 import io.bootique.rabbitmq.client.pubsub.RmqSubEndpoint;
 import io.bootique.rabbitmq.client.pubsub.RmqSubEndpointFactory;
 import io.bootique.rabbitmq.client.topology.RmqExchange;
-import io.bootique.rabbitmq.client.topology.RmqQueue;
+import io.bootique.rabbitmq.client.topology.RmqQueueTemplate;
+import io.bootique.rabbitmq.client.topology.RmqQueueTemplateFactory;
 import io.bootique.rabbitmq.client.topology.RmqTopologyManager;
 import io.bootique.shutdown.ShutdownManager;
 
@@ -52,7 +53,7 @@ public class RmqObjectsFactory {
 
     private Map<String, ConnectionFactoryFactory> connections;
     private Map<String, RmqExchange> exchanges;
-    private Map<String, RmqQueue> queues;
+    private Map<String, RmqQueueTemplateFactory> queueTemplates;
     private Map<String, RmqPubEndpointFactory> pub;
     private Map<String, RmqSubEndpointFactory> sub;
     private int channelPoolCapacity;
@@ -73,7 +74,7 @@ public class RmqObjectsFactory {
     public RmqTopologyManager createTopologyManager() {
         return new RmqTopologyManager(
                 exchanges != null ? exchanges : Collections.emptyMap(),
-                queues != null ? queues : Collections.emptyMap());
+                createQueueTemplates());
     }
 
     public RmqEndpoints createEndpoints(RmqChannelManager channelManager, RmqTopologyManager topologyManager, ShutdownManager shutdownManager) {
@@ -96,6 +97,16 @@ public class RmqObjectsFactory {
         });
 
         return manager;
+    }
+
+    protected Map<String, RmqQueueTemplate> createQueueTemplates() {
+        if (queueTemplates == null || queueTemplates.isEmpty()) {
+            return Collections.emptyMap();
+        }
+
+        Map<String, RmqQueueTemplate> map = new HashMap<>();
+        queueTemplates.forEach((k, v) -> map.put(k, v.createTemplate()));
+        return map;
     }
 
     protected Map<String, ConnectionFactory> createConnectionFactories(Injector injector) {
@@ -146,8 +157,8 @@ public class RmqObjectsFactory {
     }
 
     @BQConfigProperty("Configuration for RMQ queues. Queues are created lazily only when a channel is open that requires it")
-    public void setQueues(Map<String, RmqQueue> queues) {
-        this.queues = queues;
+    public void setQueueTemplates(Map<String, RmqQueueTemplateFactory> queueTemplates) {
+        this.queueTemplates = queueTemplates;
     }
 
     @BQConfigProperty

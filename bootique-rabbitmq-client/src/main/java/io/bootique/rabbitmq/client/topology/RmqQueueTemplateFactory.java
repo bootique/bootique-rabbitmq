@@ -19,27 +19,28 @@
 
 package io.bootique.rabbitmq.client.topology;
 
-import com.rabbitmq.client.Channel;
 import io.bootique.annotation.BQConfig;
 import io.bootique.annotation.BQConfigProperty;
 
-import java.io.IOException;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
+/**
+ * @since 3.0.M1
+ */
 @BQConfig
-public class RmqQueue {
+public class RmqQueueTemplateFactory {
 
     private static final String X_MESSAGE_TTL = "x-message-ttl";
 
-    private boolean durable = true;
-    private boolean exclusive = false;
-    private boolean autoDelete = false;
+    private boolean durable;
+    private boolean exclusive;
+    private boolean autoDelete;
     private Map<String, Object> arguments;
 
-    public void queueDeclare(Channel channel, String queueName) throws IOException {
-        channel.queueDeclare(queueName, durable, exclusive, autoDelete, cleanArguments());
+    public RmqQueueTemplateFactory() {
+        this.durable = true;
     }
 
     @BQConfigProperty("Sets queue durability. The default is 'true'")
@@ -60,6 +61,10 @@ public class RmqQueue {
     @BQConfigProperty("Sets additional arguments passed to the queue declaration. E.g. 'x-message-ttl', etc.")
     public void setArguments(Map<String, Object> arguments) {
         this.arguments = arguments;
+    }
+
+    public RmqQueueTemplate createTemplate() {
+        return new RmqQueueTemplate(durable, exclusive, autoDelete, cleanArguments());
     }
 
     // certain arguments can be bound as Strings in the map, whereas RMQ expects numbers for them.

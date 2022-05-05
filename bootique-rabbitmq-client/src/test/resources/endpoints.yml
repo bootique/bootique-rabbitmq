@@ -24,7 +24,7 @@ rabbitmq:
     e1:
       type: TOPIC
 
-  queueTemplates:
+  queues:
     queue1:
       durable: true
     queue2:
@@ -39,38 +39,40 @@ rabbitmq:
   pub:
     p1:
       connection: pubConnection
-      exchange: e1
+      exchangeConfig: e1
+      exchangeName: e1
       routingKey: "p1.X"
     p2:
       connection: pubConnection
-      exchange: e1
+      exchangeName: e1
       routingKey: "p2.X"
 
   sub:
     s1:
       connection: subConnection
-      exchange: e1
-      queueTemplate: queue1
-      queue: xqueue1
+      exchangeConfig: e1
+      exchangeName: e1
+      queueConfig: queue1
+      queueName: xqueue1
       routingKey: "*.X"
     s2:
       connection: subConnection
-      exchange: e1
-      queueTemplate: queue2
-      queue: xqueue2
+      exchangeName: e1
+      queueConfig: queue2
+      queueName: xqueue2
       routingKey: "p2.X"
     s3:
       connection: subConnection
-      exchange: e1
+      exchangeName: e1
       routingKey: "*.X"
     s4:
       connection: subConnection
-      exchange: e1
+      exchangeName: e1
       routingKey: "p2.X"
     s5:
       connection: subConnection
-      exchange: e1
-      queueTemplate: queue-ttl
-      queue: xqueue-ttl
+      exchangeName: e1
+      queueConfig: queue-ttl
+      queueName: xqueue-ttl
       routingKey: "p1.ttl"
 

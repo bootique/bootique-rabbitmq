@@ -26,6 +26,7 @@ import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.util.Map;
+import java.util.Objects;
 
 public class RmqExchangeConfig {
 
@@ -44,7 +45,7 @@ public class RmqExchangeConfig {
             boolean internal,
             Map<String, Object> arguments) {
 
-        this.type = type;
+        this.type = Objects.requireNonNull(type);
         this.durable = durable;
         this.autoDelete = autoDelete;
         this.internal = internal;

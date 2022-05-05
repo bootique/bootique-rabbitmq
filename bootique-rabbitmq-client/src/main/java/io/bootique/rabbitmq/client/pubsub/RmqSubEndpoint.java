@@ -124,8 +124,8 @@ public class RmqSubEndpoint {
      */
     public RmqSubBuilder newSubscription() {
         return new RmqSubBuilder(driver, consumerChannels, exchangeConfig, queueConfig)
-                .exchange(defaultExchange)
-                .queue(defaultQueue)
+                .exchangeName(defaultExchange)
+                .queueName(defaultQueue)
                 .routingKey(defaultRoutingKey)
                 .autoAck(defaultAutoAck);
     }

@@ -47,8 +47,8 @@ public class RmqSubBuilder {
     private final RmqExchangeConfig exchangeConfig;
     private final RmqQueueConfig queueConfig;
 
-    private String exchange;
-    private String queue;
+    private String exchangeName;
+    private String queueName;
     private String routingKey;
     private boolean autoAck;
 
@@ -65,20 +65,24 @@ public class RmqSubBuilder {
     }
 
     /**
-     * Redefines the exchange name for the subscription. Despite renaming, Exchange properties are taken from the
+     * Redefines the exchange name for the subscription. Despite renaming, Exchange properties are still taken from the
      * original exchange config associated with the endpoint.
+     *
+     * @since 3.0.M1
      */
-    public RmqSubBuilder exchange(String exchange) {
-        this.exchange = RmqTopology.normalizeName(exchange);
+    public RmqSubBuilder exchangeName(String exchangeName) {
+        this.exchangeName = RmqTopology.normalizeName(exchangeName);
         return this;
     }
 
     /**
-     * Redefines the queue name for the subscription. Despite renaming, Queue properties are taken from the
+     * Redefines the queue name for the subscription. Despite renaming, Queue properties are still taken from the
      * original queue config associated with the endpoint.
+     *
+     * @since 3.0.M1
      */
-    public RmqSubBuilder queue(String queue) {
-        this.queue = RmqTopology.normalizeName(queue);
+    public RmqSubBuilder queueName(String queueName) {
+        this.queueName = RmqTopology.normalizeName(queueName);
         return this;
     }
 
@@ -131,7 +135,7 @@ public class RmqSubBuilder {
         String consumerTag;
 
         try {
-            consumerTag = channel.basicConsume(queue, autoAck, consumer);
+            consumerTag = channel.basicConsume(queueName, autoAck, consumer);
         } catch (IOException e) {
             throw new RuntimeException("Error publishing RMQ message for connection: " + driver.getConnectionName(), e);
         }
@@ -149,14 +153,14 @@ public class RmqSubBuilder {
         //   Though for server-named queues to work, we'd need to capture the generated queue name
         //   to bind it to the exchange
 
-        RmqTopology.required(queue, "Consumer queue is not defined");
+        RmqTopology.required(queueName, "Consumer queue is not defined");
 
         RmqTopologyBuilder topologyBuilder = new RmqTopologyBuilder()
-                .ensureQueue(queue, queueConfig);
+                .ensureQueue(queueName, queueConfig);
 
-        if (RmqTopology.isDefined(exchange)) {
-            topologyBuilder.ensureExchange(exchange, exchangeConfig);
-            topologyBuilder.ensureQueueBoundToExchange(queue, exchange, routingKey);
+        if (RmqTopology.isDefined(exchangeName)) {
+            topologyBuilder.ensureExchange(exchangeName, exchangeConfig);
+            topologyBuilder.ensureQueueBoundToExchange(queueName, exchangeName, routingKey);
         }
 
         Channel channel = driver.createChannel();

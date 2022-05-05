@@ -82,8 +82,8 @@ public class EndpointsIT extends RabbitMQBaseTest {
         Sub s3 = new Sub();
         Sub s4 = new Sub();
 
-        endpoints.sub("s3").newSubscription().queue("s3-queue").subscribe(s3);
-        endpoints.sub("s4").newSubscription().queue("s4-queue").subscribe(s4);
+        endpoints.sub("s3").newSubscription().queueName("s3-queue").subscribe(s3);
+        endpoints.sub("s4").newSubscription().queueName("s4-queue").subscribe(s4);
 
         endpoints.pub("p2")
                 .newMessage()
@@ -112,7 +112,7 @@ public class EndpointsIT extends RabbitMQBaseTest {
         ThrowingSub s3 = new ThrowingSub();
         endpoints.sub("s3")
                 .newSubscription()
-                .queue("s3-exception-queue")
+                .queueName("s3-exception-queue")
                 .subscribe(s3);
 
         endpoints.pub("p1").publish("M1".getBytes());
@@ -151,7 +151,7 @@ public class EndpointsIT extends RabbitMQBaseTest {
         Sub s3 = new Sub();
 
         endpoints.sub("s3").newSubscription()
-                .queue("s3-ack-queue")
+                .queueName("s3-ack-queue")
                 .autoAck(false)
                 .subscribe(c -> new AckConsumer(c, s3));
 

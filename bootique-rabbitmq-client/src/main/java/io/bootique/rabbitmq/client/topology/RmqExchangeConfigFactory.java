@@ -36,8 +36,9 @@ public class RmqExchangeConfigFactory {
     private Map<String, Object> arguments;
 
     public RmqExchangeConfig createConfig() {
+
         return new RmqExchangeConfig(
-                type,
+                type != null ? type : BuiltinExchangeType.TOPIC,
                 durable,
                 autoDelete,
                 internal,

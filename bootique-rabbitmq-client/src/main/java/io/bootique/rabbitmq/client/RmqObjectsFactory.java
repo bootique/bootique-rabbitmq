@@ -49,8 +49,8 @@ import java.util.Map;
 public class RmqObjectsFactory {
 
     private Map<String, ConnectionFactoryFactory> connections;
-    private Map<String, RmqExchangeConfigFactory> exchangeConfigs;
-    private Map<String, RmqQueueConfigFactory> queueConfigs;
+    private Map<String, RmqExchangeConfigFactory> exchanges;
+    private Map<String, RmqQueueConfigFactory> queues;
     private Map<String, RmqPubEndpointFactory> pub;
     private Map<String, RmqSubEndpointFactory> sub;
     private int channelPoolCapacity;
@@ -97,22 +97,22 @@ public class RmqObjectsFactory {
     }
 
     protected Map<String, RmqQueueConfig> createQueueConfigs() {
-        if (queueConfigs == null || queueConfigs.isEmpty()) {
+        if (queues == null || queues.isEmpty()) {
             return Collections.emptyMap();
         }
 
         Map<String, RmqQueueConfig> map = new HashMap<>();
-        queueConfigs.forEach((k, v) -> map.put(k, v.createConfig()));
+        queues.forEach((k, v) -> map.put(k, v.createConfig()));
         return map;
     }
 
     protected Map<String, RmqExchangeConfig> createExchangeConfigs() {
-        if (exchangeConfigs == null || exchangeConfigs.isEmpty()) {
+        if (exchanges == null || exchanges.isEmpty()) {
             return Collections.emptyMap();
         }
 
         Map<String, RmqExchangeConfig> map = new HashMap<>();
-        exchangeConfigs.forEach((k, v) -> map.put(k, v.createConfig()));
+        exchanges.forEach((k, v) -> map.put(k, v.createConfig()));
         return map;
     }
 
@@ -159,13 +159,13 @@ public class RmqObjectsFactory {
     }
 
     @BQConfigProperty("Configuration for RMQ exchanges. Exchanges are created lazily only when a channel is open that requires it")
-    public void setExchangeConfigs(Map<String, RmqExchangeConfigFactory> exchangeConfigs) {
-        this.exchangeConfigs = exchangeConfigs;
+    public void setExchanges(Map<String, RmqExchangeConfigFactory> exchanges) {
+        this.exchanges = exchanges;
     }
 
     @BQConfigProperty("Configuration for RMQ queues. Queues are created lazily only when a channel is open that requires it")
-    public void setQueueConfigs(Map<String, RmqQueueConfigFactory> queueConfigs) {
-        this.queueConfigs = queueConfigs;
+    public void setQueues(Map<String, RmqQueueConfigFactory> queues) {
+        this.queues = queues;
     }
 
     @BQConfigProperty

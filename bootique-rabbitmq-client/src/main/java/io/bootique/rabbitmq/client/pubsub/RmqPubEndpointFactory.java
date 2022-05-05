@@ -35,16 +35,18 @@ public class RmqPubEndpointFactory {
 
     private String connection;
     private String exchangeConfig;
-    private String exchange;
+    private String exchangeName;
     private String routingKey;
 
     public RmqPubEndpoint create(RmqChannelManager channelManager, RmqTopologyManager topologyManager) {
-        Objects.requireNonNull(connection, "Publisher connection name is undefined");
+
+        Objects.requireNonNull(connection, "Publisher 'connection' is undefined");
+        Objects.requireNonNull(exchangeName, "Publisher 'exchangeName' is undefined");
 
         return new RmqPubEndpoint(
                 new RmqEndpointDriver(channelManager, connection),
                 createExchangeConfig(topologyManager),
-                exchange,
+                exchangeName,
                 routingKey);
     }
 
@@ -54,22 +56,25 @@ public class RmqPubEndpointFactory {
                 : new RmqExchangeConfigFactory().createConfig();
     }
 
-    /**
-     * @since 3.0.M1
-     */
-    @BQConfigProperty
-    public void setExchangeConfig(String exchangeConfig) {
-        this.exchangeConfig = exchangeConfig;
-    }
-
     @BQConfigProperty
     public void setConnection(String connection) {
         this.connection = connection;
     }
 
+    /**
+     * @since 3.0.M1
+     */
+    @BQConfigProperty("An optional reference to an exchange config declared in 'rabbitmq.exchanges'. By default a 'topic' exchange is assumed")
+    public void setExchangeConfig(String exchangeConfig) {
+        this.exchangeConfig = exchangeConfig;
+    }
+
+    /**
+     * @since 3.0.M1
+     */
     @BQConfigProperty("Default exchange name to be used for message dispatch")
-    public void setExchange(String exchange) {
-        this.exchange = exchange;
+    public void setExchangeName(String exchangeName) {
+        this.exchangeName = exchangeName;
     }
 
     @BQConfigProperty("Default routing key to be used for message dispatch")

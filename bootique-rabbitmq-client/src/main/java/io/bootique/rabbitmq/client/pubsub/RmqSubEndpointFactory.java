@@ -34,9 +34,9 @@ public class RmqSubEndpointFactory {
 
     private String connection;
     private String exchangeConfig;
-    private String exchange;
+    private String exchangeName;
     private String queueConfig;
-    private String queue;
+    private String queueName;
     private String routingKey;
     private boolean autoAck = true;
 
@@ -52,8 +52,8 @@ public class RmqSubEndpointFactory {
                 driver,
                 createExchangeConfig(topologyManager),
                 createQueueConfig(topologyManager),
-                queue,
-                exchange,
+                queueName,
+                exchangeName,
                 routingKey,
                 autoAck);
 
@@ -81,27 +81,33 @@ public class RmqSubEndpointFactory {
     /**
      * @since 3.0.M1
      */
-    @BQConfigProperty("An optional reference to an exchange config declared in 'rabbitmq.exchangeConfigs'")
+    @BQConfigProperty("An optional reference to an exchange config declared in 'rabbitmq.exchanges'. By default a 'topic' exchange is assumed")
     public void setExchangeConfig(String exchangeConfig) {
         this.exchangeConfig = exchangeConfig;
-    }
-
-    @BQConfigProperty
-    public void setExchange(String exchange) {
-        this.exchange = exchange;
     }
 
     /**
      * @since 3.0.M1
      */
-    @BQConfigProperty("An optional reference to a queue config declared in 'rabbitmq.queueConfigs'")
+    @BQConfigProperty
+    public void setExchangeName(String exchangeName) {
+        this.exchangeName = exchangeName;
+    }
+
+    /**
+     * @since 3.0.M1
+     */
+    @BQConfigProperty("An optional reference to a queue config declared in 'rabbitmq.queues'")
     public void setQueueConfig(String queueConfig) {
         this.queueConfig = queueConfig;
     }
 
+    /**
+     * @since 3.0.M1
+     */
     @BQConfigProperty
-    public void setQueue(String queue) {
-        this.queue = queue;
+    public void setQueueName(String queueName) {
+        this.queueName = queueName;
     }
 
     @BQConfigProperty

@@ -27,6 +27,9 @@ rabbitmq:
   queues:
     queue1:
       durable: true
+    queue2:
+      durable: true
+      autoDelete: true
     queue-ttl:
       durable: true
       arguments:
@@ -52,9 +55,7 @@ rabbitmq:
     s2:
       connection: subConnection
       exchange: e1
-      # queue name defined, but not references in config.
-      # ok: it will be created during subscription
-      queue: unconfigured-queue
+      queue: queue2
       routingKey: "p2.X"
     s3:
       connection: subConnection
@@ -71,3 +72,9 @@ rabbitmq:
       exchange: e1
       queue: queue-ttl
       routingKey: "p1.ttl"
+    s6:
+      connection: subConnection
+      exchange: e1
+      # queue name defined, but not references in config. Will result in an exception
+      queue: unconfigured-queue
+      routingKey: "p2.X"

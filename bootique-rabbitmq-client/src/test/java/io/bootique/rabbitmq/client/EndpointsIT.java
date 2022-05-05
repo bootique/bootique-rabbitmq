@@ -51,6 +51,12 @@ public class EndpointsIT extends RabbitMQBaseTest {
             .createRuntime();
 
     @Test
+    public void testSubConfigHasUndeclaredQueue() {
+        RmqEndpoints endpoints = app.getInstance(RmqEndpoints.class);
+        assertThrows(IllegalStateException.class, () -> endpoints.sub("s6").subscribe(new Sub()));
+    }
+
+    @Test
     public void testP1Route() {
         RmqEndpoints endpoints = app.getInstance(RmqEndpoints.class);
         Sub s1 = new Sub();

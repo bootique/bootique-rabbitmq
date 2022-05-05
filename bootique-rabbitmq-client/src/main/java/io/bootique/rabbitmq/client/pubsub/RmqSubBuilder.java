@@ -42,16 +42,21 @@ public class RmqSubBuilder {
 
     private final RmqEndpointDriver driver;
     private final Map<String, Channel> consumerChannels;
+    private final String queueTemplate;
 
     private String exchange;
     private String queue;
     private String routingKey;
     private boolean autoAck;
 
-    protected RmqSubBuilder(RmqEndpointDriver driver, Map<String, Channel> consumerChannels) {
-
+    protected RmqSubBuilder(RmqEndpointDriver driver, Map<String, Channel> consumerChannels, String queueTemplate) {
         this.driver = Objects.requireNonNull(driver);
         this.consumerChannels = consumerChannels;
+
+        // TODO: should we also track the default exchange and use it as a template for custom exchange defined
+        //  in the builder?
+        this.queueTemplate = queueTemplate;
+        this.queue = queueTemplate;
     }
 
     public RmqSubBuilder exchange(String exchange) {
@@ -59,6 +64,11 @@ public class RmqSubBuilder {
         return this;
     }
 
+    /**
+     * Redefines the queue name for the subscription. The newly created Queue properties would still be taken from the
+     * original queue configuration associated with the endpoint. This way the application can have a small number of
+     * queue configuration "templates", and yet create any number of unique consumers.
+     */
     public RmqSubBuilder queue(String queue) {
         this.queue = RmqTopology.normalizeName(queue);
         return this;
@@ -128,16 +138,16 @@ public class RmqSubBuilder {
 
         RmqTopology.required(queue, "Consumer queue is not defined");
 
-        Channel channel = driver.createChannel();
-        RmqTopologyBuilder topologyBuilder = driver.newTopology();
+        RmqTopologyBuilder topologyBuilder = driver
+                .newTopology()
+                .ensureQueue(queue, queueTemplate);
+
         if (RmqTopology.isDefined(exchange)) {
             topologyBuilder.ensureQueueBoundToExchange(queue, exchange, routingKey);
-        } else {
-            topologyBuilder.ensureQueue(queue);
         }
 
+        Channel channel = driver.createChannel();
         topologyBuilder.build(channel);
-
         return channel;
     }
 

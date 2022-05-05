@@ -68,15 +68,29 @@ public class RmqTopologyBuilder {
     }
 
     public RmqTopologyBuilder ensureQueue(String queueName) {
+        return ensureQueue(queueName, null);
+    }
+
+    /**
+     * Creates a topology action to create a named queue. Queue configuration is looked up using "queueTemplateName"
+     * parameter. If the template is null, an implicit default configuration is used. If the template name doesn't
+     * correspond to an existing configuration, an exception is thrown.
+     *
+     * @since 3.0.M1
+     */
+    public RmqTopologyBuilder ensureQueue(String queueName, String queueTemplateName) {
         RmqTopology.required(queueName, "Undefined queue name");
-        topologyActions.computeIfAbsent("q:" + queueName, k -> c -> queueDeclare(c, queueName));
+        topologyActions.computeIfAbsent("q:" + queueName, k -> c -> queueDeclare(c, queueName, queueTemplateName));
         return this;
     }
 
     public RmqTopologyBuilder ensureQueueBoundToExchange(String queueName, String exchangeName, String routingKey) {
 
-        ensureExchange(exchangeName);
+        // while we do not allow specifying "queueTemplateName" here, if "ensureQueue(n, t)" was previously called,
+        // the second "ensureQueue" will have no effect and the queue will have the right configuration
         ensureQueue(queueName);
+
+        ensureExchange(exchangeName);
 
         topologyActions.computeIfAbsent("eq:" + exchangeName + ":" + queueName + ":" + routingKey,
                 k -> c -> queueBind(c, queueName, exchangeName, routingKey));
@@ -90,7 +104,7 @@ public class RmqTopologyBuilder {
         if (exchange == null) {
             // Have to throw, as unfortunately we can't create an exchange with default parameters.
             // We need to know its type at the minimum
-            throw new IllegalStateException("No configuration present for exchange named '" + exchangeName + "'");
+            throw new IllegalStateException("No configuration present for the exchange named '" + exchangeName + "'");
         }
 
         LOGGER.debug("declaring exchange '{}'", exchangeName);
@@ -102,12 +116,8 @@ public class RmqTopologyBuilder {
         }
     }
 
-    protected void queueDeclare(Channel channel, String queueName) {
-        RmqQueue queue = queueConfigs.containsKey(queueName)
-                ? queueConfigs.get(queueName)
-                // create a queue on the fly with default settings.
-                // TODO: print a warning?
-                : new RmqQueue();
+    protected void queueDeclare(Channel channel, String queueName, String queueTemplateName) {
+        RmqQueue queue = findQueueTemplate(queueName, queueTemplateName);
 
         LOGGER.debug("declaring queue '{}'", queueName);
 
@@ -116,6 +126,24 @@ public class RmqTopologyBuilder {
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
+    }
+
+    protected RmqQueue findQueueTemplate(String queueName, String queueTemplateName) {
+
+        if (RmqTopology.isDefined(queueTemplateName)) {
+            if (!queueConfigs.containsKey(queueTemplateName)) {
+                throw new IllegalStateException("No configuration present for the queue template '" + queueTemplateName + "'");
+            }
+
+            return queueConfigs.get(queueTemplateName);
+        }
+
+        if (queueConfigs.containsKey(queueName)) {
+            return queueConfigs.get(queueName);
+        }
+
+        LOGGER.info("No configuration present for the queue template {}, will use the default settings", queueName);
+        return new RmqQueue();
     }
 
     protected void queueBind(Channel channel, String queueName, String exchangeName, String routingKey) {

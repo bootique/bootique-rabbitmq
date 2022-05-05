@@ -24,6 +24,8 @@ import io.bootique.rabbitmq.client.topology.RmqTopologyBuilder;
 import io.bootique.rabbitmq.client.topology.RmqTopologyManager;
 
 /**
+ * Provides access to a single RMQ connection, allowing to create channels and topologies.
+ *
  * @since 3.0.M1
  */
 public class RmqEndpointDriver {

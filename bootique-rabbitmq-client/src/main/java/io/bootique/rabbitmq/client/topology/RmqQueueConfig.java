@@ -30,16 +30,16 @@ import java.util.Objects;
 /**
  * @since 3.0.M1
  */
-public class RmqQueueTemplate {
+public class RmqQueueConfig {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(RmqQueueTemplate.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(RmqQueueConfig.class);
 
     private final boolean durable;
     private final boolean exclusive;
     private final boolean autoDelete;
     private final Map<String, Object> arguments;
 
-    public RmqQueueTemplate(
+    public RmqQueueConfig(
             boolean durable,
             boolean exclusive,
             boolean autoDelete,

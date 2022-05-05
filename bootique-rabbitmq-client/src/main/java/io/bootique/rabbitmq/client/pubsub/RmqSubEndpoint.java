@@ -20,7 +20,7 @@ package io.bootique.rabbitmq.client.pubsub;
 
 import com.rabbitmq.client.*;
 import io.bootique.rabbitmq.client.topology.RmqExchangeConfig;
-import io.bootique.rabbitmq.client.topology.RmqQueueTemplate;
+import io.bootique.rabbitmq.client.topology.RmqQueueConfig;
 import io.bootique.rabbitmq.client.topology.RmqTopology;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -41,7 +41,7 @@ public class RmqSubEndpoint {
 
     private final RmqEndpointDriver driver;
     private final RmqExchangeConfig exchangeConfig;
-    private final RmqQueueTemplate queueTemplate;
+    private final RmqQueueConfig queueConfig;
     private final String defaultQueue;
     private final String defaultExchange;
     private final String defaultRoutingKey;
@@ -52,7 +52,7 @@ public class RmqSubEndpoint {
     public RmqSubEndpoint(
             RmqEndpointDriver driver,
             RmqExchangeConfig exchangeConfig,
-            RmqQueueTemplate queueTemplate,
+            RmqQueueConfig queueConfig,
             String defaultQueue,
             String defaultExchange,
             String defaultRoutingKey,
@@ -60,7 +60,7 @@ public class RmqSubEndpoint {
 
         this.driver = Objects.requireNonNull(driver);
         this.exchangeConfig = Objects.requireNonNull(exchangeConfig);
-        this.queueTemplate = Objects.requireNonNull(queueTemplate);
+        this.queueConfig = Objects.requireNonNull(queueConfig);
 
         this.defaultQueue = RmqTopology.normalizeName(defaultQueue);
         this.defaultExchange = RmqTopology.normalizeName(defaultExchange);
@@ -123,7 +123,7 @@ public class RmqSubEndpoint {
      * before subscribing a consumer.
      */
     public RmqSubBuilder newSubscription() {
-        return new RmqSubBuilder(driver, consumerChannels, exchangeConfig, queueTemplate)
+        return new RmqSubBuilder(driver, consumerChannels, exchangeConfig, queueConfig)
                 .exchange(defaultExchange)
                 .queue(defaultQueue)
                 .routingKey(defaultRoutingKey)

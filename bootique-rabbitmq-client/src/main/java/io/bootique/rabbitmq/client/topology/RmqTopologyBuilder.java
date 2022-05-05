@@ -76,20 +76,20 @@ public class RmqTopologyBuilder {
      */
     // TODO: deprecate?
     public RmqTopologyBuilder ensureQueue(String queueName) {
-        return ensureQueue(queueName, new RmqQueueTemplateFactory().createTemplate());
+        return ensureQueue(queueName, new RmqQueueConfigFactory().createConfig());
     }
 
     /**
-     * Adds a topology action to create a named queue. Queue configuration is taken from "queueTemplate"
-     * parameter. If the template is null, an implicit default configuration is used. If the template name doesn't
+     * Adds a topology action to create a named queue. Queue configuration is taken from "queueConfig"
+     * parameter. If the config is null, an implicit default configuration is used. If the template name doesn't
      * correspond to an existing configuration, an exception is thrown.
      *
      * @since 3.0.M1
      */
-    public RmqTopologyBuilder ensureQueue(String queueName, RmqQueueTemplate queueTemplate) {
+    public RmqTopologyBuilder ensureQueue(String queueName, RmqQueueConfig queueConfig) {
         RmqTopology.required(queueName, "Undefined queue name");
-        Objects.requireNonNull(queueTemplate, "'queueTemplate' is null");
-        topologyActions.computeIfAbsent("q:" + queueName, k -> c -> queueTemplate.queueDeclare(c, queueName));
+        Objects.requireNonNull(queueConfig, "'queueConfig' is null");
+        topologyActions.computeIfAbsent("q:" + queueName, k -> c -> queueConfig.queueDeclare(c, queueName));
         return this;
     }
 

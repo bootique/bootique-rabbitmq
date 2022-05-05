@@ -35,7 +35,7 @@ public class RmqSubEndpointFactory {
     private String connection;
     private String exchangeConfig;
     private String exchange;
-    private String queueTemplate;
+    private String queueConfig;
     private String queue;
     private String routingKey;
     private boolean autoAck = true;
@@ -51,7 +51,7 @@ public class RmqSubEndpointFactory {
         RmqSubEndpoint endpoint = new RmqSubEndpoint(
                 driver,
                 createExchangeConfig(topologyManager),
-                createQueueTemplate(topologyManager),
+                createQueueConfig(topologyManager),
                 queue,
                 exchange,
                 routingKey,
@@ -67,10 +67,10 @@ public class RmqSubEndpointFactory {
                 : new RmqExchangeConfigFactory().createConfig();
     }
 
-    protected RmqQueueTemplate createQueueTemplate(RmqTopologyManager topologyManager) {
-        return this.queueTemplate != null
-                ? topologyManager.getQueueTemplate(queueTemplate)
-                : new RmqQueueTemplateFactory().createTemplate();
+    protected RmqQueueConfig createQueueConfig(RmqTopologyManager topologyManager) {
+        return this.queueConfig != null
+                ? topologyManager.getQueueConfig(queueConfig)
+                : new RmqQueueConfigFactory().createConfig();
     }
 
     @BQConfigProperty
@@ -81,7 +81,7 @@ public class RmqSubEndpointFactory {
     /**
      * @since 3.0.M1
      */
-    @BQConfigProperty
+    @BQConfigProperty("An optional reference to an exchange config declared in 'rabbitmq.exchangeConfigs'")
     public void setExchangeConfig(String exchangeConfig) {
         this.exchangeConfig = exchangeConfig;
     }
@@ -94,9 +94,9 @@ public class RmqSubEndpointFactory {
     /**
      * @since 3.0.M1
      */
-    @BQConfigProperty("An optional reference to a queue template declared elsewhere in config")
-    public void setQueueTemplate(String queueTemplate) {
-        this.queueTemplate = queueTemplate;
+    @BQConfigProperty("An optional reference to a queue config declared in 'rabbitmq.queueConfigs'")
+    public void setQueueConfig(String queueConfig) {
+        this.queueConfig = queueConfig;
     }
 
     @BQConfigProperty

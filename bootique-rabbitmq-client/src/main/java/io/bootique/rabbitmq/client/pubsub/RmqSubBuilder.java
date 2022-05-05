@@ -20,7 +20,7 @@ package io.bootique.rabbitmq.client.pubsub;
 
 import com.rabbitmq.client.*;
 import io.bootique.rabbitmq.client.topology.RmqExchangeConfig;
-import io.bootique.rabbitmq.client.topology.RmqQueueTemplate;
+import io.bootique.rabbitmq.client.topology.RmqQueueConfig;
 import io.bootique.rabbitmq.client.topology.RmqTopology;
 import io.bootique.rabbitmq.client.topology.RmqTopologyBuilder;
 import org.slf4j.Logger;
@@ -45,7 +45,7 @@ public class RmqSubBuilder {
     private final RmqEndpointDriver driver;
     private final Map<String, Channel> consumerChannels;
     private final RmqExchangeConfig exchangeConfig;
-    private final RmqQueueTemplate queueTemplate;
+    private final RmqQueueConfig queueConfig;
 
     private String exchange;
     private String queue;
@@ -56,12 +56,12 @@ public class RmqSubBuilder {
             RmqEndpointDriver driver,
             Map<String, Channel> consumerChannels,
             RmqExchangeConfig exchangeConfig,
-            RmqQueueTemplate queueTemplate) {
+            RmqQueueConfig queueConfig) {
 
         this.driver = Objects.requireNonNull(driver);
         this.consumerChannels = Objects.requireNonNull(consumerChannels);
         this.exchangeConfig = Objects.requireNonNull(exchangeConfig);
-        this.queueTemplate = Objects.requireNonNull(queueTemplate);
+        this.queueConfig = Objects.requireNonNull(queueConfig);
     }
 
     /**
@@ -152,7 +152,7 @@ public class RmqSubBuilder {
         RmqTopology.required(queue, "Consumer queue is not defined");
 
         RmqTopologyBuilder topologyBuilder = new RmqTopologyBuilder()
-                .ensureQueue(queue, queueTemplate);
+                .ensureQueue(queue, queueConfig);
 
         if (RmqTopology.isDefined(exchange)) {
             topologyBuilder.ensureExchange(exchange, exchangeConfig);

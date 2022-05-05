@@ -30,20 +30,20 @@ import java.util.Objects;
 public class RmqTopologyManager {
 
     private final Map<String, RmqExchangeConfig> exchangeConfigs;
-    private final Map<String, RmqQueueTemplate> queueTemplates;
+    private final Map<String, RmqQueueConfig> queueConfigs;
 
-    public RmqTopologyManager(Map<String, RmqExchangeConfig> exchangeConfigs, Map<String, RmqQueueTemplate> queueTemplates) {
+    public RmqTopologyManager(Map<String, RmqExchangeConfig> exchangeConfigs, Map<String, RmqQueueConfig> queueConfigs) {
         this.exchangeConfigs = Objects.requireNonNull(exchangeConfigs);
-        this.queueTemplates = Objects.requireNonNull(queueTemplates);
+        this.queueConfigs = Objects.requireNonNull(queueConfigs);
     }
 
-    public RmqQueueTemplate getQueueTemplate(String name) {
-        RmqQueueTemplate template = queueTemplates.get(name);
-        if (template == null) {
-            throw new IllegalArgumentException("Unknown queue template name: " + name);
+    public RmqQueueConfig getQueueConfig(String name) {
+        RmqQueueConfig config = queueConfigs.get(name);
+        if (config == null) {
+            throw new IllegalArgumentException("Unknown queue config name: " + name);
         }
 
-        return template;
+        return config;
     }
 
     public RmqExchangeConfig getExchangeConfig(String name) {

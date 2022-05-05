@@ -21,6 +21,9 @@ package io.bootique.rabbitmq.client.pubsub;
 import io.bootique.annotation.BQConfig;
 import io.bootique.annotation.BQConfigProperty;
 import io.bootique.rabbitmq.client.channel.RmqChannelManager;
+import io.bootique.rabbitmq.client.topology.RmqExchangeConfig;
+import io.bootique.rabbitmq.client.topology.RmqExchangeConfigFactory;
+import io.bootique.rabbitmq.client.topology.RmqTopologyManager;
 
 import java.util.Objects;
 
@@ -31,14 +34,32 @@ import java.util.Objects;
 public class RmqPubEndpointFactory {
 
     private String connection;
+    private String exchangeConfig;
     private String exchange;
     private String routingKey;
 
-    public RmqPubEndpoint create(RmqChannelManager channelManager) {
+    public RmqPubEndpoint create(RmqChannelManager channelManager, RmqTopologyManager topologyManager) {
         Objects.requireNonNull(connection, "Publisher connection name is undefined");
 
-        RmqEndpointDriver driver = new RmqEndpointDriver(channelManager, connection);
-        return new RmqPubEndpoint(driver, exchange, routingKey);
+        return new RmqPubEndpoint(
+                new RmqEndpointDriver(channelManager, connection),
+                createExchangeConfig(topologyManager),
+                exchange,
+                routingKey);
+    }
+
+    protected RmqExchangeConfig createExchangeConfig(RmqTopologyManager topologyManager) {
+        return this.exchangeConfig != null
+                ? topologyManager.getExchangeConfig(exchangeConfig)
+                : new RmqExchangeConfigFactory().createConfig();
+    }
+
+    /**
+     * @since 3.0.M1
+     */
+    @BQConfigProperty
+    public void setExchangeConfig(String exchangeConfig) {
+        this.exchangeConfig = exchangeConfig;
     }
 
     @BQConfigProperty

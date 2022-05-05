@@ -30,7 +30,7 @@ import java.util.Map;
  * @since 3.0.M1
  */
 @BQConfig
-public class RmqQueueTemplateFactory {
+public class RmqQueueConfigFactory {
 
     private static final String X_MESSAGE_TTL = "x-message-ttl";
 
@@ -39,7 +39,7 @@ public class RmqQueueTemplateFactory {
     private boolean autoDelete;
     private Map<String, Object> arguments;
 
-    public RmqQueueTemplateFactory() {
+    public RmqQueueConfigFactory() {
         this.durable = true;
     }
 
@@ -63,8 +63,8 @@ public class RmqQueueTemplateFactory {
         this.arguments = arguments;
     }
 
-    public RmqQueueTemplate createTemplate() {
-        return new RmqQueueTemplate(durable, exclusive, autoDelete, cleanArguments());
+    public RmqQueueConfig createConfig() {
+        return new RmqQueueConfig(durable, exclusive, autoDelete, cleanArguments());
     }
 
     // certain arguments can be bound as Strings in the map, whereas RMQ expects numbers for them.

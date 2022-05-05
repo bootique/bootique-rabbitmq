@@ -50,7 +50,7 @@ public class RmqObjectsFactory {
 
     private Map<String, ConnectionFactoryFactory> connections;
     private Map<String, RmqExchangeConfigFactory> exchangeConfigs;
-    private Map<String, RmqQueueTemplateFactory> queueTemplates;
+    private Map<String, RmqQueueConfigFactory> queueConfigs;
     private Map<String, RmqPubEndpointFactory> pub;
     private Map<String, RmqSubEndpointFactory> sub;
     private int channelPoolCapacity;
@@ -71,7 +71,7 @@ public class RmqObjectsFactory {
     public RmqTopologyManager createTopologyManager() {
         return new RmqTopologyManager(
                 createExchangeConfigs(),
-                createQueueTemplates());
+                createQueueConfigs());
     }
 
     public RmqEndpoints createEndpoints(RmqChannelManager channelManager, RmqTopologyManager topologyManager, ShutdownManager shutdownManager) {
@@ -96,13 +96,13 @@ public class RmqObjectsFactory {
         return manager;
     }
 
-    protected Map<String, RmqQueueTemplate> createQueueTemplates() {
-        if (queueTemplates == null || queueTemplates.isEmpty()) {
+    protected Map<String, RmqQueueConfig> createQueueConfigs() {
+        if (queueConfigs == null || queueConfigs.isEmpty()) {
             return Collections.emptyMap();
         }
 
-        Map<String, RmqQueueTemplate> map = new HashMap<>();
-        queueTemplates.forEach((k, v) -> map.put(k, v.createTemplate()));
+        Map<String, RmqQueueConfig> map = new HashMap<>();
+        queueConfigs.forEach((k, v) -> map.put(k, v.createConfig()));
         return map;
     }
 
@@ -164,8 +164,8 @@ public class RmqObjectsFactory {
     }
 
     @BQConfigProperty("Configuration for RMQ queues. Queues are created lazily only when a channel is open that requires it")
-    public void setQueueTemplates(Map<String, RmqQueueTemplateFactory> queueTemplates) {
-        this.queueTemplates = queueTemplates;
+    public void setQueueConfigs(Map<String, RmqQueueConfigFactory> queueConfigs) {
+        this.queueConfigs = queueConfigs;
     }
 
     @BQConfigProperty

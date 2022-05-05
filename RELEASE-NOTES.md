@@ -5,7 +5,8 @@
 * #15 Make RmqConnectionManager injectable
 * #16 Injectable RmqTopologyManager
 * #17 Split RmqChannelFactory functions between RmqChannelManager and RmqTopologyManager
-* #20 Queue config templates for sub endpoints (short-lived queues)
+* #20 "queues" to act as configs, not the actual named queues
+* #21 "exchanges" to act as configs, not the actual named exchanges
 
 ## 2.0.RC1
 

@@ -65,8 +65,8 @@ public class RabbitMQModule extends ConfigModule {
     @Deprecated
     @Singleton
     @Provides
-    RmqChannelFactory provideChannelFactory(RmqChannelManager channelManager, RmqTopologyManager topologyManager) {
-        return new RmqChannelFactory(channelManager, topologyManager);
+    RmqChannelFactory provideChannelFactory(RmqChannelManager channelManager) {
+        return new RmqChannelFactory(channelManager);
     }
 
     @Singleton

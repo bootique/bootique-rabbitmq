@@ -20,15 +20,14 @@
 package io.bootique.rabbitmq.client.topology;
 
 import com.rabbitmq.client.BuiltinExchangeType;
-import com.rabbitmq.client.Channel;
 import io.bootique.annotation.BQConfig;
 import io.bootique.annotation.BQConfigProperty;
 
-import java.io.IOException;
+import java.util.Collections;
 import java.util.Map;
 
 @BQConfig
-public class RmqExchange {
+public class RmqExchangeConfigFactory {
 
     private BuiltinExchangeType type;
     private boolean durable;
@@ -36,8 +35,13 @@ public class RmqExchange {
     private boolean internal;
     private Map<String, Object> arguments;
 
-    public void exchangeDeclare(Channel channel, String exchangeName) throws IOException {
-        channel.exchangeDeclare(exchangeName, type, durable, autoDelete, internal, arguments);
+    public RmqExchangeConfig createConfig() {
+        return new RmqExchangeConfig(
+                type,
+                durable,
+                autoDelete,
+                internal,
+                this.arguments != null ? this.arguments : Collections.emptyMap());
     }
 
     @BQConfigProperty

@@ -40,11 +40,10 @@ public class RmqChannelBuilder {
     private String connectionName;
 
     public RmqChannelBuilder(
-            RmqChannelManager channelManager,
-            RmqTopologyBuilder topologyBuilder) {
+            RmqChannelManager channelManager) {
 
         this.channelManager = channelManager;
-        this.topologyBuilder = topologyBuilder;
+        this.topologyBuilder = new RmqTopologyBuilder();
     }
 
     public RmqChannelBuilder connectionName(String connectionName) {
@@ -52,11 +51,13 @@ public class RmqChannelBuilder {
         return this;
     }
 
+    // TODO: deprecate?
     public RmqChannelBuilder ensureExchange(String exchangeName) {
         topologyBuilder.ensureExchange(exchangeName);
         return this;
     }
 
+    // TODO: deprecate?
     public RmqChannelBuilder ensureQueue(String queueName) {
         topologyBuilder.ensureQueue(queueName);
         return this;

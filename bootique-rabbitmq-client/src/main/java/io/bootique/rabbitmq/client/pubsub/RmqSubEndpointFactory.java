@@ -21,9 +21,7 @@ package io.bootique.rabbitmq.client.pubsub;
 import io.bootique.annotation.BQConfig;
 import io.bootique.annotation.BQConfigProperty;
 import io.bootique.rabbitmq.client.channel.RmqChannelManager;
-import io.bootique.rabbitmq.client.topology.RmqQueueTemplate;
-import io.bootique.rabbitmq.client.topology.RmqQueueTemplateFactory;
-import io.bootique.rabbitmq.client.topology.RmqTopologyManager;
+import io.bootique.rabbitmq.client.topology.*;
 import io.bootique.shutdown.ShutdownManager;
 
 import java.util.Objects;
@@ -35,6 +33,7 @@ import java.util.Objects;
 public class RmqSubEndpointFactory {
 
     private String connection;
+    private String exchangeConfig;
     private String exchange;
     private String queueTemplate;
     private String queue;
@@ -47,10 +46,11 @@ public class RmqSubEndpointFactory {
             ShutdownManager shutdownManager) {
 
         Objects.requireNonNull(connection, "Subscriber connection name is undefined");
-        RmqEndpointDriver driver = new RmqEndpointDriver(channelManager, topologyManager, connection);
+        RmqEndpointDriver driver = new RmqEndpointDriver(channelManager, connection);
 
         RmqSubEndpoint endpoint = new RmqSubEndpoint(
                 driver,
+                createExchangeConfig(topologyManager),
                 createQueueTemplate(topologyManager),
                 queue,
                 exchange,
@@ -59,6 +59,12 @@ public class RmqSubEndpointFactory {
 
         shutdownManager.addShutdownHook(() -> endpoint.close());
         return endpoint;
+    }
+
+    protected RmqExchangeConfig createExchangeConfig(RmqTopologyManager topologyManager) {
+        return this.exchangeConfig != null
+                ? topologyManager.getExchangeConfig(exchangeConfig)
+                : new RmqExchangeConfigFactory().createConfig();
     }
 
     protected RmqQueueTemplate createQueueTemplate(RmqTopologyManager topologyManager) {
@@ -70,6 +76,14 @@ public class RmqSubEndpointFactory {
     @BQConfigProperty
     public void setConnection(String connection) {
         this.connection = connection;
+    }
+
+    /**
+     * @since 3.0.M1
+     */
+    @BQConfigProperty
+    public void setExchangeConfig(String exchangeConfig) {
+        this.exchangeConfig = exchangeConfig;
     }
 
     @BQConfigProperty

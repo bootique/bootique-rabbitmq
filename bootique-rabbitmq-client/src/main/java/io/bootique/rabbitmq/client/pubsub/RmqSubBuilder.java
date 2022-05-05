@@ -19,6 +19,7 @@
 package io.bootique.rabbitmq.client.pubsub;
 
 import com.rabbitmq.client.*;
+import io.bootique.rabbitmq.client.topology.RmqExchangeConfig;
 import io.bootique.rabbitmq.client.topology.RmqQueueTemplate;
 import io.bootique.rabbitmq.client.topology.RmqTopology;
 import io.bootique.rabbitmq.client.topology.RmqTopologyBuilder;
@@ -43,6 +44,7 @@ public class RmqSubBuilder {
 
     private final RmqEndpointDriver driver;
     private final Map<String, Channel> consumerChannels;
+    private final RmqExchangeConfig exchangeConfig;
     private final RmqQueueTemplate queueTemplate;
 
     private String exchange;
@@ -53,24 +55,27 @@ public class RmqSubBuilder {
     protected RmqSubBuilder(
             RmqEndpointDriver driver,
             Map<String, Channel> consumerChannels,
-            RmqQueueTemplate queueTemplate,
-            String queue) {
+            RmqExchangeConfig exchangeConfig,
+            RmqQueueTemplate queueTemplate) {
 
         this.driver = Objects.requireNonNull(driver);
         this.consumerChannels = Objects.requireNonNull(consumerChannels);
+        this.exchangeConfig = Objects.requireNonNull(exchangeConfig);
         this.queueTemplate = Objects.requireNonNull(queueTemplate);
-        this.queue = queue;
     }
 
+    /**
+     * Redefines the exchange name for the subscription. Despite renaming, Exchange properties are taken from the
+     * original exchange config associated with the endpoint.
+     */
     public RmqSubBuilder exchange(String exchange) {
         this.exchange = RmqTopology.normalizeName(exchange);
         return this;
     }
 
     /**
-     * Redefines the queue name for the subscription. The newly created Queue properties would still be taken from the
-     * original queue configuration associated with the endpoint. This way the application can have a small number of
-     * queue configuration "templates", and yet create any number of unique consumers.
+     * Redefines the queue name for the subscription. Despite renaming, Queue properties are taken from the
+     * original queue config associated with the endpoint.
      */
     public RmqSubBuilder queue(String queue) {
         this.queue = RmqTopology.normalizeName(queue);
@@ -146,11 +151,11 @@ public class RmqSubBuilder {
 
         RmqTopology.required(queue, "Consumer queue is not defined");
 
-        RmqTopologyBuilder topologyBuilder = driver
-                .newTopology()
+        RmqTopologyBuilder topologyBuilder = new RmqTopologyBuilder()
                 .ensureQueue(queue, queueTemplate);
 
         if (RmqTopology.isDefined(exchange)) {
+            topologyBuilder.ensureExchange(exchange, exchangeConfig);
             topologyBuilder.ensureQueueBoundToExchange(queue, exchange, routingKey);
         }
 

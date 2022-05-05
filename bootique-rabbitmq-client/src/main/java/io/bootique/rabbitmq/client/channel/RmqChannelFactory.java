@@ -34,14 +34,9 @@ import java.util.Objects;
 public class RmqChannelFactory {
 
     private final RmqChannelManager channelManager;
-    private final RmqTopologyManager topologyManager;
 
-    public RmqChannelFactory(
-            RmqChannelManager channelManager,
-            RmqTopologyManager topologyManager) {
-
+    public RmqChannelFactory(RmqChannelManager channelManager) {
         this.channelManager = Objects.requireNonNull(channelManager);
-        this.topologyManager = Objects.requireNonNull(topologyManager);
     }
 
     /**
@@ -60,6 +55,6 @@ public class RmqChannelFactory {
      * @since 2.0
      */
     public RmqChannelBuilder newChannel(String connectionName) {
-        return new RmqChannelBuilder(channelManager, topologyManager.newTopology()).connectionName(connectionName);
+        return new RmqChannelBuilder(channelManager).connectionName(connectionName);
     }
 }

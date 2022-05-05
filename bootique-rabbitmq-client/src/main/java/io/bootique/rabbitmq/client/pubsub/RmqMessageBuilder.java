@@ -21,7 +21,9 @@ package io.bootique.rabbitmq.client.pubsub;
 import com.rabbitmq.client.AMQP;
 import com.rabbitmq.client.Channel;
 import com.rabbitmq.client.MessageProperties;
+import io.bootique.rabbitmq.client.topology.RmqExchangeConfig;
 import io.bootique.rabbitmq.client.topology.RmqTopology;
+import io.bootique.rabbitmq.client.topology.RmqTopologyBuilder;
 
 import java.io.IOException;
 import java.util.Objects;
@@ -33,6 +35,7 @@ import java.util.concurrent.TimeoutException;
 public class RmqMessageBuilder {
 
     private final RmqEndpointDriver driver;
+    private final RmqExchangeConfig exchangeConfig;
 
     private String exchange;
     private String routingKey;
@@ -40,8 +43,9 @@ public class RmqMessageBuilder {
     private boolean immediate;
     private AMQP.BasicProperties properties;
 
-    protected RmqMessageBuilder(RmqEndpointDriver driver) {
+    protected RmqMessageBuilder(RmqEndpointDriver driver, RmqExchangeConfig exchangeConfig) {
         this.driver = Objects.requireNonNull(driver);
+        this.exchangeConfig = Objects.requireNonNull(exchangeConfig);
         this.exchange = "";
         this.routingKey = "";
     }
@@ -81,7 +85,7 @@ public class RmqMessageBuilder {
         AMQP.BasicProperties properties = this.properties != null
                 ? this.properties
                 : MessageProperties.MINIMAL_BASIC;
-        
+
         try (Channel channel = createChannelWithTopology()) {
             channel.basicPublish(exchange, routingKey, mandatory, immediate, properties, message);
         } catch (IOException e) {
@@ -94,11 +98,8 @@ public class RmqMessageBuilder {
     protected Channel createChannelWithTopology() {
         Channel channel = driver.createChannel();
 
-        // We have to ensure the exchange exists on every message...
-        // Otherwise, auto-deletabale exchanges would go away without notice between calls to "basicPublish"
-
         if (RmqTopology.isDefined(exchange)) {
-            driver.newTopology().ensureExchange(exchange).build(channel);
+            new RmqTopologyBuilder().ensureExchange(exchange, exchangeConfig).build(channel);
         }
 
         return channel;

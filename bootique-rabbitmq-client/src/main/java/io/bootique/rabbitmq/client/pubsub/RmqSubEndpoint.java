@@ -19,6 +19,7 @@
 package io.bootique.rabbitmq.client.pubsub;
 
 import com.rabbitmq.client.*;
+import io.bootique.rabbitmq.client.topology.RmqExchangeConfig;
 import io.bootique.rabbitmq.client.topology.RmqQueueTemplate;
 import io.bootique.rabbitmq.client.topology.RmqTopology;
 import org.slf4j.Logger;
@@ -39,6 +40,7 @@ public class RmqSubEndpoint {
     private static final Logger LOGGER = LoggerFactory.getLogger(RmqSubEndpoint.class);
 
     private final RmqEndpointDriver driver;
+    private final RmqExchangeConfig exchangeConfig;
     private final RmqQueueTemplate queueTemplate;
     private final String defaultQueue;
     private final String defaultExchange;
@@ -49,6 +51,7 @@ public class RmqSubEndpoint {
 
     public RmqSubEndpoint(
             RmqEndpointDriver driver,
+            RmqExchangeConfig exchangeConfig,
             RmqQueueTemplate queueTemplate,
             String defaultQueue,
             String defaultExchange,
@@ -56,6 +59,7 @@ public class RmqSubEndpoint {
             boolean defaultAutoAck) {
 
         this.driver = Objects.requireNonNull(driver);
+        this.exchangeConfig = Objects.requireNonNull(exchangeConfig);
         this.queueTemplate = Objects.requireNonNull(queueTemplate);
 
         this.defaultQueue = RmqTopology.normalizeName(defaultQueue);
@@ -119,8 +123,9 @@ public class RmqSubEndpoint {
      * before subscribing a consumer.
      */
     public RmqSubBuilder newSubscription() {
-        return new RmqSubBuilder(driver, consumerChannels, queueTemplate, defaultQueue)
+        return new RmqSubBuilder(driver, consumerChannels, exchangeConfig, queueTemplate)
                 .exchange(defaultExchange)
+                .queue(defaultQueue)
                 .routingKey(defaultRoutingKey)
                 .autoAck(defaultAutoAck);
     }

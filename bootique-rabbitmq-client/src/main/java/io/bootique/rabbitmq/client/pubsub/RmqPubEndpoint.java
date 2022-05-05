@@ -18,6 +18,7 @@
  */
 package io.bootique.rabbitmq.client.pubsub;
 
+import io.bootique.rabbitmq.client.topology.RmqExchangeConfig;
 import io.bootique.rabbitmq.client.topology.RmqTopology;
 
 import java.util.Objects;
@@ -30,15 +31,18 @@ import java.util.Objects;
 public class RmqPubEndpoint {
 
     private final RmqEndpointDriver driver;
+    private final RmqExchangeConfig exchangeConfig;
     private final String defaultExchange;
     private final String defaultRoutingKey;
 
     public RmqPubEndpoint(
             RmqEndpointDriver driver,
+            RmqExchangeConfig exchangeConfig,
             String defaultExchange,
             String defaultRoutingKey) {
 
         this.driver = Objects.requireNonNull(driver);
+        this.exchangeConfig = Objects.requireNonNull(exchangeConfig);
         this.defaultExchange = RmqTopology.normalizeName(defaultExchange);
         this.defaultRoutingKey = RmqTopology.normalizeName(defaultRoutingKey);
     }
@@ -48,7 +52,7 @@ public class RmqPubEndpoint {
      * parameters before publishing a message.
      */
     public RmqMessageBuilder newMessage() {
-        return new RmqMessageBuilder(driver).exchange(defaultExchange).routingKey(defaultRoutingKey);
+        return new RmqMessageBuilder(driver, exchangeConfig).exchange(defaultExchange).routingKey(defaultRoutingKey);
     }
 
     /**

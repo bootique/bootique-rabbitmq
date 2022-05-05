@@ -35,13 +35,9 @@ public class RmqTopologyBuilder {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(RmqTopologyBuilder.class);
 
-    private final Map<String, RmqExchange> exchangeConfigs;
-    private final Map<String, RmqQueueTemplate> queueTemplates;
     private final Map<String, Consumer<Channel>> topologyActions;
 
-    public RmqTopologyBuilder(Map<String, RmqExchange> exchangeConfigs, Map<String, RmqQueueTemplate> queueTemplates) {
-        this.exchangeConfigs = exchangeConfigs;
-        this.queueTemplates = queueTemplates;
+    public RmqTopologyBuilder() {
         this.topologyActions = new LinkedHashMap<>();
     }
 
@@ -61,15 +57,24 @@ public class RmqTopologyBuilder {
         topologyActions.values().forEach(ta -> ta.accept(channel));
     }
 
+    // TODO: deprecate?
     public RmqTopologyBuilder ensureExchange(String exchangeName) {
+        return ensureExchange(exchangeName, new RmqExchangeConfigFactory().createConfig());
+    }
+
+    /**
+     * @since 3.0.M1
+     */
+    public RmqTopologyBuilder ensureExchange(String exchangeName, RmqExchangeConfig exchangeConfig) {
         RmqTopology.required(exchangeName, "Undefined exchange name");
-        topologyActions.computeIfAbsent("e:" + exchangeName, k -> c -> exchangeDeclare(c, exchangeName));
+        topologyActions.computeIfAbsent("e:" + exchangeName, k -> c -> exchangeConfig.exchangeDeclare(c, exchangeName));
         return this;
     }
 
     /**
      * Adds a topology action to establish a named queue with default settings (durable, non-exclusive, non-auto-delete).
      */
+    // TODO: deprecate?
     public RmqTopologyBuilder ensureQueue(String queueName) {
         return ensureQueue(queueName, new RmqQueueTemplateFactory().createTemplate());
     }
@@ -90,48 +95,15 @@ public class RmqTopologyBuilder {
 
     public RmqTopologyBuilder ensureQueueBoundToExchange(String queueName, String exchangeName, String routingKey) {
 
-        // while we do not allow specifying "queueTemplateName" here, if "ensureQueue(n, t)" was previously called,
-        // the second "ensureQueue" will have no effect and the queue will have the right configuration
+        // TODO: should we remove the next two lines, as they may result in unexpected exchage/queue configurations?
+        //   Instead we'd require an explicit call to 'ensureQueue(q, c)' and 'ensureExchange(e, c)'
         ensureQueue(queueName);
-
         ensureExchange(exchangeName);
 
         topologyActions.computeIfAbsent("eq:" + exchangeName + ":" + queueName + ":" + routingKey,
                 k -> c -> queueBind(c, queueName, exchangeName, routingKey));
 
         return this;
-    }
-
-    protected void exchangeDeclare(Channel channel, String exchangeName) {
-
-        RmqExchange exchange = exchangeConfigs.get(exchangeName);
-        if (exchange == null) {
-            // Have to throw, as unfortunately we can't create an exchange with default parameters.
-            // We need to know its type at the minimum
-            throw new IllegalStateException("No configuration present for the exchange named '" + exchangeName + "'");
-        }
-
-        LOGGER.debug("declaring exchange '{}'", exchangeName);
-
-        try {
-            exchange.exchangeDeclare(channel, exchangeName);
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
-    }
-
-    protected RmqQueueTemplate getOrCreateQueueTemplate(String queueTemplateName) {
-
-        if (RmqTopology.isDefined(queueTemplateName)) {
-            if (!queueTemplates.containsKey(queueTemplateName)) {
-                throw new IllegalStateException("No configuration present for the queue template '" + queueTemplateName + "'");
-            }
-
-            return queueTemplates.get(queueTemplateName);
-        }
-
-        LOGGER.info("No configuration present for queue template {}, will use the default settings", queueTemplateName);
-        return new RmqQueueTemplateFactory().createTemplate();
     }
 
     protected void queueBind(Channel channel, String queueName, String exchangeName, String routingKey) {

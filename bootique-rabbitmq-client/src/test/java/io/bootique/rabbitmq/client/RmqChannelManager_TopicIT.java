@@ -25,7 +25,7 @@ import io.bootique.BQCoreModule;
 import io.bootique.BQRuntime;
 import io.bootique.junit5.BQTest;
 import io.bootique.rabbitmq.client.channel.RmqChannelManager;
-import io.bootique.rabbitmq.client.topology.RmqTopologyManager;
+import io.bootique.rabbitmq.client.topology.RmqTopologyBuilder;
 import io.bootique.rabbitmq.client.unit.RabbitMQBaseTest;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -50,7 +50,7 @@ public class RmqChannelManager_TopicIT extends RabbitMQBaseTest {
 
         try (Channel channel = runtime.getInstance(RmqChannelManager.class).createChannel("c1")) {
 
-            runtime.getInstance(RmqTopologyManager.class).newTopology()
+            new RmqTopologyBuilder()
                     .ensureQueueBoundToExchange("new_queue", "topicExchange", "a.*")
                     .build(channel);
 
@@ -73,7 +73,7 @@ public class RmqChannelManager_TopicIT extends RabbitMQBaseTest {
 
         try (Channel channel = runtime.getInstance(RmqChannelManager.class).createChannel("c1")) {
 
-            runtime.getInstance(RmqTopologyManager.class).newTopology()
+            new RmqTopologyBuilder()
                     .ensureQueueBoundToExchange("rq_queue", "topicExchange", "a.*")
                     .ensureQueueBoundToExchange("rq_queue", "topicExchange", "b.*")
                     .build(channel);
@@ -112,7 +112,7 @@ public class RmqChannelManager_TopicIT extends RabbitMQBaseTest {
         assertNotEquals(cr2.getChannelNumber(), cw1.getChannelNumber(), "Channel is still open and should not be reused");
 
         String queue = exchange + "_q";
-        runtime.getInstance(RmqTopologyManager.class).newTopology()
+        new RmqTopologyBuilder()
                 .ensureQueueBoundToExchange(queue, exchange, "a.*")
                 .build(cw1);
 

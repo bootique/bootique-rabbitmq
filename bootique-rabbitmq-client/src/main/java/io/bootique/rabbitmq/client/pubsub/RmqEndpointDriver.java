@@ -20,8 +20,6 @@ package io.bootique.rabbitmq.client.pubsub;
 
 import com.rabbitmq.client.Channel;
 import io.bootique.rabbitmq.client.channel.RmqChannelManager;
-import io.bootique.rabbitmq.client.topology.RmqTopologyBuilder;
-import io.bootique.rabbitmq.client.topology.RmqTopologyManager;
 
 /**
  * Provides access to a single RMQ connection, allowing to create channels and topologies.
@@ -31,15 +29,12 @@ import io.bootique.rabbitmq.client.topology.RmqTopologyManager;
 public class RmqEndpointDriver {
 
     private final RmqChannelManager channelManager;
-    private final RmqTopologyManager topologyManager;
     private final String connectionName;
 
     public RmqEndpointDriver(
             RmqChannelManager channelManager,
-            RmqTopologyManager topologyManager,
             String connectionName) {
         this.channelManager = channelManager;
-        this.topologyManager = topologyManager;
         this.connectionName = connectionName;
     }
 
@@ -49,9 +44,5 @@ public class RmqEndpointDriver {
 
     public Channel createChannel() {
         return channelManager.createChannel(connectionName);
-    }
-
-    public RmqTopologyBuilder newTopology() {
-        return topologyManager.newTopology();
     }
 }

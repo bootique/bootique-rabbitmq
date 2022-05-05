@@ -19,49 +19,45 @@
 
 package io.bootique.rabbitmq.client.topology;
 
+import com.rabbitmq.client.BuiltinExchangeType;
 import com.rabbitmq.client.Channel;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.util.Map;
-import java.util.Objects;
 
-/**
- * @since 3.0.M1
- */
-public class RmqQueueTemplate {
+public class RmqExchangeConfig {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(RmqQueueTemplate.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(RmqExchangeConfig.class);
 
+    private final BuiltinExchangeType type;
     private final boolean durable;
-    private final boolean exclusive;
     private final boolean autoDelete;
+    private final boolean internal;
     private final Map<String, Object> arguments;
 
-    public RmqQueueTemplate(
+    public RmqExchangeConfig(
+            BuiltinExchangeType type,
             boolean durable,
-            boolean exclusive,
             boolean autoDelete,
+            boolean internal,
             Map<String, Object> arguments) {
 
+        this.type = type;
         this.durable = durable;
-        this.exclusive = exclusive;
         this.autoDelete = autoDelete;
-        this.arguments = Objects.requireNonNull(arguments);
+        this.internal = internal;
+        this.arguments = arguments;
     }
 
-    public void queueDeclare(Channel channel, String queueName) {
+    public void exchangeDeclare(Channel channel, String exchangeName) {
+        RmqTopology.required(exchangeName, "Undefined exchange name");
 
-        // TODO: empty queues names are quite valid in RMQ. The broker would assign the name in this case
-        //   https://www.rabbitmq.com/queues.html#server-named-queues
-        //   Also see a note in RmqSubBuilder for why we can't (yet) have server-named queues
-        RmqTopology.required(queueName, "Undefined queue name");
-
-        LOGGER.debug("declaring queue '{}'", queueName);
+        LOGGER.debug("declaring exchange '{}'", exchangeName);
 
         try {
-            channel.queueDeclare(queueName, durable, exclusive, autoDelete, arguments);
+            channel.exchangeDeclare(exchangeName, type, durable, autoDelete, internal, arguments);
         } catch (IOException e) {
             throw new RuntimeException(e);
         }

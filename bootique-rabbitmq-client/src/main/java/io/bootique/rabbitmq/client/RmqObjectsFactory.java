@@ -33,10 +33,7 @@ import io.bootique.rabbitmq.client.pubsub.RmqPubEndpoint;
 import io.bootique.rabbitmq.client.pubsub.RmqPubEndpointFactory;
 import io.bootique.rabbitmq.client.pubsub.RmqSubEndpoint;
 import io.bootique.rabbitmq.client.pubsub.RmqSubEndpointFactory;
-import io.bootique.rabbitmq.client.topology.RmqExchange;
-import io.bootique.rabbitmq.client.topology.RmqQueueTemplate;
-import io.bootique.rabbitmq.client.topology.RmqQueueTemplateFactory;
-import io.bootique.rabbitmq.client.topology.RmqTopologyManager;
+import io.bootique.rabbitmq.client.topology.*;
 import io.bootique.shutdown.ShutdownManager;
 
 import java.util.Collections;
@@ -52,7 +49,7 @@ import java.util.Map;
 public class RmqObjectsFactory {
 
     private Map<String, ConnectionFactoryFactory> connections;
-    private Map<String, RmqExchange> exchanges;
+    private Map<String, RmqExchangeConfigFactory> exchangeConfigs;
     private Map<String, RmqQueueTemplateFactory> queueTemplates;
     private Map<String, RmqPubEndpointFactory> pub;
     private Map<String, RmqSubEndpointFactory> sub;
@@ -73,7 +70,7 @@ public class RmqObjectsFactory {
      */
     public RmqTopologyManager createTopologyManager() {
         return new RmqTopologyManager(
-                exchanges != null ? exchanges : Collections.emptyMap(),
+                createExchangeConfigs(),
                 createQueueTemplates());
     }
 
@@ -106,6 +103,16 @@ public class RmqObjectsFactory {
 
         Map<String, RmqQueueTemplate> map = new HashMap<>();
         queueTemplates.forEach((k, v) -> map.put(k, v.createTemplate()));
+        return map;
+    }
+
+    protected Map<String, RmqExchangeConfig> createExchangeConfigs() {
+        if (exchangeConfigs == null || exchangeConfigs.isEmpty()) {
+            return Collections.emptyMap();
+        }
+
+        Map<String, RmqExchangeConfig> map = new HashMap<>();
+        exchangeConfigs.forEach((k, v) -> map.put(k, v.createConfig()));
         return map;
     }
 
@@ -152,8 +159,8 @@ public class RmqObjectsFactory {
     }
 
     @BQConfigProperty("Configuration for RMQ exchanges. Exchanges are created lazily only when a channel is open that requires it")
-    public void setExchanges(Map<String, RmqExchange> exchanges) {
-        this.exchanges = exchanges;
+    public void setExchangeConfigs(Map<String, RmqExchangeConfigFactory> exchangeConfigs) {
+        this.exchangeConfigs = exchangeConfigs;
     }
 
     @BQConfigProperty("Configuration for RMQ queues. Queues are created lazily only when a channel is open that requires it")

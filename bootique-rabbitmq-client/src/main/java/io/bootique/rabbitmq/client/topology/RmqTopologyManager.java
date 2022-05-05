@@ -29,16 +29,12 @@ import java.util.Objects;
  */
 public class RmqTopologyManager {
 
-    private final Map<String, RmqExchange> exchanges;
+    private final Map<String, RmqExchangeConfig> exchangeConfigs;
     private final Map<String, RmqQueueTemplate> queueTemplates;
 
-    public RmqTopologyManager(Map<String, RmqExchange> exchanges, Map<String, RmqQueueTemplate> queueTemplates) {
-        this.exchanges = Objects.requireNonNull(exchanges);
+    public RmqTopologyManager(Map<String, RmqExchangeConfig> exchangeConfigs, Map<String, RmqQueueTemplate> queueTemplates) {
+        this.exchangeConfigs = Objects.requireNonNull(exchangeConfigs);
         this.queueTemplates = Objects.requireNonNull(queueTemplates);
-    }
-
-    public RmqTopologyBuilder newTopology() {
-        return new RmqTopologyBuilder(exchanges, queueTemplates);
     }
 
     public RmqQueueTemplate getQueueTemplate(String name) {
@@ -48,5 +44,14 @@ public class RmqTopologyManager {
         }
 
         return template;
+    }
+
+    public RmqExchangeConfig getExchangeConfig(String name) {
+        RmqExchangeConfig config = exchangeConfigs.get(name);
+        if (config == null) {
+            throw new IllegalArgumentException("Unknown exchange config name: " + name);
+        }
+
+        return config;
     }
 }

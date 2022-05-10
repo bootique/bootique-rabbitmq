@@ -24,7 +24,6 @@ import io.bootique.config.ConfigurationFactory;
 import io.bootique.di.Injector;
 import io.bootique.di.Provides;
 import io.bootique.log.BootLogger;
-import io.bootique.rabbitmq.client.channel.RmqChannelFactory;
 import io.bootique.rabbitmq.client.channel.RmqChannelManager;
 import io.bootique.rabbitmq.client.connection.RmqConnectionManager;
 import io.bootique.rabbitmq.client.topology.RmqTopologyManager;
@@ -60,13 +59,6 @@ public class RabbitMQModule extends ConfigModule {
     @Provides
     RmqTopologyManager provideTopologyManager(RmqObjectsFactory factory) {
         return factory.createTopologyManager();
-    }
-
-    @Deprecated
-    @Singleton
-    @Provides
-    RmqChannelFactory provideChannelFactory(RmqChannelManager channelManager) {
-        return new RmqChannelFactory(channelManager);
     }
 
     @Singleton

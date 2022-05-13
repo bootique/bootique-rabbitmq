@@ -52,7 +52,7 @@ public class RmqPubEndpoint {
      * parameters before publishing a message.
      */
     public RmqMessageBuilder newMessage() {
-        return new RmqMessageBuilder(driver, exchangeConfig).exchange(defaultExchange).routingKey(defaultRoutingKey);
+        return new RmqMessageBuilder(driver, exchangeConfig).exchangeName(defaultExchange).routingKey(defaultRoutingKey);
     }
 
     /**

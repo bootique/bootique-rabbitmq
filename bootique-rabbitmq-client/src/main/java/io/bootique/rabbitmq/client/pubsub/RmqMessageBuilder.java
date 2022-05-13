@@ -37,7 +37,7 @@ public class RmqMessageBuilder {
     private final RmqEndpointDriver driver;
     private final RmqExchangeConfig exchangeConfig;
 
-    private String exchange;
+    private String exchangeName;
     private String routingKey;
     private boolean mandatory;
     private boolean immediate;
@@ -46,12 +46,26 @@ public class RmqMessageBuilder {
     protected RmqMessageBuilder(RmqEndpointDriver driver, RmqExchangeConfig exchangeConfig) {
         this.driver = Objects.requireNonNull(driver);
         this.exchangeConfig = Objects.requireNonNull(exchangeConfig);
-        this.exchange = "";
+        this.exchangeName = "";
         this.routingKey = "";
     }
 
+    /**
+     * @deprecated since 3.0.M1 in favor of {@link #exchangeName(String)}
+     */
+    @Deprecated
     public RmqMessageBuilder exchange(String exchange) {
-        this.exchange = RmqTopology.normalizeName(exchange);
+        return exchangeName(exchange);
+    }
+
+    /**
+     * Redefines the exchange name for publishing. Despite renaming, Exchange properties are still taken from the
+     * original exchange config associated with the endpoint.
+     *
+     * @since 3.0.M1
+     */
+    public RmqMessageBuilder exchangeName(String exchange) {
+        this.exchangeName = RmqTopology.normalizeName(exchange);
         return this;
     }
 
@@ -87,7 +101,7 @@ public class RmqMessageBuilder {
                 : MessageProperties.MINIMAL_BASIC;
 
         try (Channel channel = createChannelWithTopology()) {
-            channel.basicPublish(exchange, routingKey, mandatory, immediate, properties, message);
+            channel.basicPublish(exchangeName, routingKey, mandatory, immediate, properties, message);
         } catch (IOException e) {
             throw new RuntimeException("Error publishing RMQ message for connection: " + driver.getConnectionName(), e);
         } catch (TimeoutException e) {
@@ -98,8 +112,8 @@ public class RmqMessageBuilder {
     protected Channel createChannelWithTopology() {
         Channel channel = driver.createChannel();
 
-        if (RmqTopology.isDefined(exchange)) {
-            new RmqTopologyBuilder().ensureExchange(exchange, exchangeConfig).build(channel);
+        if (RmqTopology.isDefined(exchangeName)) {
+            new RmqTopologyBuilder().ensureExchange(exchangeName, exchangeConfig).build(channel);
         }
 
         return channel;

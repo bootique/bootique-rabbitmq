@@ -151,11 +151,12 @@ public class RmqConnectionManager {
             throw new IllegalStateException("No factory present for Connection named '" + connectionName + "'");
         }
 
-        LOGGER.debug("Creating named RabbitMQ connection '{}'", connectionName);
+        LOGGER.debug("Creating named RabbitMQ connection '{}' to host '{}'", connectionName, factory.getHost());
         try {
             return factory.newConnection();
         } catch (IOException | TimeoutException e) {
-            throw new RuntimeException(String.format("Can't create connection \"%s\".", connectionName), e);
+            String message = String.format("Can't create connection \"%s\", host %s.", connectionName, factory.getHost());
+            throw new RuntimeException(message, e);
         }
     }
 }

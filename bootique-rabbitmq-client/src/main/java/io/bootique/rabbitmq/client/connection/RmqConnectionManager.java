@@ -155,7 +155,7 @@ public class RmqConnectionManager {
         try {
             return factory.newConnection();
         } catch (IOException | TimeoutException e) {
-            String message = String.format("Can't create connection \"%s\", host %s.", connectionName, factory.getHost());
+            String message = String.format("Can't create connection \"%s\", host \"%s\".", connectionName, factory.getHost());
             throw new RuntimeException(message, e);
         }
     }

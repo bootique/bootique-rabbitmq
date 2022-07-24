@@ -7,6 +7,7 @@
 * #17 Split RmqChannelFactory functions between RmqChannelManager and RmqTopologyManager
 * #20 "queues" to act as configs, not the actual named queues
 * #21 "exchanges" to act as configs, not the actual named exchanges
+* #22 Upgrade RMQ client to 5.15.0
 
 ## 2.0.RC1
 

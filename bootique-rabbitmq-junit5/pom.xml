@@ -48,7 +48,6 @@
             <groupId>org.testcontainers</groupId>
             <artifactId>rabbitmq</artifactId>
         </dependency>
-       
 
         <!-- Unit test dependencies -->
         <dependency>

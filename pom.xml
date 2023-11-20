@@ -30,7 +30,7 @@
 
     <groupId>io.bootique.rabbitmq</groupId>
     <artifactId>bootique-rabbitmq-parent</artifactId>
-    <version>3.0.M2-SNAPSHOT</version>
+    <version>3.0.M2</version>
 
     <name>bootique-rabbitmq-parent</name>
     <description>
@@ -50,7 +50,7 @@
     <scm>
         <developerConnection>scm:git:ssh://git@github.com/bootique/bootique-rabbitmq</developerConnection>
         <url>https://github.com/bootique/bootique-rabbitmq</url>
-        <tag>HEAD</tag>
+        <tag>3.0.M2</tag>
     </scm>
 
     <dependencyManagement>

@@ -22,7 +22,7 @@
     <parent>
         <artifactId>bootique-rabbitmq-parent</artifactId>
         <groupId>io.bootique.rabbitmq</groupId>
-        <version>3.0.M2-SNAPSHOT</version>
+        <version>3.0.M2</version>
     </parent>
     <modelVersion>4.0.0</modelVersion>
 

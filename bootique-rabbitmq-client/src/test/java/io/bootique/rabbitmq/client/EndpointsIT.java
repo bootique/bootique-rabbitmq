@@ -106,7 +106,7 @@ public class EndpointsIT extends RabbitMQBaseTest {
 
     @Test
     @Disabled("This works on OSX, but fails on CI/CD - the second delivery still goes through. Unclear why")
-    public void testConsumerExceptions() {
+    public void consumerExceptions() {
         RmqEndpoints endpoints = app.getInstance(RmqEndpoints.class);
 
         ThrowingSub s3 = new ThrowingSub();

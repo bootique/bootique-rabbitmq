@@ -94,7 +94,7 @@ public class RmqChannelManager_TopicIT extends RabbitMQBaseTest {
 
     @ParameterizedTest
     @ValueSource(strings = {"ex_durable", "ex_non_durable"})
-    public void testChannelCache(String exchange) throws IOException, TimeoutException, InterruptedException {
+    public void channelCache(String exchange) throws IOException, TimeoutException, InterruptedException {
         BQRuntime runtime = testFactory
                 .app("-c", "classpath:channel-cache.yml")
                 .module(b -> BQCoreModule.extend(b).setProperty("bq.rabbitmq.connections.c.uri", rmq.getAmqpUrl()))

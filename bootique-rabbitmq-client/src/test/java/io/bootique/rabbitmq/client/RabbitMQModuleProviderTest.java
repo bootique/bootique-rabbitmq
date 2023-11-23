@@ -25,12 +25,12 @@ import org.junit.jupiter.api.Test;
 public class RabbitMQModuleProviderTest {
 
     @Test
-    public void testAutoLoadable() {
+    public void autoLoadable() {
         BQModuleProviderChecker.testAutoLoadable(RabbitMQModuleProvider.class);
     }
 
     @Test
-    public void testMetadata() {
+    public void metadata() {
         BQModuleProviderChecker.testMetadata(RabbitMQModuleProvider.class);
     }
 

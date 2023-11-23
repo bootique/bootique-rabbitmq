@@ -41,7 +41,7 @@ import static org.junit.jupiter.api.Assertions.*;
 public class RmqChannelManager_TopicIT extends RabbitMQBaseTest {
 
     @Test
-    public void testSingleRoutingKey() throws IOException, TimeoutException {
+    public void singleRoutingKey() throws IOException, TimeoutException {
         BQRuntime runtime = testFactory
                 .app("-c", "classpath:exchange-topic.yml")
                 .module(b -> BQCoreModule.extend(b).setProperty("bq.rabbitmq.connections.c1.uri", rmq.getAmqpUrl()))
@@ -64,7 +64,7 @@ public class RmqChannelManager_TopicIT extends RabbitMQBaseTest {
     }
 
     @Test
-    public void testMultiRoutingKeys() throws IOException, TimeoutException {
+    public void multiRoutingKeys() throws IOException, TimeoutException {
         BQRuntime runtime = testFactory
                 .app("-c", "classpath:exchange-topic.yml")
                 .module(b -> BQCoreModule.extend(b).setProperty("bq.rabbitmq.connections.c1.uri", rmq.getAmqpUrl()))

@@ -51,7 +51,7 @@ public class EndpointsIT extends RabbitMQBaseTest {
             .createRuntime();
 
     @Test
-    public void testP1Route() {
+    public void p1Route() {
         RmqEndpoints endpoints = app.getInstance(RmqEndpoints.class);
         Sub s1 = new Sub();
         Sub s2 = new Sub();
@@ -77,7 +77,7 @@ public class EndpointsIT extends RabbitMQBaseTest {
     }
 
     @Test
-    public void testP2Route() {
+    public void p2Route() {
         RmqEndpoints endpoints = app.getInstance(RmqEndpoints.class);
         Sub s3 = new Sub();
         Sub s4 = new Sub();
@@ -125,7 +125,7 @@ public class EndpointsIT extends RabbitMQBaseTest {
     }
 
     @Test
-    public void testCancelSubscription() {
+    public void cancelSubscription() {
         RmqEndpoints endpoints = app.getInstance(RmqEndpoints.class);
 
         RmqSubEndpoint s1Endpoint = endpoints.sub("s1");
@@ -146,7 +146,7 @@ public class EndpointsIT extends RabbitMQBaseTest {
     }
 
     @Test
-    public void testSubWithAck() {
+    public void subWithAck() {
         RmqEndpoints endpoints = app.getInstance(RmqEndpoints.class);
         Sub s3 = new Sub();
 
@@ -165,7 +165,7 @@ public class EndpointsIT extends RabbitMQBaseTest {
     }
 
     @Test
-    public void testP1QueueWithTTL() {
+    public void p1QueueWithTTL() {
         RmqEndpoints endpoints = app.getInstance(RmqEndpoints.class);
         Sub s5 = new Sub();
 

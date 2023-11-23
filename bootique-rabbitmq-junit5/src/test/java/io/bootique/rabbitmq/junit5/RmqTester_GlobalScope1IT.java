@@ -30,7 +30,7 @@ import java.util.concurrent.TimeoutException;
 public class RmqTester_GlobalScope1IT extends RmqTester_GlobalScopeIT {
 
     @Test
-    public void testAppInitialized() throws IOException, TimeoutException {
+    public void appInitialized() throws IOException, TimeoutException {
         assertCanOpenChannel(app.getInstance(RmqConnectionManager.class));
     }
 }

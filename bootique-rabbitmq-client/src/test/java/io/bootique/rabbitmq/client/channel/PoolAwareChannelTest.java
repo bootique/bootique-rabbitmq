@@ -32,7 +32,7 @@ import static org.mockito.Mockito.*;
 public class PoolAwareChannelTest {
 
     @Test
-    public void testClose() throws IOException, TimeoutException {
+    public void close() throws IOException, TimeoutException {
         Channel delegate = mock(Channel.class);
         when(delegate.isOpen()).thenReturn(true);
 
@@ -50,7 +50,7 @@ public class PoolAwareChannelTest {
     }
 
     @Test
-    public void testClose_CacheIsFull() throws IOException, TimeoutException {
+    public void close_CacheIsFull() throws IOException, TimeoutException {
         Channel delegate = mock(Channel.class);
         when(delegate.isOpen()).thenReturn(true);
 

@@ -35,7 +35,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 public class RmqConnectionManagerIT extends RabbitMQBaseTest {
 
     @Test
-    public void testUri_Defaults() throws IOException, TimeoutException {
+    public void uri_Defaults() throws IOException, TimeoutException {
         BQRuntime runtime = testFactory
                 .app()
                 .module(b -> BQCoreModule.extend(b)
@@ -49,7 +49,7 @@ public class RmqConnectionManagerIT extends RabbitMQBaseTest {
     }
 
     @Test
-    public void testAmqpConfig() throws IOException, TimeoutException {
+    public void amqpConfig() throws IOException, TimeoutException {
         BQRuntime runtime = testFactory
                 .app("-c", "classpath:connection-amqp.yml")
                 .module(b -> BQCoreModule.extend(b)
@@ -61,7 +61,7 @@ public class RmqConnectionManagerIT extends RabbitMQBaseTest {
     }
 
     @Test
-    public void testUriConfig() throws IOException, TimeoutException {
+    public void uriConfig() throws IOException, TimeoutException {
         BQRuntime runtime = testFactory
                 .app("-c", "classpath:connection-uri.yml")
                 .module(b -> BQCoreModule.extend(b).setProperty("bq.rabbitmq.connections.c1.uri", rmq.getAmqpUrl()))

@@ -32,7 +32,7 @@ import static org.mockito.Mockito.*;
 public class PoolingChannelManagerTest {
 
     @Test
-    public void testCreateChannel() throws IOException, TimeoutException {
+    public void createChannel() throws IOException, TimeoutException {
 
         Channel c1 = mock(Channel.class);
         Channel c2 = mock(Channel.class);
@@ -62,7 +62,7 @@ public class PoolingChannelManagerTest {
     }
 
     @Test
-    public void testClose() throws IOException, TimeoutException {
+    public void close() throws IOException, TimeoutException {
 
         Connection connection = mock(Connection.class);
         when(connection.isOpen()).thenReturn(true);

@@ -45,7 +45,7 @@ public class RmqTesterIT {
             .createRuntime();
 
     @Test
-    public void testAppInitialized() throws IOException, TimeoutException {
+    public void appInitialized() throws IOException, TimeoutException {
         assertCanOpenChannel(app.getInstance(RmqConnectionManager.class));
     }
 

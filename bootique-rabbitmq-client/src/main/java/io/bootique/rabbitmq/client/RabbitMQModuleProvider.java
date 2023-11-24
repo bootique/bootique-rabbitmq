@@ -19,33 +19,17 @@
 
 package io.bootique.rabbitmq.client;
 
-import io.bootique.BQModuleMetadata;
 import io.bootique.BQModuleProvider;
-import io.bootique.di.BQModule;
-
-import java.lang.reflect.Type;
-import java.util.Collections;
-import java.util.Map;
+import io.bootique.bootstrap.BuiltModule;
 
 public class RabbitMQModuleProvider implements BQModuleProvider {
 
     @Override
-    public BQModule module() {
-        return new RabbitMQModule();
-    }
-
-
-    @Override
-    public Map<String, Type> configs() {
-        // TODO: config prefix is hardcoded. Refactor away from ConfigModule, and make provider
-        // generate config prefix, reusing it in metadata...
-        return Collections.singletonMap("rabbitmq", RmqObjectsFactory.class);
-    }
-
-    @Override
-    public BQModuleMetadata.Builder moduleBuilder() {
-        return BQModuleProvider.super
-                .moduleBuilder()
-                .description("Provides integration with RabbitMQ client library.");
+    public BuiltModule buildModule() {
+        return BuiltModule.of(new RabbitMQModule())
+                .provider(this)
+                .description("Integrates RabbitMQ client library")
+                .config("rabbitmq", RmqObjectsFactory.class)
+                .build();
     }
 }

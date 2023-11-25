@@ -1,1 +1,1 @@
-io.bootique.rabbitmq.client.RabbitMQModuleProvider
+io.bootique.rabbitmq.client.RabbitMQModule

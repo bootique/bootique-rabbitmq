@@ -19,8 +19,11 @@
 
 package io.bootique.rabbitmq.client;
 
-import io.bootique.ConfigModule;
+import io.bootique.BQModuleProvider;
+import io.bootique.bootstrap.BuiltModule;
 import io.bootique.config.ConfigurationFactory;
+import io.bootique.di.BQModule;
+import io.bootique.di.Binder;
 import io.bootique.di.Injector;
 import io.bootique.di.Provides;
 import io.bootique.log.BootLogger;
@@ -31,12 +34,26 @@ import io.bootique.shutdown.ShutdownManager;
 
 import javax.inject.Singleton;
 
-public class RabbitMQModule extends ConfigModule {
+public class RabbitMQModule implements BQModule, BQModuleProvider {
+
+    private static final String CONFIG_PREFIX = "rabbitmq";
+
+    @Override
+    public BuiltModule buildModule() {
+        return BuiltModule.of(this)
+                .description("Integrates RabbitMQ client library")
+                .config(CONFIG_PREFIX, RmqObjectsFactory.class)
+                .build();
+    }
+
+    @Override
+    public void configure(Binder binder) {
+    }
 
     @Singleton
     @Provides
     RmqObjectsFactory provideRmqObjectsFactory(ConfigurationFactory configFactory) {
-        return config(RmqObjectsFactory.class, configFactory);
+        return configFactory.config(RmqObjectsFactory.class, CONFIG_PREFIX);
     }
 
     @Singleton

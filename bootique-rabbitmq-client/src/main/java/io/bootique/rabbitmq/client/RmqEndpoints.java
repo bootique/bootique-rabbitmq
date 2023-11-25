@@ -28,7 +28,7 @@ import java.util.Map;
  * An "endpoint" is a Bootique abstraction intended to simplify configuration and working with RabbitMQ topologies -
  * connections, channels, exchanges, queues and routing keys.
  *
- * @since 2.0.B1
+ * @since 2.0
  */
 public class RmqEndpoints {
 

@@ -29,7 +29,7 @@ import java.util.concurrent.TimeoutException;
 /**
  * An RMQ Channel that returns itself to the pool upon closing.
  *
- * @since 3.0.M1
+ * @since 3.0
  */
 public class PoolAwareChannel implements Channel {
 

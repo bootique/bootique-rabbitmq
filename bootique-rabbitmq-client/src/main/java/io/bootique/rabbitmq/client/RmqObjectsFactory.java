@@ -56,7 +56,7 @@ public class RmqObjectsFactory {
     private int channelPoolCapacity;
 
     /**
-     * @since 3.0.M1
+     * @since 3.0
      */
     public RmqChannelManager createChannelManager(RmqConnectionManager connectionManager) {
         SimpleChannelManager nonPoolingManager = new SimpleChannelManager(connectionManager);
@@ -66,7 +66,7 @@ public class RmqObjectsFactory {
     }
 
     /**
-     * @since 3.0.M1
+     * @since 3.0
      */
     public RmqTopologyManager createTopologyManager() {
         return new RmqTopologyManager(
@@ -179,7 +179,7 @@ public class RmqObjectsFactory {
     }
 
     /**
-     * @since 3.0.M1
+     * @since 3.0
      */
     @BQConfigProperty("Per-Connection Channel pool capacity. If set to a value greater than zero, Bootique would pool " +
             "and reuse Channels. Default is zero, i.e. no pooling")

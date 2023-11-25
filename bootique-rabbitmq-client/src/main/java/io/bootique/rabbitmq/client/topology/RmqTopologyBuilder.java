@@ -29,7 +29,7 @@ import java.util.Objects;
 import java.util.function.Consumer;
 
 /**
- * @since 2.0.B1
+ * @since 2.0
  */
 public class RmqTopologyBuilder {
 
@@ -51,7 +51,7 @@ public class RmqTopologyBuilder {
     }
 
     /**
-     * @since 3.0.M1
+     * @since 3.0
      */
     public void build(Channel channel) {
         topologyActions.values().forEach(ta -> ta.accept(channel));
@@ -63,7 +63,7 @@ public class RmqTopologyBuilder {
     }
 
     /**
-     * @since 3.0.M1
+     * @since 3.0
      */
     public RmqTopologyBuilder ensureExchange(String exchangeName, RmqExchangeConfig exchangeConfig) {
         RmqTopology.required(exchangeName, "Undefined exchange name");
@@ -84,7 +84,7 @@ public class RmqTopologyBuilder {
      * parameter. If the config is null, an implicit default configuration is used. If the template name doesn't
      * correspond to an existing configuration, an exception is thrown.
      *
-     * @since 3.0.M1
+     * @since 3.0
      */
     public RmqTopologyBuilder ensureQueue(String queueName, RmqQueueConfig queueConfig) {
         RmqTopology.required(queueName, "Undefined queue name");

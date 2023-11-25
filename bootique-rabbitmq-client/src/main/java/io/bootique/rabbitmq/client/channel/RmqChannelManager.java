@@ -21,7 +21,7 @@ package io.bootique.rabbitmq.client.channel;
 import com.rabbitmq.client.Channel;
 
 /**
- * @since 3.0.M1
+ * @since 3.0
  */
 public interface RmqChannelManager {
 

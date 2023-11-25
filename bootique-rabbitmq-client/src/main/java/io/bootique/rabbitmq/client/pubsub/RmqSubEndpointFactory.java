@@ -27,7 +27,7 @@ import io.bootique.shutdown.ShutdownManager;
 import java.util.Objects;
 
 /**
- * @since 2.0.B1
+ * @since 2.0
  */
 @BQConfig
 public class RmqSubEndpointFactory {
@@ -79,7 +79,7 @@ public class RmqSubEndpointFactory {
     }
 
     /**
-     * @since 3.0.M1
+     * @since 3.0
      */
     @BQConfigProperty("An optional reference to an exchange config declared in 'rabbitmq.exchanges'. By default a 'topic' exchange is assumed")
     public void setExchangeConfig(String exchangeConfig) {
@@ -87,7 +87,7 @@ public class RmqSubEndpointFactory {
     }
 
     /**
-     * @since 3.0.M1
+     * @since 3.0
      */
     @BQConfigProperty
     public void setExchangeName(String exchangeName) {
@@ -95,7 +95,7 @@ public class RmqSubEndpointFactory {
     }
 
     /**
-     * @since 3.0.M1
+     * @since 3.0
      */
     @BQConfigProperty("An optional reference to a queue config declared in 'rabbitmq.queues'")
     public void setQueueConfig(String queueConfig) {
@@ -103,7 +103,7 @@ public class RmqSubEndpointFactory {
     }
 
     /**
-     * @since 3.0.M1
+     * @since 3.0
      */
     @BQConfigProperty
     public void setQueueName(String queueName) {

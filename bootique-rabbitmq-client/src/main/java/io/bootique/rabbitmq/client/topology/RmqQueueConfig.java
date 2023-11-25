@@ -28,7 +28,7 @@ import java.util.Map;
 import java.util.Objects;
 
 /**
- * @since 3.0.M1
+ * @since 3.0
  */
 public class RmqQueueConfig {
 

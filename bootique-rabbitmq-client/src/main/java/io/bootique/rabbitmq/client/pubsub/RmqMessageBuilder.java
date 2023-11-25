@@ -30,7 +30,7 @@ import java.util.Objects;
 import java.util.concurrent.TimeoutException;
 
 /**
- * @since 2.0.B1
+ * @since 2.0
  */
 public class RmqMessageBuilder {
 
@@ -62,7 +62,7 @@ public class RmqMessageBuilder {
      * Redefines the exchange name for publishing. Despite renaming, Exchange properties are still taken from the
      * original exchange config associated with the endpoint.
      *
-     * @since 3.0.M1
+     * @since 3.0
      */
     public RmqMessageBuilder exchangeName(String exchange) {
         this.exchangeName = RmqTopology.normalizeName(exchange);

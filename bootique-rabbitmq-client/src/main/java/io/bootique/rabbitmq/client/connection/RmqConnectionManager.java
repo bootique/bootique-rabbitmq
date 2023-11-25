@@ -101,7 +101,7 @@ public class RmqConnectionManager {
     /**
      * Creates and returns a new channel for a named connection.
      *
-     * @since 3.0.M1
+     * @since 3.0
      */
     public Channel createChannel(String connectionName) {
         Objects.requireNonNull(connectionName, "'connectionName' is null");

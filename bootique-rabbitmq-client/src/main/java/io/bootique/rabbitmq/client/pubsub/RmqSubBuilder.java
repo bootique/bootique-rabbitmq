@@ -36,7 +36,7 @@ import java.util.function.Function;
  * opening one Channel per subscription. The open Channel is registered with the parent endpoint and can be closed if
  * the subscription is canceled.
  *
- * @since 2.0.B1
+ * @since 2.0
  */
 public class RmqSubBuilder {
 
@@ -68,7 +68,7 @@ public class RmqSubBuilder {
      * Redefines the exchange name for the subscription. Despite renaming, Exchange properties are still taken from the
      * original exchange config associated with the endpoint.
      *
-     * @since 3.0.M1
+     * @since 3.0
      */
     public RmqSubBuilder exchangeName(String exchangeName) {
         this.exchangeName = RmqTopology.normalizeName(exchangeName);
@@ -79,7 +79,7 @@ public class RmqSubBuilder {
      * Redefines the queue name for the subscription. Despite renaming, Queue properties are still taken from the
      * original queue config associated with the endpoint.
      *
-     * @since 3.0.M1
+     * @since 3.0
      */
     public RmqSubBuilder queueName(String queueName) {
         this.queueName = RmqTopology.normalizeName(queueName);

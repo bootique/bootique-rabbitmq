@@ -23,7 +23,7 @@ package io.bootique.rabbitmq.client.topology;
  * keys). For RabbitMQ both empty and null names are "undefined". This class helps to deal with this logic in the
  * Bootique code.
  *
- * @since 2.0.B1
+ * @since 2.0
  */
 public class RmqTopology {
 

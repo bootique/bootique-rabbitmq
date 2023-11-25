@@ -33,7 +33,7 @@ import java.util.concurrent.TimeoutException;
 import java.util.function.Function;
 
 /**
- * @since 2.0.B1
+ * @since 2.0
  */
 public class RmqSubEndpoint {
 

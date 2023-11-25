@@ -28,7 +28,7 @@ import io.bootique.rabbitmq.client.topology.RmqTopologyManager;
 import java.util.Objects;
 
 /**
- * @since 2.0.B1
+ * @since 2.0
  */
 @BQConfig
 public class RmqPubEndpointFactory {
@@ -62,7 +62,7 @@ public class RmqPubEndpointFactory {
     }
 
     /**
-     * @since 3.0.M1
+     * @since 3.0
      */
     @BQConfigProperty("An optional reference to an exchange config declared in 'rabbitmq.exchanges'. By default a 'topic' exchange is assumed")
     public void setExchangeConfig(String exchangeConfig) {
@@ -70,7 +70,7 @@ public class RmqPubEndpointFactory {
     }
 
     /**
-     * @since 3.0.M1
+     * @since 3.0
      */
     @BQConfigProperty("Default exchange name to be used for message dispatch")
     public void setExchangeName(String exchangeName) {

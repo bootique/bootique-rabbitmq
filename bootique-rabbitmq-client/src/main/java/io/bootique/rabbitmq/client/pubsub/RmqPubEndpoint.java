@@ -26,7 +26,7 @@ import java.util.Objects;
 /**
  * A stateless RabbitMQ message publisher with preconfigured target exchange and routing key.
  *
- * @since 2.0.B1
+ * @since 2.0
  */
 public class RmqPubEndpoint {
 

@@ -35,7 +35,7 @@ import java.util.concurrent.LinkedBlockingQueue;
  * passed in the constructor  controls how many channels can exist in the cache, but the channel manager is allowed to
  * open more channels if requested. It just won't cache any number over the capacity.
  *
- * @since 3.0.M1
+ * @since 3.0
  */
 public class PoolingChannelManager implements RmqChannelManager {
 

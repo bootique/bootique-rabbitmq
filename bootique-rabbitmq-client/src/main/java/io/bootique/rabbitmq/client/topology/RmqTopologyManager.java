@@ -25,7 +25,7 @@ import java.util.Objects;
  * Allows creating RabbitMQ queue/exchange topologies with bindings between them. Exhange and queue properties are
  * taken from configuration.
  *
- * @since 3.0.M1
+ * @since 3.0
  */
 public class RmqTopologyManager {
 

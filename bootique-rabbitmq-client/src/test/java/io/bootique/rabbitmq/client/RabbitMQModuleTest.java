@@ -19,19 +19,13 @@
 
 package io.bootique.rabbitmq.client;
 
-import io.bootique.junit5.BQModuleProviderChecker;
+import io.bootique.junit5.BQModuleTester;
 import org.junit.jupiter.api.Test;
 
 public class RabbitMQModuleTest {
 
     @Test
-    public void autoLoadable() {
-        BQModuleProviderChecker.testAutoLoadable(RabbitMQModule.class);
+    public void check() {
+        BQModuleTester.of(RabbitMQModule.class).testAutoLoadable().testConfig();
     }
-
-    @Test
-    public void metadata() {
-        BQModuleProviderChecker.testMetadata(RabbitMQModule.class);
-    }
-
 }

@@ -25,7 +25,6 @@ import io.bootique.config.ConfigurationFactory;
 import io.bootique.di.Binder;
 import io.bootique.di.Injector;
 import io.bootique.di.Provides;
-import io.bootique.log.BootLogger;
 import io.bootique.rabbitmq.client.channel.RmqChannelManager;
 import io.bootique.rabbitmq.client.connection.RmqConnectionManager;
 import io.bootique.rabbitmq.client.topology.RmqTopologyManager;
@@ -59,10 +58,9 @@ public class RabbitMQModule implements BQModule {
     @Provides
     RmqConnectionManager provideConnectionManager(
             RmqObjectsFactory factory,
-            BootLogger bootLogger,
             ShutdownManager shutdownManager,
             Injector injector) {
-        return factory.createConnectionManager(injector, bootLogger, shutdownManager);
+        return factory.createConnectionManager(injector, shutdownManager);
     }
 
     @Singleton

@@ -57,8 +57,7 @@ public class RmqSubEndpointFactory {
                 routingKey,
                 autoAck);
 
-        shutdownManager.addShutdownHook(() -> endpoint.close());
-        return endpoint;
+        return shutdownManager.onShutdown(endpoint, RmqSubEndpoint::close);
     }
 
     protected RmqExchangeConfig createExchangeConfig(RmqTopologyManager topologyManager) {

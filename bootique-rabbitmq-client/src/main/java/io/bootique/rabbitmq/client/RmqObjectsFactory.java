@@ -23,7 +23,6 @@ import com.rabbitmq.client.ConnectionFactory;
 import io.bootique.annotation.BQConfig;
 import io.bootique.annotation.BQConfigProperty;
 import io.bootique.di.Injector;
-import io.bootique.log.BootLogger;
 import io.bootique.rabbitmq.client.channel.PoolingChannelManager;
 import io.bootique.rabbitmq.client.channel.RmqChannelManager;
 import io.bootique.rabbitmq.client.channel.SimpleChannelManager;
@@ -80,20 +79,11 @@ public class RmqObjectsFactory {
                 createSubEndpoints(channelManager, topologyManager, shutdownManager));
     }
 
-    public RmqConnectionManager createConnectionManager(
-            Injector injector,
-            BootLogger bootLogger,
-            ShutdownManager shutdownManager) {
-
+    public RmqConnectionManager createConnectionManager(Injector injector, ShutdownManager shutdownManager) {
         Map<String, ConnectionFactory> factories = createConnectionFactories(injector);
-
-        RmqConnectionManager manager = new RmqConnectionManager(factories);
-        shutdownManager.addShutdownHook(() -> {
-            bootLogger.trace(() -> "shutting down RabbitMQ ConnectionManager...");
-            manager.shutdown();
-        });
-
-        return manager;
+        return shutdownManager.onShutdown(
+                new RmqConnectionManager(factories),
+                RmqConnectionManager::shutdown);
     }
 
     protected Map<String, RmqQueueConfig> createQueueConfigs() {

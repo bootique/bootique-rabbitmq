@@ -22,7 +22,6 @@ package io.bootique.rabbitmq.client;
 import com.rabbitmq.client.ConnectionFactory;
 import io.bootique.annotation.BQConfig;
 import io.bootique.annotation.BQConfigProperty;
-import io.bootique.di.Injector;
 import io.bootique.rabbitmq.client.channel.PoolingChannelManager;
 import io.bootique.rabbitmq.client.channel.RmqChannelManager;
 import io.bootique.rabbitmq.client.channel.SimpleChannelManager;
@@ -35,6 +34,7 @@ import io.bootique.rabbitmq.client.pubsub.RmqSubEndpointFactory;
 import io.bootique.rabbitmq.client.topology.*;
 import io.bootique.shutdown.ShutdownManager;
 
+import javax.inject.Inject;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
@@ -47,12 +47,26 @@ import java.util.Map;
 @BQConfig
 public class RmqObjectsFactory {
 
+    private final ShutdownManager shutdownManager;
+
     private Map<String, ConnectionFactoryFactory> connections;
     private Map<String, RmqExchangeConfigFactory> exchanges;
     private Map<String, RmqQueueConfigFactory> queues;
     private Map<String, RmqPubEndpointFactory> pub;
     private Map<String, RmqSubEndpointFactory> sub;
     private int channelPoolCapacity;
+
+    @Inject
+    public RmqObjectsFactory(ShutdownManager shutdownManager) {
+        this.shutdownManager = shutdownManager;
+    }
+
+    public RmqConnectionManager createConnectionManager() {
+        Map<String, ConnectionFactory> factories = createConnectionFactories();
+        return shutdownManager.onShutdown(
+                new RmqConnectionManager(factories),
+                RmqConnectionManager::shutdown);
+    }
 
     /**
      * @since 3.0
@@ -73,17 +87,10 @@ public class RmqObjectsFactory {
                 createQueueConfigs());
     }
 
-    public RmqEndpoints createEndpoints(RmqChannelManager channelManager, RmqTopologyManager topologyManager, ShutdownManager shutdownManager) {
+    public RmqEndpoints createEndpoints(RmqChannelManager channelManager, RmqTopologyManager topologyManager) {
         return new RmqEndpoints(
                 createPubEndpoints(channelManager, topologyManager),
-                createSubEndpoints(channelManager, topologyManager, shutdownManager));
-    }
-
-    public RmqConnectionManager createConnectionManager(Injector injector, ShutdownManager shutdownManager) {
-        Map<String, ConnectionFactory> factories = createConnectionFactories(injector);
-        return shutdownManager.onShutdown(
-                new RmqConnectionManager(factories),
-                RmqConnectionManager::shutdown);
+                createSubEndpoints(channelManager, topologyManager));
     }
 
     protected Map<String, RmqQueueConfig> createQueueConfigs() {
@@ -106,13 +113,13 @@ public class RmqObjectsFactory {
         return map;
     }
 
-    protected Map<String, ConnectionFactory> createConnectionFactories(Injector injector) {
+    protected Map<String, ConnectionFactory> createConnectionFactories() {
         if (connections == null || connections.isEmpty()) {
             return Collections.emptyMap();
         }
 
         Map<String, ConnectionFactory> map = new HashMap<>();
-        connections.forEach((k, v) -> map.put(k, v.createConnectionFactory(k, injector)));
+        connections.forEach((k, v) -> map.put(k, v.createConnectionFactory(k)));
         return map;
     }
 
@@ -129,17 +136,14 @@ public class RmqObjectsFactory {
         return map;
     }
 
-    protected Map<String, RmqSubEndpoint> createSubEndpoints(
-            RmqChannelManager channelManager,
-            RmqTopologyManager topologyManager,
-            ShutdownManager shutdownManager) {
+    protected Map<String, RmqSubEndpoint> createSubEndpoints(RmqChannelManager channelManager, RmqTopologyManager topologyManager) {
 
         if (sub == null || sub.isEmpty()) {
             return Collections.emptyMap();
         }
 
         Map<String, RmqSubEndpoint> map = new HashMap<>();
-        sub.forEach((k, v) -> map.put(k, v.create(channelManager, topologyManager, shutdownManager)));
+        sub.forEach((k, v) -> map.put(k, v.create(channelManager, topologyManager)));
         return map;
     }
 

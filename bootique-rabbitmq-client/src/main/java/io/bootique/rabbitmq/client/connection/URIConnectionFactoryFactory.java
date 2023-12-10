@@ -23,7 +23,6 @@ import com.fasterxml.jackson.annotation.JsonTypeName;
 import com.rabbitmq.client.ConnectionFactory;
 import io.bootique.annotation.BQConfig;
 import io.bootique.annotation.BQConfigProperty;
-import io.bootique.di.Injector;
 
 @BQConfig
 @JsonTypeName("uri")
@@ -32,13 +31,13 @@ public class URIConnectionFactoryFactory extends ConnectionFactoryFactory {
     private String uri;
 
     @Override
-    protected ConnectionFactory configureFactory(ConnectionFactory factory, String connectionName, Injector injector) {
+    protected ConnectionFactory configureFactory(ConnectionFactory factory, String connectionName) {
         try {
             factory.setUri(uri);
         } catch (Exception e) {
             throw new RuntimeException("Failed to initialize RabbitMQ URI connection factory", e);
         }
-        return super.configureFactory(factory, connectionName, injector);
+        return super.configureFactory(factory, connectionName);
     }
 
     @BQConfigProperty

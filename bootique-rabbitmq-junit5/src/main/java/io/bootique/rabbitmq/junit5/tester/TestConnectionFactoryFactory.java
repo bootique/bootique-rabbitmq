@@ -28,6 +28,8 @@ import io.bootique.rabbitmq.junit5.RmqTester;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import javax.inject.Inject;
+
 @JsonTypeName("bqrmqtest")
 // must be able to deserialize over the existing configs, so instruct Jackson to be lenient
 @JsonIgnoreProperties(ignoreUnknown = true)
@@ -35,8 +37,15 @@ public class TestConnectionFactoryFactory extends ConnectionFactoryFactory {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(TestConnectionFactoryFactory.class);
 
+    private final Injector injector;
+
+    @Inject
+    public TestConnectionFactoryFactory(Injector injector) {
+        this.injector = injector;
+    }
+
     @Override
-    protected ConnectionFactory configureFactory(ConnectionFactory factory, String connectionName, Injector injector) {
+    protected ConnectionFactory configureFactory(ConnectionFactory factory, String connectionName) {
 
         RmqTester tester = injector.getInstance(Key.get(RmqTester.class, connectionName));
         String url = tester.getAmqpUrl();
@@ -49,6 +58,6 @@ public class TestConnectionFactoryFactory extends ConnectionFactoryFactory {
             throw new RuntimeException("Failed to initialize RabbitMQ URI connection factory", e);
         }
 
-        return super.configureFactory(factory, connectionName, injector);
+        return super.configureFactory(factory, connectionName);
     }
 }

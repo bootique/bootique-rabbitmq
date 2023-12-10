@@ -23,7 +23,6 @@ import com.fasterxml.jackson.annotation.JsonTypeName;
 import com.rabbitmq.client.ConnectionFactory;
 import io.bootique.annotation.BQConfig;
 import io.bootique.annotation.BQConfigProperty;
-import io.bootique.di.Injector;
 
 @BQConfig
 @JsonTypeName("amqp")
@@ -36,7 +35,7 @@ public class AMQPConnectionFactoryFactory extends ConnectionFactoryFactory {
     private int port = -1;
 
     @Override
-    protected ConnectionFactory configureFactory(ConnectionFactory factory, String connectionName, Injector injector) {
+    protected ConnectionFactory configureFactory(ConnectionFactory factory, String connectionName) {
         if (username != null) {
             factory.setUsername(username);
         }
@@ -55,7 +54,7 @@ public class AMQPConnectionFactoryFactory extends ConnectionFactoryFactory {
 
         factory.setPort(port);
 
-        return super.configureFactory(factory, connectionName, injector);
+        return super.configureFactory(factory, connectionName);
     }
 
     @BQConfigProperty

@@ -27,8 +27,8 @@ import io.bootique.di.Binder;
  */
 public class ConnectionPropertyBuilder {
 
-    private String propertyPrefix;
-    private BQCoreModuleExtender extender;
+    private final String propertyPrefix;
+    private final BQCoreModuleExtender extender;
 
     protected ConnectionPropertyBuilder(String propertyPrefix, BQCoreModuleExtender extender) {
         this.propertyPrefix = propertyPrefix;

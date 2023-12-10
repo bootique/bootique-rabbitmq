@@ -23,12 +23,10 @@ import io.bootique.BQModule;
 import io.bootique.ModuleCrate;
 import io.bootique.config.ConfigurationFactory;
 import io.bootique.di.Binder;
-import io.bootique.di.Injector;
 import io.bootique.di.Provides;
 import io.bootique.rabbitmq.client.channel.RmqChannelManager;
 import io.bootique.rabbitmq.client.connection.RmqConnectionManager;
 import io.bootique.rabbitmq.client.topology.RmqTopologyManager;
-import io.bootique.shutdown.ShutdownManager;
 
 import javax.inject.Singleton;
 
@@ -56,11 +54,8 @@ public class RabbitMQModule implements BQModule {
 
     @Singleton
     @Provides
-    RmqConnectionManager provideConnectionManager(
-            RmqObjectsFactory factory,
-            ShutdownManager shutdownManager,
-            Injector injector) {
-        return factory.createConnectionManager(injector, shutdownManager);
+    RmqConnectionManager provideConnectionManager(RmqObjectsFactory factory) {
+        return factory.createConnectionManager();
     }
 
     @Singleton
@@ -80,8 +75,7 @@ public class RabbitMQModule implements BQModule {
     RmqEndpoints provideEndpoints(
             RmqObjectsFactory factory,
             RmqChannelManager channelManager,
-            RmqTopologyManager topologyManager,
-            ShutdownManager shutdownManager) {
-        return factory.createEndpoints(channelManager, topologyManager, shutdownManager);
+            RmqTopologyManager topologyManager) {
+        return factory.createEndpoints(channelManager, topologyManager);
     }
 }

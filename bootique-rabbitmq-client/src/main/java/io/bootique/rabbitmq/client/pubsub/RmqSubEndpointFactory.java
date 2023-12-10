@@ -24,6 +24,7 @@ import io.bootique.rabbitmq.client.channel.RmqChannelManager;
 import io.bootique.rabbitmq.client.topology.*;
 import io.bootique.shutdown.ShutdownManager;
 
+import javax.inject.Inject;
 import java.util.Objects;
 
 /**
@@ -31,6 +32,8 @@ import java.util.Objects;
  */
 @BQConfig
 public class RmqSubEndpointFactory {
+
+    private final ShutdownManager shutdownManager;
 
     private String connection;
     private String exchangeConfig;
@@ -40,10 +43,12 @@ public class RmqSubEndpointFactory {
     private String routingKey;
     private boolean autoAck = true;
 
-    public RmqSubEndpoint create(
-            RmqChannelManager channelManager,
-            RmqTopologyManager topologyManager,
-            ShutdownManager shutdownManager) {
+    @Inject
+    public RmqSubEndpointFactory(ShutdownManager shutdownManager) {
+        this.shutdownManager = shutdownManager;
+    }
+
+    public RmqSubEndpoint create(RmqChannelManager channelManager, RmqTopologyManager topologyManager) {
 
         Objects.requireNonNull(connection, "Subscriber connection name is undefined");
         RmqEndpointDriver driver = new RmqEndpointDriver(channelManager, connection);

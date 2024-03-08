@@ -115,7 +115,7 @@ public class RmqConnectionManager {
 
     public void shutdown() {
 
-        LOGGER.debug("Shutting down RabbitMQ connections...");
+        LOGGER.debug("Stopping RabbitMQ connections...");
 
         // this will prevent new connections creation, and we'll drain the ones already created...
         this.shutdown = true;

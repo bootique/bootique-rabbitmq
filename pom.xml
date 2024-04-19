@@ -44,7 +44,7 @@
 
     <properties>
         <bootique.version>${project.version}</bootique.version>
-        <rabbitmq.version>5.15.0</rabbitmq.version>
+        <rabbitmq.version>5.21.0</rabbitmq.version>
     </properties>
 
     <scm>

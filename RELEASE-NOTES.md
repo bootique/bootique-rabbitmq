@@ -1,3 +1,7 @@
+## 3.0-M4
+
+* #23 Upgrade to amqp-client 5.21.0
+
 ## 3.0.M1
 
 * #9 Channel pool support in ChannelFactory

@@ -43,7 +43,6 @@
     </modules>
 
     <properties>
-        <bootique.version>${project.version}</bootique.version>
         <rabbitmq.version>5.21.0</rabbitmq.version>
     </properties>
 
@@ -84,7 +83,7 @@
             <dependency>
                 <groupId>io.bootique</groupId>
                 <artifactId>bootique-junit5</artifactId>
-                <version>${bootique.version}</version>
+                <version>${project.version}</version>
             </dependency>
             <!-- Importing testcontainers modules individually instead of using a BOM
             to have more control over the transitive dependencies -->

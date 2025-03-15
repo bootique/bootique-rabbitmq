@@ -24,7 +24,7 @@ import io.bootique.rabbitmq.client.channel.RmqChannelManager;
 import io.bootique.rabbitmq.client.topology.*;
 import io.bootique.shutdown.ShutdownManager;
 
-import javax.inject.Inject;
+import jakarta.inject.Inject;
 import java.util.Objects;
 
 /**

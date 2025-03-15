@@ -28,7 +28,7 @@ import io.bootique.rabbitmq.client.channel.RmqChannelManager;
 import io.bootique.rabbitmq.client.connection.RmqConnectionManager;
 import io.bootique.rabbitmq.client.topology.RmqTopologyManager;
 
-import javax.inject.Singleton;
+import jakarta.inject.Singleton;
 
 public class RabbitMQModule implements BQModule {
 

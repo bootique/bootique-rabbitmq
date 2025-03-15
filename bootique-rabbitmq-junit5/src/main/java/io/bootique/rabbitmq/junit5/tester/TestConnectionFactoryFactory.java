@@ -28,7 +28,7 @@ import io.bootique.rabbitmq.junit5.RmqTester;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.inject.Inject;
+import jakarta.inject.Inject;
 
 @JsonTypeName("bqrmqtest")
 // must be able to deserialize over the existing configs, so instruct Jackson to be lenient

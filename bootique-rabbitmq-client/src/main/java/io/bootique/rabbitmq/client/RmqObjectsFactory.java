@@ -34,7 +34,7 @@ import io.bootique.rabbitmq.client.pubsub.RmqSubEndpointFactory;
 import io.bootique.rabbitmq.client.topology.*;
 import io.bootique.shutdown.ShutdownManager;
 
-import javax.inject.Inject;
+import jakarta.inject.Inject;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;

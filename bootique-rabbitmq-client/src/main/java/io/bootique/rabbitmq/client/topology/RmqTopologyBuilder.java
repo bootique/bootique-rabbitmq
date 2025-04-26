@@ -42,15 +42,6 @@ public class RmqTopologyBuilder {
     }
 
     /**
-     * @deprecated since 3.0.M1 in favor of {@link #build(Channel)}
-     */
-    @Deprecated
-    public Channel buildTopology(Channel channel) {
-        build(channel);
-        return channel;
-    }
-
-    /**
      * @since 3.0
      */
     public void build(Channel channel) {

@@ -51,14 +51,6 @@ public class RmqMessageBuilder {
     }
 
     /**
-     * @deprecated since 3.0.M1 in favor of {@link #exchangeName(String)}
-     */
-    @Deprecated
-    public RmqMessageBuilder exchange(String exchange) {
-        return exchangeName(exchange);
-    }
-
-    /**
      * Redefines the exchange name for publishing. Despite renaming, Exchange properties are still taken from the
      * original exchange config associated with the endpoint.
      *

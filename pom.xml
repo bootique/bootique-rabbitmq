@@ -43,7 +43,7 @@
     </modules>
 
     <properties>
-        <rabbitmq.version>5.21.0</rabbitmq.version>
+        <rabbitmq.version>5.25.0</rabbitmq.version>
         <commons.compress.version>1.26.1</commons.compress.version>
     </properties>
 

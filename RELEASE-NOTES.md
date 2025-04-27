@@ -1,3 +1,7 @@
+## 4.0-M1
+
+* #24 Upgrade RabbitMQ client to 5.25.0
+
 ## 3.0-M4
 
 * #23 Upgrade to amqp-client 5.21.0

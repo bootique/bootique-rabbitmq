@@ -44,6 +44,7 @@
 
     <properties>
         <rabbitmq.version>5.21.0</rabbitmq.version>
+        <commons.compress.version>1.26.1</commons.compress.version>
     </properties>
 
     <scm>
@@ -111,7 +112,17 @@
                         <groupId>org.slf4j</groupId>
                         <artifactId>*</artifactId>
                     </exclusion>
+                    <!-- There's a CVE against the older commons-compress included with tc rabbitmq -->
+                    <exclusion>
+                        <groupId>org.apache.commons</groupId>
+                        <artifactId>commons-compress</artifactId>
+                    </exclusion>
                 </exclusions>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.commons</groupId>
+                <artifactId>commons-compress</artifactId>
+                <version>${commons.compress.version}</version>
             </dependency>
             <dependency>
                 <groupId>org.junit.jupiter</groupId>

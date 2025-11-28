@@ -24,22 +24,20 @@ import org.junit.jupiter.api.Test;
 
 import java.io.IOException;
 import java.util.concurrent.TimeoutException;
+import java.util.concurrent.atomic.AtomicInteger;
 
-import static org.junit.jupiter.api.Assertions.assertSame;
-import static org.mockito.ArgumentMatchers.anyString;
-import static org.mockito.Mockito.*;
+import static org.junit.jupiter.api.Assertions.*;
 
 public class PoolingChannelManagerTest {
 
     @Test
     public void createChannel() throws IOException, TimeoutException {
 
-        Channel c1 = mock(Channel.class);
-        Channel c2 = mock(Channel.class);
-        Channel c3 = mock(Channel.class);
+        TestChannel c1 = new TestChannel();
+        TestChannel c2 = new TestChannel();
+        TestChannel c3 = new TestChannel();
 
-        RmqChannelManager delegate = mock(RmqChannelManager.class);
-        when(delegate.createChannel(anyString())).thenReturn(c1, c2, c3);
+        RmqChannelManager delegate = new TestChannelManager(c1, c2, c3);
 
         PoolingChannelManager m = new PoolingChannelManager(delegate, 2);
         Channel pc1 = m.createChannel("c");
@@ -64,24 +62,30 @@ public class PoolingChannelManagerTest {
     @Test
     public void close() throws IOException, TimeoutException {
 
-        Connection connection = mock(Connection.class);
-        when(connection.isOpen()).thenReturn(true);
+        Connection connection = new TestConnection();
+        TestChannel c1 = new TestChannel() {
+            @Override
+            public Connection getConnection() {
+                return connection;
+            }
+        };
 
-        Channel c1 = mock(Channel.class);
-        when(c1.isOpen()).thenReturn(true);
-        when(c1.getConnection()).thenReturn(connection);
 
-        Channel c2 = mock(Channel.class);
-        when(c2.isOpen()).thenReturn(true);
-        when(c2.getConnection()).thenReturn(connection);
+        TestChannel c2 = new TestChannel() {
+            @Override
+            public Connection getConnection() {
+                return connection;
+            }
+        };
 
-        Channel c3 = mock(Channel.class);
-        when(c3.isOpen()).thenReturn(true);
-        when(c3.getConnection()).thenReturn(connection);
+        TestChannel c3 = new TestChannel() {
+            @Override
+            public Connection getConnection() {
+                return connection;
+            }
+        };
 
-        RmqChannelManager delegate = mock(RmqChannelManager.class);
-        when(delegate.createChannel(anyString())).thenReturn(c1, c2, c3);
-
+        RmqChannelManager delegate = new TestChannelManager(c1, c2, c3);
         PoolingChannelManager m = new PoolingChannelManager(delegate, 2);
         Channel pc1 = m.createChannel("c1");
         Channel pc2 = m.createChannel("c1");
@@ -90,14 +94,29 @@ public class PoolingChannelManagerTest {
         pc2.close();
         pc3.close();
 
-        verify(c1, times(0)).close();
-        verify(c2, times(0)).close();
-        verify(c3, times(0)).close();
-        
+        assertTrue(c1.open);
+        assertTrue(c2.open);
+        assertTrue(c3.open);
+
         m.close();
 
-        verify(c1).close();
-        verify(c2).close();
-        verify(c3).close();
+        assertFalse(c1.open);
+        assertFalse(c2.open);
+        assertFalse(c3.open);
+    }
+
+    static class TestChannelManager implements RmqChannelManager {
+        final AtomicInteger counter;
+        final TestChannel[] channels;
+
+        public TestChannelManager(TestChannel... channels) {
+            this.counter = new AtomicInteger();
+            this.channels = channels;
+        }
+
+        @Override
+        public Channel createChannel(String connectionName) {
+            return channels[counter.getAndIncrement()];
+        }
     }
 }

@@ -27,43 +27,40 @@ import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.TimeoutException;
 
 import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.Mockito.*;
 
 public class PoolAwareChannelTest {
 
     @Test
     public void close() throws IOException, TimeoutException {
-        Channel delegate = mock(Channel.class);
-        when(delegate.isOpen()).thenReturn(true);
+        TestChannel delegate = new TestChannel();
 
         BlockingQueue<Channel> cache = new LinkedBlockingQueue<>(5);
-        PoolAwareChannel channel  = new PoolAwareChannel(delegate, cache);
-
+        PoolAwareChannel channel = new PoolAwareChannel(delegate, cache);
 
         assertTrue(channel.isOpen());
         channel.close();
         assertFalse(channel.isOpen());
 
         // underlying channel should stay open
-        verify(delegate, times(0)).close();
+        assertTrue(delegate.open);
         assertSame(delegate, cache.poll());
     }
 
     @Test
     public void close_CacheIsFull() throws IOException, TimeoutException {
-        Channel delegate = mock(Channel.class);
-        when(delegate.isOpen()).thenReturn(true);
+        TestChannel delegate = new TestChannel();
 
         BlockingQueue<Channel> filledCache = new LinkedBlockingQueue<>(1);
-        filledCache.offer(mock((Channel.class)));
+        filledCache.offer(new TestChannel());
 
-        PoolAwareChannel channel  = new PoolAwareChannel(delegate, filledCache);
+        PoolAwareChannel channel = new PoolAwareChannel(delegate, filledCache);
 
         assertTrue(channel.isOpen());
         channel.close();
         assertFalse(channel.isOpen());
 
         // underlying channel could not be cached and should have been closed
-        verify(delegate, times(1)).close();
+        assertFalse(delegate.open);
     }
+
 }

@@ -46,6 +46,7 @@
         <rabbitmq.version>5.25.0</rabbitmq.version>
         <commons.lang.version>3.18.0</commons.lang.version>
         <commons.compress.version>1.26.1</commons.compress.version>
+        <commons.io.version>2.19.0</commons.io.version>
     </properties>
 
     <scm>
@@ -135,6 +136,11 @@
                         <artifactId>commons-io</artifactId>
                     </exclusion>
                 </exclusions>
+            </dependency>
+            <dependency>
+                <groupId>commons-io</groupId>
+                <artifactId>commons-io</artifactId>
+                <version>${commons.io.version}</version>
             </dependency>
         </dependencies>
     </dependencyManagement>

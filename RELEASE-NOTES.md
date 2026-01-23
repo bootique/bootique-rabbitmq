@@ -1,3 +1,7 @@
+## 4.0-M3
+
+* #25 Upgrade Testcontainers to 2.0.3
+
 ## 4.0-M1
 
 * #24 Upgrade RabbitMQ client to 5.25.0

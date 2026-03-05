@@ -16,7 +16,7 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package io.bootique.rabbitmq.junit5.tester;
+package io.bootique.rabbitmq.junit.tester;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonTypeName;
@@ -24,7 +24,7 @@ import com.rabbitmq.client.ConnectionFactory;
 import io.bootique.di.Injector;
 import io.bootique.di.Key;
 import io.bootique.rabbitmq.client.connection.ConnectionFactoryFactory;
-import io.bootique.rabbitmq.junit5.RmqTester;
+import io.bootique.rabbitmq.junit.RmqTester;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

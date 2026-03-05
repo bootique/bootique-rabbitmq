@@ -16,7 +16,7 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package io.bootique.rabbitmq.junit5.tester;
+package io.bootique.rabbitmq.junit.tester;
 
 import io.bootique.BQCoreModule;
 import io.bootique.BQCoreModuleExtender;

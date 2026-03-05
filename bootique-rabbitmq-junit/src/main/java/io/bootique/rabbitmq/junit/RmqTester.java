@@ -16,7 +16,7 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package io.bootique.rabbitmq.junit5;
+package io.bootique.rabbitmq.junit;
 
 import io.bootique.BQModule;
 import io.bootique.di.Binder;
@@ -24,7 +24,7 @@ import io.bootique.di.Key;
 import io.bootique.junit.BQTestScope;
 import io.bootique.junit.scope.BQAfterScopeCallback;
 import io.bootique.junit.scope.BQBeforeScopeCallback;
-import io.bootique.rabbitmq.junit5.tester.ConnectionPropertyBuilder;
+import io.bootique.rabbitmq.junit.tester.ConnectionPropertyBuilder;
 import org.junit.jupiter.api.extension.ExtensionContext;
 import org.testcontainers.containers.RabbitMQContainer;
 

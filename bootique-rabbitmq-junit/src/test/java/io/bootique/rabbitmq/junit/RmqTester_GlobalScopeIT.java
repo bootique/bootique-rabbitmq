@@ -17,7 +17,7 @@
  * under the License.
  */
 
-package io.bootique.rabbitmq.junit5;
+package io.bootique.rabbitmq.junit;
 
 import com.rabbitmq.client.Connection;
 import io.bootique.BQRuntime;
@@ -27,6 +27,7 @@ import io.bootique.junit.BQTest;
 import io.bootique.junit.BQTestScope;
 import io.bootique.junit.BQTestTool;
 import io.bootique.rabbitmq.client.connection.RmqConnectionManager;
+import io.bootique.rabbitmq.junit.RmqTester;
 
 import java.io.IOException;
 import java.util.concurrent.TimeoutException;

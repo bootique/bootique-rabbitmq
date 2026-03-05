@@ -17,7 +17,7 @@
  * under the License.
  */
 
-package io.bootique.rabbitmq.junit5;
+package io.bootique.rabbitmq.junit;
 
 import io.bootique.junit.BQTest;
 import io.bootique.rabbitmq.client.connection.RmqConnectionManager;
@@ -27,8 +27,8 @@ import java.io.IOException;
 import java.util.concurrent.TimeoutException;
 
 @BQTest
-public class RmqTester_GlobalScope1IT extends RmqTester_GlobalScopeIT {
-
+public class RmqTester_GlobalScope2IT extends RmqTester_GlobalScopeIT {
+    
     @Test
     public void appInitialized() throws IOException, TimeoutException {
         assertCanOpenChannel(app.getInstance(RmqConnectionManager.class));

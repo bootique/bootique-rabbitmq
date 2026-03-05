@@ -17,14 +17,9 @@
  * under the License.
  */
 
-package io.bootique.rabbitmq.junit5;
+package io.bootique.rabbitmq.junit;
 
-import com.rabbitmq.client.Connection;
-import io.bootique.BQRuntime;
-import io.bootique.Bootique;
-import io.bootique.junit.BQApp;
 import io.bootique.junit.BQTest;
-import io.bootique.junit.BQTestTool;
 import io.bootique.rabbitmq.client.connection.RmqConnectionManager;
 import org.junit.jupiter.api.Test;
 
@@ -32,26 +27,10 @@ import java.io.IOException;
 import java.util.concurrent.TimeoutException;
 
 @BQTest
-public class RmqTesterIT {
-
-    @BQTestTool
-    static final RmqTester rmq = RmqTester.create("rabbitmq:3.8.5-alpine");
-
-    @BQApp(skipRun = true)
-    static final BQRuntime app = Bootique
-            .app()
-            .autoLoadModules()
-            .module(rmq.moduleWithTestRmqClient("c1"))
-            .createRuntime();
+public class RmqTester_GlobalScope1IT extends RmqTester_GlobalScopeIT {
 
     @Test
     public void appInitialized() throws IOException, TimeoutException {
         assertCanOpenChannel(app.getInstance(RmqConnectionManager.class));
-    }
-
-    private void assertCanOpenChannel(RmqConnectionManager connectionManager) throws IOException, TimeoutException {
-        try (Connection connection = connectionManager.forName("c1")) {
-            connection.openChannel().get().close();
-        }
     }
 }

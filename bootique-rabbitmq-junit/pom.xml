@@ -26,12 +26,12 @@
     </parent>
     <modelVersion>4.0.0</modelVersion>
 
-    <artifactId>bootique-rabbitmq-junit5</artifactId>
+    <artifactId>bootique-rabbitmq-junit</artifactId>
     <packaging>jar</packaging>
 
-    <name>bootique-rabbitmq-junit5: JUnit 5-based helper classes for unit tests with RabbitMQ</name>
+    <name>bootique-rabbitmq-junit: JUnit-based helper classes for unit tests with RabbitMQ</name>
     <description>
-        Provides JUnit 5 based helper classes for unit tests with RabbitMQ
+        Provides JUnit based helper classes for unit tests with RabbitMQ
     </description>
 
     <dependencies>

@@ -19,7 +19,7 @@
 
 package io.bootique.rabbitmq.junit5;
 
-import io.bootique.junit5.BQTest;
+import io.bootique.junit.BQTest;
 import io.bootique.rabbitmq.client.connection.RmqConnectionManager;
 import org.junit.jupiter.api.Test;
 

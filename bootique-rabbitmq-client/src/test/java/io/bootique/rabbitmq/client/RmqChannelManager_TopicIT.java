@@ -23,7 +23,7 @@ import com.rabbitmq.client.Channel;
 import com.rabbitmq.client.GetResponse;
 import io.bootique.BQCoreModule;
 import io.bootique.BQRuntime;
-import io.bootique.junit5.BQTest;
+import io.bootique.junit.BQTest;
 import io.bootique.rabbitmq.client.channel.RmqChannelManager;
 import io.bootique.rabbitmq.client.topology.RmqTopologyBuilder;
 import io.bootique.rabbitmq.client.unit.RabbitMQBaseTest;
